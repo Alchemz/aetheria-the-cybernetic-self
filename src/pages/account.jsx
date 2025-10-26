@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, User, Mail, Calendar, MapPin, Clock, LogOut } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { APP_CONFIG } from '@/config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input'; // Keeping this import as it was in the original, even if not explicitly used in the JSX
 
@@ -24,6 +25,27 @@ export default function AccountPage() {
   const checkAuthAndLoadUser = async () => {
     try {
       setIsLoading(true);
+      
+      if (APP_CONFIG.BYPASS_AUTH) {
+        const demoUser = {
+          full_name: 'Demo User',
+          email: 'demo@example.com',
+          birth_date: '',
+          birth_time: '',
+          birth_location: '',
+          subscription_status: 'active'
+        };
+        setUser(demoUser);
+        setFormData({
+          full_name: demoUser.full_name || '',
+          birth_date: demoUser.birth_date || '',
+          birth_time: demoUser.birth_time || '',
+          birth_location: demoUser.birth_location || ''
+        });
+        setIsLoading(false);
+        return;
+      }
+      
       const authenticated = await base44.auth.isAuthenticated();
       
       if (!authenticated) {

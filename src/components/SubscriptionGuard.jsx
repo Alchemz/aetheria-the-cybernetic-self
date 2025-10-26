@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import { APP_CONFIG } from '@/config';
 
 export default function SubscriptionGuard({ requiredProduct, children }) {
   // BETA MODE: Bypassing all subscription checks
   // TODO: Re-enable subscription checks after beta testing
-  const BETA_MODE = true;
+  const BETA_MODE = APP_CONFIG.BETA_MODE;
 
   const [hasAccess, setHasAccess] = useState(false);
   const [loading, setLoading] = useState(true);

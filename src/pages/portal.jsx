@@ -2,12 +2,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { APP_CONFIG } from '@/config';
 import * as THREE from 'three';
 
 export default function SovereignPortal() {
   const [currentRealm, setCurrentRealm] = useState(0);
-  const [isAuthenticating, setIsAuthenticating] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(!APP_CONFIG.BYPASS_AUTH);
+  const [isAuthenticated, setIsAuthenticated] = useState(APP_CONFIG.BYPASS_AUTH);
   const [synchronyOpen, setSynchronyOpen] = useState(false); // Added synchronyOpen state
   const scrollContainerRef = useRef(null);
   const canvasRef = useRef(null);
@@ -67,6 +68,12 @@ export default function SovereignPortal() {
 
   // Check authentication on mount
   useEffect(() => {
+    if (APP_CONFIG.BYPASS_AUTH) {
+      setIsAuthenticated(true);
+      setIsAuthenticating(false);
+      return;
+    }
+    
     const checkAuth = async () => {
       try {
         const authenticated = await base44.auth.isAuthenticated();
