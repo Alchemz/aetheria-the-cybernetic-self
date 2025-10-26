@@ -1,76 +1,76 @@
 import Layout from "./Layout.jsx";
 
-import foundation from "./foundation";
+import Foundation from "./foundation";
 
-import portal from "./portal";
+import Portal from "./portal";
 
-import wisdomwell from "./wisdomwell";
+import Wisdomwell from "./wisdomwell";
 
-import nexus from "./nexus";
+import Nexus from "./nexus";
 
-import nexus-frequency-lab from "./nexus-frequency-lab";
+import NexusFrequencyLab from "./nexus-frequency-lab";
 
-import nexus-cosmic-library from "./nexus-cosmic-library";
+import NexusCosmicLibrary from "./nexus-cosmic-library";
 
-import account from "./account";
+import Account from "./account";
 
-import nexus-pineal-atrium from "./nexus-pineal-atrium";
+import NexusPinealAtrium from "./nexus-pineal-atrium";
 
-import nexus-biohacking-lab from "./nexus-biohacking-lab";
+import NexusBiohackingLab from "./nexus-biohacking-lab";
 
-import nexus-cosmic-observatory from "./nexus-cosmic-observatory";
+import NexusCosmicObservatory from "./nexus-cosmic-observatory";
 
-import subscribe from "./subscribe";
+import Subscribe from "./subscribe";
 
-import heartwave from "./heartwave";
+import Heartwave from "./heartwave";
 
-import admin-setup from "./admin-setup";
+import AdminSetup from "./admin-setup";
 
-import heartwave-protocols from "./heartwave-protocols";
+import HeartwaveProtocols from "./heartwave-protocols";
 
-import heartwave-athena from "./heartwave-athena";
+import HeartwaveAthena from "./heartwave-athena";
 
-import heartwave-console from "./heartwave-console";
+import HeartwaveConsole from "./heartwave-console";
 
-import synchrony from "./synchrony";
+import Synchrony from "./synchrony";
 
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 
 const PAGES = {
     
-    foundation: foundation,
+    foundation: Foundation,
     
-    portal: portal,
+    portal: Portal,
     
-    wisdomwell: wisdomwell,
+    wisdomwell: Wisdomwell,
     
-    nexus: nexus,
+    nexus: Nexus,
     
-    nexus-frequency-lab: nexus-frequency-lab,
+    'nexus-frequency-lab': NexusFrequencyLab,
     
-    nexus-cosmic-library: nexus-cosmic-library,
+    'nexus-cosmic-library': NexusCosmicLibrary,
     
-    account: account,
+    account: Account,
     
-    nexus-pineal-atrium: nexus-pineal-atrium,
+    'nexus-pineal-atrium': NexusPinealAtrium,
     
-    nexus-biohacking-lab: nexus-biohacking-lab,
+    'nexus-biohacking-lab': NexusBiohackingLab,
     
-    nexus-cosmic-observatory: nexus-cosmic-observatory,
+    'nexus-cosmic-observatory': NexusCosmicObservatory,
     
-    subscribe: subscribe,
+    subscribe: Subscribe,
     
-    heartwave: heartwave,
+    heartwave: Heartwave,
     
-    admin-setup: admin-setup,
+    'admin-setup': AdminSetup,
     
-    heartwave-protocols: heartwave-protocols,
+    'heartwave-protocols': HeartwaveProtocols,
     
-    heartwave-athena: heartwave-athena,
+    'heartwave-athena': HeartwaveAthena,
     
-    heartwave-console: heartwave-console,
+    'heartwave-console': HeartwaveConsole,
     
-    synchrony: synchrony,
+    synchrony: Synchrony,
     
 }
 
@@ -96,42 +96,42 @@ function PagesContent() {
         <Layout currentPageName={currentPage}>
             <Routes>            
                 
-                    <Route path="/" element={<foundation />} />
+                    <Route path="/" element={<Foundation />} />
                 
                 
-                <Route path="/foundation" element={<foundation />} />
+                <Route path="/foundation" element={<Foundation />} />
                 
-                <Route path="/portal" element={<portal />} />
+                <Route path="/portal" element={<Portal />} />
                 
-                <Route path="/wisdomwell" element={<wisdomwell />} />
+                <Route path="/wisdomwell" element={<Wisdomwell />} />
                 
-                <Route path="/nexus" element={<nexus />} />
+                <Route path="/nexus" element={<Nexus />} />
                 
-                <Route path="/nexus-frequency-lab" element={<nexus-frequency-lab />} />
+                <Route path="/nexus-frequency-lab" element={<NexusFrequencyLab />} />
                 
-                <Route path="/nexus-cosmic-library" element={<nexus-cosmic-library />} />
+                <Route path="/nexus-cosmic-library" element={<NexusCosmicLibrary />} />
                 
-                <Route path="/account" element={<account />} />
+                <Route path="/account" element={<Account />} />
                 
-                <Route path="/nexus-pineal-atrium" element={<nexus-pineal-atrium />} />
+                <Route path="/nexus-pineal-atrium" element={<NexusPinealAtrium />} />
                 
-                <Route path="/nexus-biohacking-lab" element={<nexus-biohacking-lab />} />
+                <Route path="/nexus-biohacking-lab" element={<NexusBiohackingLab />} />
                 
-                <Route path="/nexus-cosmic-observatory" element={<nexus-cosmic-observatory />} />
+                <Route path="/nexus-cosmic-observatory" element={<NexusCosmicObservatory />} />
                 
-                <Route path="/subscribe" element={<subscribe />} />
+                <Route path="/subscribe" element={<Subscribe />} />
                 
-                <Route path="/heartwave" element={<heartwave />} />
+                <Route path="/heartwave" element={<Heartwave />} />
                 
-                <Route path="/admin-setup" element={<admin-setup />} />
+                <Route path="/admin-setup" element={<AdminSetup />} />
                 
-                <Route path="/heartwave-protocols" element={<heartwave-protocols />} />
+                <Route path="/heartwave-protocols" element={<HeartwaveProtocols />} />
                 
-                <Route path="/heartwave-athena" element={<heartwave-athena />} />
+                <Route path="/heartwave-athena" element={<HeartwaveAthena />} />
                 
-                <Route path="/heartwave-console" element={<heartwave-console />} />
+                <Route path="/heartwave-console" element={<HeartwaveConsole />} />
                 
-                <Route path="/synchrony" element={<synchrony />} />
+                <Route path="/synchrony" element={<Synchrony />} />
                 
             </Routes>
         </Layout>
