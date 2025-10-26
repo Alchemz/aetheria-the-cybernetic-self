@@ -40,7 +40,30 @@ This is a Vite + React application that connects to the Base44 API. The app prov
 - **Run**: `npx vite preview --host 0.0.0.0 --port 5000`
 
 ## Authentication
-The app uses Base44 SDK for authentication. Users must be logged in through the Base44 platform to access most features. The 401 authentication errors in console are expected for unauthenticated users.
+
+### Demo Mode (Currently Active)
+The app is configured to run in **demo mode** with Base44 authentication completely bypassed. This allows you to develop and test all features locally without needing Base44 credentials.
+
+**Configuration**: `/src/config.js`
+```javascript
+{
+  DEMO_MODE: true,
+  BETA_MODE: true,
+  BYPASS_AUTH: true  // ← Set to false to re-enable Base44 auth
+}
+```
+
+When `BYPASS_AUTH` is enabled:
+- Mock authentication returns demo user data
+- No redirects to external Base44 login
+- Full access to all app features
+- Subscription checks are bypassed
+
+### Production Mode
+To re-enable Base44 authentication for production:
+1. Set `BYPASS_AUTH: false` in `/src/config.js`
+2. Users will need to authenticate through Base44 platform
+3. Subscription and access controls will be enforced
 
 ## Key Files
 - `vite.config.js` - Vite configuration with proxy settings
