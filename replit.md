@@ -15,7 +15,17 @@ INNERSYNC is a Vite + React meditation and wellness platform featuring 3D graphi
 ## Recent Changes
 **Date**: October 26, 2025
 
-### Supabase Migration
+### OpenAI Streaming Integration ✅ COMPLETED
+Integrated OpenAI API with streaming support for both AI assistants:
+1. **Created OpenAI Service**: New `src/api/openaiService.js` with streaming and non-streaming functions
+2. **Updated Integrations**: `src/api/integrations.js` now exports `InvokeLLM` and `InvokeLLMStream`
+3. **Athena AI (HeartWave)**: Updated to stream responses with user bio-mods context
+4. **Dream Assistant (Foundation)**: Updated to stream responses with dream journal context
+5. **Context Embedding**: User context (profile, bio-mods, dream journal) properly embedded in messages array
+6. **Streaming UI**: Added real-time chunk-by-chunk text display with streaming cursor animation
+7. **Error Handling**: Robust error handling for API failures
+
+### Supabase Migration ✅ COMPLETED
 Successfully migrated from Base44 authentication to Supabase:
 1. **Removed Base44 SDK**: Uninstalled `@base44/sdk` package
 2. **Installed Supabase**: Added `@supabase/supabase-js`
@@ -25,9 +35,12 @@ Successfully migrated from Base44 authentication to Supabase:
 6. **Preserved Demo Mode**: BYPASS_AUTH flag still available for local development
 
 ### Files Modified
-- `src/api/supabaseClient.js` - NEW: Supabase client and auth helpers
+- `src/api/openaiService.js` - NEW: OpenAI client with streaming support
+- `src/api/integrations.js` - Updated to use OpenAI service
+- `src/pages/heartwave-athena.jsx` - Updated with streaming and bio-mods context
+- `src/pages/foundation.jsx` - Updated with streaming and dream journal context
+- `src/api/supabaseClient.js` - Supabase client and auth helpers
 - `src/api/base44Client.js` - DELETED
-- `src/api/integrations.js` - Stubbed out (needs replacement with your OpenAI integration)
 - All pages updated: `portal.jsx`, `account.jsx`, `subscribe.jsx`, `foundation.jsx`, `heartwave-*.jsx`, `nexus-*.jsx`, `synchrony.jsx`, `admin-setup.jsx`
 - `src/components/SubscriptionGuard.jsx` - Updated for Supabase
 - `vite.config.js` - Added environment variable injection
@@ -136,14 +149,33 @@ To enable real authentication:
 3. Configure Supabase auth methods
 4. Test signup/login flow
 
-## Integration Notes
+## AI Integration
 
-### OpenAI / LLM Integration
-The `src/api/integrations.js` file currently has placeholder exports for:
-- `InvokeLLM` - Used in HeartWave Athena (AI chat)
-- Other Base44 integrations (SendEmail, UploadFile, etc.)
+### OpenAI Integration ✅ ACTIVE
+The app now uses OpenAI's `gpt-4o-mini` model for both AI assistants with streaming support.
 
-**TODO**: Replace with your own OpenAI agent workflow
+**Configuration**: `src/api/openaiService.js`
+- Model: `gpt-4o-mini`
+- Streaming: Enabled (chunk-by-chunk responses)
+- Temperature: 0.7
+- Max Tokens: 2000
+
+**AI Assistants**:
+1. **Dream Assistant** (Foundation Module)
+   - Workflow ID: `wf_68e61b27f9288190b15bf8ee1289fa580c52641aed33ca62`
+   - Context: User profile, recent dreams, dream journal entries
+   - Features: Dream interpretation, sleep guidance, consciousness mastery
+
+2. **Athena AI** (HeartWave Module)
+   - Workflow ID: `wf_68f0bd6c0efc8190a01a6b8f81ea19030dc679f4080c2874`
+   - Context: User profile, active bio-mods, habit tracking
+   - Features: Bio-protocol optimization, science explanations, habit adjustments
+
+**How It Works**:
+- User context is embedded as a system message in the API request
+- Responses stream in real-time with visual feedback (streaming cursor)
+- Context includes user profile, active protocols, and relevant history
+- Error handling provides graceful fallbacks
 
 ### Future: Native iOS App
 This codebase is designed to be converted to a native iOS app using **Capacitor** (not React Native):
@@ -156,14 +188,18 @@ This codebase is designed to be converted to a native iOS app using **Capacitor*
 Managed via Replit Secrets:
 - `SUPABASE_URL` - Your Supabase project URL
 - `SUPABASE_ANON_KEY` - Your Supabase anonymous/public key
+- `OPENAI_API_KEY` - Your OpenAI API key for AI assistants
 
-**Note**: These are currently hardcoded in `supabaseClient.js` for development. For production, use proper environment variable injection.
+**Note**: Supabase credentials are currently hardcoded in `supabaseClient.js` for development. For production, use proper environment variable injection.
 
 ## Key Files
 - `vite.config.js` - Vite configuration
 - `src/config.js` - App-wide configuration flags
 - `src/api/supabaseClient.js` - Supabase client and auth helpers
-- `src/api/integrations.js` - Placeholder for integrations (needs replacement)
+- `src/api/openaiService.js` - OpenAI client with streaming support
+- `src/api/integrations.js` - Integration wrapper functions
+- `src/pages/heartwave-athena.jsx` - Athena AI chat interface
+- `src/pages/foundation.jsx` - Dream Assistant and Sanctuary module
 - `src/pages/index.jsx` - Main routing configuration
 - `package.json` - Dependencies and scripts
 
