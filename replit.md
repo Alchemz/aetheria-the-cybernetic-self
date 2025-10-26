@@ -55,10 +55,26 @@ Successfully migrated from Base44 authentication to Supabase:
 2. Installed missing dependencies: `three`, `@tanstack/react-query`
 3. Configured Vite for Replit (host: 0.0.0.0, port: 5000, allowedHosts: true)
 
+## Architecture
+
+### Frontend + Backend Setup
+The app now uses a **secure client-server architecture** to protect API keys:
+
+**Frontend** (Port 5000):
+- Vite + React application
+- Serves the user interface
+- Calls backend API for OpenAI requests
+
+**Backend** (Port 3000):
+- Express.js API server
+- Handles OpenAI API calls with streaming
+- Protects API keys (never exposed to client)
+
 ## Workflow Configuration
 - **Name**: Server
-- **Command**: `npm run dev`
-- **Port**: 5000
+- **Command**: `npm run dev:all` (runs both frontend and backend)
+- **Frontend Port**: 5000
+- **Backend Port**: 3000
 - **Type**: Webview (Frontend preview)
 
 ## Authentication
@@ -172,10 +188,17 @@ The app now uses OpenAI's `gpt-4o-mini` model for both AI assistants with stream
    - Features: Bio-protocol optimization, science explanations, habit adjustments
 
 **How It Works**:
-- User context is embedded as a system message in the API request
+- Frontend calls secure backend API (never exposes OpenAI API key)
+- Backend embeds user context as system message in OpenAI request
 - Responses stream in real-time with visual feedback (streaming cursor)
 - Context includes user profile, active protocols, and relevant history
 - Error handling provides graceful fallbacks
+
+**Security Architecture**:
+- ✅ OpenAI API key stored server-side only (in `server.js`)
+- ✅ Frontend calls local backend API (`localhost:3000`)
+- ✅ Backend proxies requests to OpenAI
+- ✅ API key never exposed to browser/client code
 
 ### Future: Native iOS App
 This codebase is designed to be converted to a native iOS app using **Capacitor** (not React Native):
@@ -193,10 +216,16 @@ Managed via Replit Secrets:
 **Note**: Supabase credentials are currently hardcoded in `supabaseClient.js` for development. For production, use proper environment variable injection.
 
 ## Key Files
+
+### Backend
+- `server.js` - Express API server for secure OpenAI integration
+- Endpoints: `/api/chat/stream` (streaming) and `/api/chat` (non-streaming)
+
+### Frontend
 - `vite.config.js` - Vite configuration
 - `src/config.js` - App-wide configuration flags
 - `src/api/supabaseClient.js` - Supabase client and auth helpers
-- `src/api/openaiService.js` - OpenAI client with streaming support
+- `src/api/openaiService.js` - Frontend service that calls backend API
 - `src/api/integrations.js` - Integration wrapper functions
 - `src/pages/heartwave-athena.jsx` - Athena AI chat interface
 - `src/pages/foundation.jsx` - Dream Assistant and Sanctuary module

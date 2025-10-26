@@ -1,8 +1,9 @@
 // OpenAI Service for Dream Assistant and Athena
+// Calls secure backend API to protect API keys
 // Supports streaming responses with gpt-4o-mini
 
-const OPENAI_API_KEY = import.meta.env.OPENAI_API_KEY || '';
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+// Backend API URL (runs on port 3000)
+const API_BASE_URL = 'http://localhost:3000';
 
 // Workflow IDs
 const WORKFLOWS = {
@@ -49,30 +50,25 @@ export async function invokeAIWithStreaming({
     }
 
     const workflowId = workflow === 'dream' ? WORKFLOWS.DREAM_ASSISTANT : WORKFLOWS.ATHENA;
-    
-    const requestBody = {
-      model: 'gpt-4o-mini',
-      messages: apiMessages,
-      stream: true,
-      temperature: 0.7,
-      max_tokens: 2000
-    };
 
-    const response = await fetch(OPENAI_API_URL, {
+    // Call our secure backend API
+    const response = await fetch(`${API_BASE_URL}/api/chat/stream`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify({
+        messages: apiMessages,
+        workflow: workflowId
+      })
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`OpenAI API error: ${error.error?.message || response.statusText}`);
+      const error = await response.json().catch(() => ({ error: response.statusText }));
+      throw new Error(`API error: ${error.error || error.details || response.statusText}`);
     }
 
-    // Handle streaming response
+    // Handle streaming response (Server-Sent Events)
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let fullResponse = '';
@@ -94,7 +90,7 @@ export async function invokeAIWithStreaming({
 
           try {
             const parsed = JSON.parse(data);
-            const content = parsed.choices?.[0]?.delta?.content;
+            const content = parsed.content;
             
             if (content) {
               fullResponse += content;
@@ -140,28 +136,28 @@ export async function invokeAI({ prompt, workflow = 'athena', context = {} }) {
       role: 'user',
       content: prompt
     });
-    
-    const response = await fetch(OPENAI_API_URL, {
+
+    const workflowId = workflow === 'dream' ? WORKFLOWS.DREAM_ASSISTANT : WORKFLOWS.ATHENA;
+
+    // Call our secure backend API
+    const response = await fetch(`${API_BASE_URL}/api/chat`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
         messages: apiMessages,
-        temperature: 0.7,
-        max_tokens: 2000
+        workflow: workflowId
       })
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`OpenAI API error: ${error.error?.message || response.statusText}`);
+      const error = await response.json().catch(() => ({ error: response.statusText }));
+      throw new Error(`API error: ${error.error || error.details || response.statusText}`);
     }
 
     const data = await response.json();
-    return data.choices[0].message.content;
+    return data.content;
   } catch (error) {
     console.error('OpenAI API error:', error);
     throw error;
