@@ -2,8 +2,9 @@
 // Calls secure backend API to protect API keys
 // Supports streaming responses with gpt-4o-mini
 
-// Backend API URL (runs on port 3000)
-const API_BASE_URL = 'http://localhost:3000';
+// Backend API URL (proxied through Vite)
+// In production, this would be the actual backend URL
+const API_BASE_URL = '';
 
 // Workflow IDs
 const WORKFLOWS = {

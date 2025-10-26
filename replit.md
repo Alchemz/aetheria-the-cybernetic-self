@@ -16,14 +16,17 @@ INNERSYNC is a Vite + React meditation and wellness platform featuring 3D graphi
 **Date**: October 26, 2025
 
 ### OpenAI Streaming Integration ✅ COMPLETED
-Integrated OpenAI API with streaming support for both AI assistants:
-1. **Created OpenAI Service**: New `src/api/openaiService.js` with streaming and non-streaming functions
-2. **Updated Integrations**: `src/api/integrations.js` now exports `InvokeLLM` and `InvokeLLMStream`
-3. **Athena AI (HeartWave)**: Updated to stream responses with user bio-mods context
-4. **Dream Assistant (Foundation)**: Updated to stream responses with dream journal context
-5. **Context Embedding**: User context (profile, bio-mods, dream journal) properly embedded in messages array
-6. **Streaming UI**: Added real-time chunk-by-chunk text display with streaming cursor animation
-7. **Error Handling**: Robust error handling for API failures
+Integrated OpenAI API with **secure backend architecture** and streaming support:
+1. **Created Backend API Server**: `server.js` - Express server on port 3000 handles all OpenAI calls
+2. **Secure API Key Management**: OpenAI API key stored server-side only, never exposed to browser
+3. **Vite Proxy Configuration**: Frontend proxies `/api/*` requests to backend automatically
+4. **Created OpenAI Service**: `src/api/openaiService.js` calls backend API (not OpenAI directly)
+5. **Updated Integrations**: `src/api/integrations.js` exports `InvokeLLM` and `InvokeLLMStream`
+6. **Athena AI (HeartWave)**: Streams responses with user bio-mods context
+7. **Dream Assistant (Foundation)**: Streams responses with dream journal context
+8. **Context Embedding**: User context embedded as system messages
+9. **Streaming UI**: Real-time word-by-word display with cursor animation
+10. **Concurrent Servers**: `npm run dev:all` runs both frontend (5000) and backend (3000)
 
 ### Supabase Migration ✅ COMPLETED
 Successfully migrated from Base44 authentication to Supabase:
@@ -35,7 +38,10 @@ Successfully migrated from Base44 authentication to Supabase:
 6. **Preserved Demo Mode**: BYPASS_AUTH flag still available for local development
 
 ### Files Modified
-- `src/api/openaiService.js` - NEW: OpenAI client with streaming support
+- `server.js` - **NEW**: Express backend API for secure OpenAI integration
+- `package.json` - Added `dev:all` script to run both servers
+- `vite.config.js` - Added proxy configuration for `/api` requests
+- `src/api/openaiService.js` - **NEW**: Frontend service that calls backend API
 - `src/api/integrations.js` - Updated to use OpenAI service
 - `src/pages/heartwave-athena.jsx` - Updated with streaming and bio-mods context
 - `src/pages/foundation.jsx` - Updated with streaming and dream journal context
