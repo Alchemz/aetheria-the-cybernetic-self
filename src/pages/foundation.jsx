@@ -14,7 +14,9 @@ import {
 } from 'lucide-react';
 
 import { auth } from '@/api/supabaseClient';
-import SubscriptionGuard from '../components/SubscriptionGuard'; // Import SubscriptionGuard
+import { InvokeLLMStream } from '@/api/integrations';
+import { buildDreamContext } from '@/api/openaiService';
+import SubscriptionGuard from '../components/SubscriptionGuard';
 
 // Mark body as loaded when component mounts
 if (typeof document !== 'undefined') {
@@ -1064,6 +1066,8 @@ export default function SleepSanctuary() { // Renamed from Foundation to SleepSa
     { role: 'assistant', content: 'Welcome to The Sanctuary. I am your Dream Assistant, here to guide you on your journey to master sleep, dreams, and consciousness. How was your sleep last night?' }
   ]);
   const [isLoadingChat, setIsLoadingChat] = useState(false);
+  const [isStreamingChat, setIsStreamingChat] = useState(false);
+  const [streamingChatContent, setStreamingChatContent] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [dreamJournalEntry, setDreamJournalEntry] = useState('');
@@ -1322,7 +1326,7 @@ export default function SleepSanctuary() { // Renamed from Foundation to SleepSa
   }, [activePanel]);
   
   const handleChatSubmit = async () => {
-    if (!chatInput.trim() || isLoadingChat) return;
+    if (!chatInput.trim() || isLoadingChat || isStreamingChat) return;
 
     const userMessage = chatInput.trim();
     setChatInput('');
@@ -1330,6 +1334,8 @@ export default function SleepSanctuary() { // Renamed from Foundation to SleepSa
     // Add user message to chat
     setChatMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsLoadingChat(true);
+    setIsStreamingChat(true);
+    setStreamingChatContent('');
 
     try {
       // Build conversation context
@@ -1361,21 +1367,33 @@ User's new message: ${userMessage}
 
 Respond as the Dream Assistant with warmth, insight, and practical guidance:`;
 
-      const llmResponse = await base44.integrations.Core.InvokeLLM({ 
-        prompt: systemPrompt 
+      // Build context with user's dream journal and profile
+      const context = buildDreamContext(user, dreamJournalEntries);
+
+      // Call OpenAI with streaming
+      const fullResponse = await InvokeLLMStream({
+        prompt: systemPrompt,
+        workflow: 'dream',
+        context,
+        onChunk: (chunk) => {
+          // Update streaming content as chunks arrive
+          setStreamingChatContent(prev => prev + chunk);
+        }
       });
 
-      const assistantMessage = typeof llmResponse === 'string' ? llmResponse : llmResponse.response || llmResponse.message || 'I apologize, I encountered an error. How else can I assist you with your sleep journey?';
-      
-      setChatMessages(prev => [...prev, { role: 'assistant', content: assistantMessage }]);
+      // Add complete response to messages
+      setChatMessages(prev => [...prev, { role: 'assistant', content: fullResponse }]);
+      setStreamingChatContent('');
     } catch (error) {
       console.error('Chat error:', error);
       setChatMessages(prev => [...prev, { 
         role: 'assistant', 
         content: 'I apologize, I\'m having trouble connecting right now. Please try again in a moment.' 
       }]);
+      setStreamingChatContent('');
     } finally {
       setIsLoadingChat(false);
+      setIsStreamingChat(false);
     }
   };
 
@@ -1408,25 +1426,39 @@ Respond as the Dream Assistant with warmth, insight, and practical guidance:`;
     
     // Auto-interpret the dream
     setTimeout(async () => {
+      setIsStreamingChat(true);
+      setStreamingChatContent('');
+      
       try {
         const prompt = `You are the Dream Assistant. A user just shared this dream: "${newEntry.content}". 
           
 Provide a warm, insightful interpretation. Frame it as possibilities, connect symbols to potential meanings, and end by asking if it resonates with them.`;
 
-        const llmResponse = await base44.integrations.Core.InvokeLLM({ 
-          prompt: prompt 
+        // Build context with user's dream journal and profile
+        const context = buildDreamAssistantContext(user, updatedEntries);
+
+        // Call OpenAI with streaming
+        const interpretation = await InvokeLLMStream({
+          prompt,
+          workflow: 'dream',
+          context,
+          onChunk: (chunk) => {
+            setStreamingChatContent(prev => prev + chunk);
+          }
         });
         
-        const interpretation = typeof llmResponse === 'string' ? llmResponse : llmResponse.response || llmResponse.message || 'Thank you for sharing your dream. What feelings did you experience during this dream?';
         setChatMessages(prev => [...prev, { role: 'assistant', content: interpretation }]);
+        setStreamingChatContent('');
       } catch (error) {
         console.error('Dream interpretation error:', error);
         setChatMessages(prev => [...prev, { 
           role: 'assistant', 
           content: 'Thank you for sharing your dream. I\'m having trouble providing an interpretation right now, but I\'d love to hear more about how it made you feel.'
         }]);
+        setStreamingChatContent('');
       } finally {
         setIsLoadingChat(false);
+        setIsStreamingChat(false);
       }
     }, 500);
   };
@@ -3754,7 +3786,15 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
                               {msg.content}
                             </div>
                           ))}
-                          {isLoadingChat && (
+                          {/* Streaming message (appears as chunks arrive) */}
+                          {isStreamingChat && streamingChatContent && (
+                            <div className="chat-message assistant">
+                              {streamingChatContent}
+                              <span className="streaming-cursor">▊</span>
+                            </div>
+                          )}
+                          {/* Loading indicator (before streaming starts) */}
+                          {isLoadingChat && !streamingChatContent && (
                             <div className="chat-message assistant loading">
                               Consulting the dreamscape...
                             </div>

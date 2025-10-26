@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { auth } from '@/api/supabaseClient';
+import { InvokeLLMStream } from '@/api/integrations';
+import { buildAthenaContext } from '@/api/openaiService';
 import SubscriptionGuard from '../components/SubscriptionGuard';
 
 export default function HeartWaveAthena() {
@@ -20,10 +22,12 @@ export default function HeartWaveAthena() {
       content: 'Welcome to ATHENA. I\'m your Bio-Integration AI Agent. I can help you optimize your protocols, explain the science behind each practice, and adapt your routine to your goals and progress. How can I assist you today?'
     }
   ]);
-  const [inputMessage, setInputMessage] = useState(''); // Renamed from 'input'
+  const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamingContent, setStreamingContent] = useState('');
   const [user, setUser] = useState(null);
-  const messagesEndRef = useRef(null); // Added useRef
+  const messagesEndRef = useRef(null);
 
   // Set background immediately on mount to prevent flash
   useEffect(() => {
@@ -33,10 +37,23 @@ export default function HeartWaveAthena() {
     };
   }, []);
 
+  // Load user data on mount
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const currentUser = await auth.me();
+        setUser(currentUser);
+      } catch (error) {
+        console.error('Error loading user:', error);
+      }
+    };
+    loadUser();
+  }, []);
+
   // Scroll to the bottom of messages whenever messages or loading state changes
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isLoading]);
+  }, [messages, isLoading, streamingContent]);
 
   // Complete Bio-Mods database
   const bioModsData = {
@@ -552,31 +569,47 @@ Respond as ATHENA, providing insightful, relevant, and actionable guidance based
   };
 
   const handleSend = async () => {
-    if (!inputMessage.trim() || isLoading) return; // Use inputMessage
+    if (!inputMessage.trim() || isLoading || isStreaming) return;
 
     const userMessage = inputMessage.trim();
-    setInputMessage(''); // Use setInputMessage
+    setInputMessage('');
     
+    // Add user message
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
+    setIsStreaming(true);
+    setStreamingContent('');
 
     try {
       const prompt = constructPrompt(userMessage);
+      
+      // Build context with user's active bio-mods
+      const context = buildAthenaContext(user, bioModsData);
 
-      const response = await base44.integrations.Core.InvokeLLM({
-        prompt: prompt,
-        add_context_from_internet: false
+      // Call OpenAI with streaming
+      const fullResponse = await InvokeLLMStream({
+        prompt,
+        workflow: 'athena',
+        context,
+        onChunk: (chunk) => {
+          // Update streaming content as chunks arrive
+          setStreamingContent(prev => prev + chunk);
+        }
       });
 
-      setMessages(prev => [...prev, { role: 'assistant', content: response }]);
+      // Add complete response to messages
+      setMessages(prev => [...prev, { role: 'assistant', content: fullResponse }]);
+      setStreamingContent('');
     } catch (error) {
       console.error('Error calling AI:', error);
       setMessages(prev => [...prev, { 
         role: 'assistant', 
         content: 'I apologize, but I\'m experiencing technical difficulties. Please try again in a moment.' 
       }]);
+      setStreamingContent('');
     } finally {
       setIsLoading(false);
+      setIsStreaming(false);
     }
   };
 
@@ -934,7 +967,18 @@ Respond as ATHENA, providing insightful, relevant, and actionable guidance based
               </div>
             ))}
 
-            {isLoading && (
+            {/* Streaming message (appears as chunks arrive) */}
+            {isStreaming && streamingContent && (
+              <div className="hw-message assistant">
+                <div className="hw-message-bubble">
+                  {streamingContent}
+                  <span className="hw-streaming-cursor">▊</span>
+                </div>
+              </div>
+            )}
+
+            {/* Loading indicator (before streaming starts) */}
+            {isLoading && !streamingContent && (
               <div className="hw-message assistant">
                 <div className="hw-message-bubble">
                   <div className="hw-loading">

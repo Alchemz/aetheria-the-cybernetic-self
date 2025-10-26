@@ -1,17 +1,38 @@
-// TODO: Replace Base44 integrations with your own OpenAI/LLM integration
-// The following Base44-specific integrations need to be replaced:
-// - InvokeLLM (for AI chat functionality)
-// - SendEmail
-// - UploadFile, UploadPrivateFile
-// - GenerateImage
-// - ExtractDataFromUploadedFile
-// - CreateFileSignedUrl
+// OpenAI Integration using custom workflows
+// Replaces Base44 integrations with OpenAI gpt-4o-mini
 
-// Placeholder exports to prevent import errors
-// Replace these with your actual integrations
+import { invokeAI, invokeAIWithStreaming } from './openaiService';
 
-export const Core = null;
-export const InvokeLLM = null;
+// Core integration object that matches Base44 API structure
+export const Core = {
+  // Main LLM invocation function (non-streaming)
+  InvokeLLM: async ({ prompt, workflow = 'athena', context = {}, add_context_from_internet = false }) => {
+    const response = await invokeAI({ 
+      prompt, 
+      workflow,
+      context 
+    });
+    return response;
+  },
+
+  // Streaming version for real-time responses
+  InvokeLLMStream: async ({ prompt, workflow = 'athena', context = {}, onChunk, messages = [] }) => {
+    const response = await invokeAIWithStreaming({
+      prompt,
+      workflow,
+      context,
+      onChunk,
+      messages
+    });
+    return response;
+  }
+};
+
+// Shorthand exports
+export const InvokeLLM = Core.InvokeLLM;
+export const InvokeLLMStream = Core.InvokeLLMStream;
+
+// Placeholder exports for future integrations
 export const SendEmail = null;
 export const UploadFile = null;
 export const GenerateImage = null;
