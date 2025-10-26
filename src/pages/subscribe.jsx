@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import * as THREE from 'three';
 import { Check, Sparkles, ArrowLeft } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { auth } from '@/api/supabaseClient';
 import { Button } from '@/components/ui/button';
 
 export default function SubscribePage() {
@@ -23,7 +23,7 @@ export default function SubscribePage() {
 
   const loadUser = async () => {
     try {
-      const currentUser = await base44.auth.me();
+      const currentUser = await auth.me();
       setUser(currentUser);
     } catch (error) {
       console.error('Error loading user:', error);
@@ -109,7 +109,7 @@ export default function SubscribePage() {
       const trialEndDate = new Date();
       trialEndDate.setDate(trialEndDate.getDate() + 7);
 
-      await base44.auth.updateMe({
+      await auth.updateMe({
         subscription_status: 'trial',
         subscribed_products: ['sanctuary', 'nexus', 'heartwave'],
         subscription_type: 'all_bundle',

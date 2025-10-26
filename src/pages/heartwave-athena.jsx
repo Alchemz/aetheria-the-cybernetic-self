@@ -10,7 +10,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { base44 } from '@/api/base44Client';
+import { auth } from '@/api/supabaseClient';
 import SubscriptionGuard from '../components/SubscriptionGuard';
 
 export default function HeartWaveAthena() {
@@ -462,7 +462,7 @@ export default function HeartWaveAthena() {
 
   const loadUser = async () => {
     try {
-      const currentUser = await base44.auth.me();
+      const currentUser = await auth.me();
       setUser(currentUser);
     } catch (error) {
       console.error('Error loading user:', error);

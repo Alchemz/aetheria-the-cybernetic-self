@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { auth } from '@/api/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { Shield, Check } from 'lucide-react';
 
@@ -15,7 +15,7 @@ export default function AdminSetup() {
 
   const loadUser = async () => {
     try {
-      const currentUser = await base44.auth.me();
+      const currentUser = await auth.me();
       setUser(currentUser);
     } catch (err) {
       setError('Could not load user. Please refresh the page.');
@@ -38,7 +38,7 @@ export default function AdminSetup() {
     
     try {
       // Update directly from frontend
-      await base44.auth.updateMe({
+      await auth.updateMe({
         subscription_status: 'active',
         subscribed_products: ['sanctuary', 'nexus', 'heartwave'],
         subscription_type: 'all_bundle',

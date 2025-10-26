@@ -13,7 +13,7 @@ import {
   Home
 } from 'lucide-react';
 
-import { base44 } from '@/api/base44Client';
+import { auth } from '@/api/supabaseClient';
 import SubscriptionGuard from '../components/SubscriptionGuard'; // Import SubscriptionGuard
 
 // Mark body as loaded when component mounts

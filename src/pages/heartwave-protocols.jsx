@@ -22,7 +22,7 @@ import {
   Wind
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { base44 } from '@/api/base44Client';
+import { auth } from '@/api/supabaseClient';
 import SubscriptionGuard from '../components/SubscriptionGuard';
 
 export default function HeartWaveProtocols() {
@@ -44,7 +44,7 @@ export default function HeartWaveProtocols() {
 
   const loadUserBioMods = async () => {
     try {
-      const currentUser = await base44.auth.me();
+      const currentUser = await auth.me();
       setUser(currentUser);
       
       const userBioMods = currentUser.active_bio_mods || [];
@@ -521,7 +521,7 @@ export default function HeartWaveProtocols() {
     setActiveBioMods(newActiveBioMods);
     
     try {
-      await base44.auth.updateMe({
+      await auth.updateMe({
         active_bio_mods: newActiveBioMods
       });
     } catch (error) {

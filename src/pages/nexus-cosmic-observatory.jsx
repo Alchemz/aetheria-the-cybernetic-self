@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import * as THREE from 'three';
 import { ArrowLeft, Bell, Calendar, Sparkles, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { base44 } from '@/api/base44Client';
+import { auth } from '@/api/supabaseClient';
 
 export default function CosmicObservatory() {
   const mountRef = useRef(null);

@@ -10,7 +10,7 @@ import { format } from "date-fns";
 import { Calendar as CalendarIcon, Plus, Check, Info, Target, Flame, Zap, X, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from 'react-router-dom';
-import { base44 } from "@/api/base44Client";
+import { auth } from "@/api/supabaseClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import SubscriptionGuard from '../components/SubscriptionGuard';
 
@@ -36,7 +36,7 @@ export default function HeartWaveConsole() {
 
   const loadUserData = async () => {
     try {
-      const currentUser = await base44.auth.me();
+      const currentUser = await auth.me();
       setUser(currentUser);
       
       const userBioMods = currentUser.active_bio_mods || [];

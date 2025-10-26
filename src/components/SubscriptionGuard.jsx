@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { auth } from '@/api/supabaseClient';
 import { APP_CONFIG } from '@/config';
 
 export default function SubscriptionGuard({ requiredProduct, children }) {
@@ -23,7 +23,7 @@ export default function SubscriptionGuard({ requiredProduct, children }) {
 
   const checkAccess = async () => {
     try {
-      const user = await base44.auth.me();
+      const user = await auth.me();
       
       // Check if user has active subscription or trial
       const isActive = user.subscription_status === 'active' || user.subscription_status === 'trial';

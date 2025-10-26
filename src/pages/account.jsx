@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, User, Mail, Calendar, MapPin, Clock, LogOut } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { auth } from '@/api/supabaseClient';
 import { APP_CONFIG } from '@/config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input'; // Keeping this import as it was in the original, even if not explicitly used in the JSX
@@ -46,14 +46,14 @@ export default function AccountPage() {
         return;
       }
       
-      const authenticated = await base44.auth.isAuthenticated();
+      const authenticated = await auth.isAuthenticated();
       
       if (!authenticated) {
-        base44.auth.redirectToLogin('/account');
+        auth.redirectToLogin('/account');
         return; // Stop further execution if not authenticated
       }
 
-      const currentUser = await base44.auth.me();
+      const currentUser = await auth.me();
       console.log('Loaded user:', currentUser);
       setUser(currentUser);
       setFormData({
@@ -65,7 +65,7 @@ export default function AccountPage() {
     } catch (error) {
       console.error('Error loading user or authentication failed:', error);
       // If there's an error loading user (e.g., token expired or invalid), redirect to login
-      base44.auth.redirectToLogin('/account');
+      auth.redirectToLogin('/account');
     } finally {
       setIsLoading(false);
     }
@@ -73,7 +73,7 @@ export default function AccountPage() {
 
   const handleSave = async () => {
     try {
-      await base44.auth.updateMe(formData);
+      await auth.updateMe(formData);
       alert('Profile updated successfully!');
       await checkAuthAndLoadUser(); // Reload user data after successful save
       setIsEditing(false);
@@ -84,7 +84,7 @@ export default function AccountPage() {
   };
 
   const handleLogout = () => {
-    base44.auth.logout('/portal');
+    auth.logout('/portal');
   };
 
   if (isLoading) {

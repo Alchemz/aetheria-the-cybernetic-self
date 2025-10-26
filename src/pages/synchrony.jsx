@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import * as THREE from 'three';
 import { ArrowLeft } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { auth } from '@/api/supabaseClient';
 import { Button } from '@/components/ui/button';
 
 export default function Synchrony() {
@@ -240,7 +240,7 @@ export default function Synchrony() {
 
   const handleJoinSession = async () => {
     try {
-      const user = await base44.auth.me();
+      const user = await auth.me();
       if (!user) {
         alert('Please login to join the session');
         return;

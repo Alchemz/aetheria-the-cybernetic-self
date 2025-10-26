@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { auth } from '@/api/supabaseClient';
 import { APP_CONFIG } from '@/config';
 import * as THREE from 'three';
 
@@ -76,12 +76,12 @@ export default function SovereignPortal() {
     
     const checkAuth = async () => {
       try {
-        const authenticated = await base44.auth.isAuthenticated();
+        const authenticated = await auth.isAuthenticated();
         setIsAuthenticated(authenticated);
         
         if (!authenticated) {
           setTimeout(() => {
-            base44.auth.redirectToLogin('/portal');
+            auth.redirectToLogin('/portal');
           }, 2000);
         }
       } catch (error) {
