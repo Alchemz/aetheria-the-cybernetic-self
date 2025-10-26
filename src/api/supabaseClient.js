@@ -1,15 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Supabase credentials - loaded from environment variables
-// These are injected at build time via vite.config.js from Replit Secrets
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Supabase credentials
+// Note: These are public keys - safe to commit (anon key is meant for client-side use)
+const supabaseUrl = 'https://azbtiweuzixzqkcrmnwq.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6YnRpd2V1eml4enFrY3JtbndxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1MDExNTMsImV4cCI6MjA3NzA3NzE1M30.PmpdxGaA9ADUDrOercYHDDN9FeB1nPGwHdAS4pZi4tY';
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing Supabase environment variables. Please check your Replit Secrets.');
-}
-
-export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '');
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Helper functions to match the Base44 auth API
 export const auth = {
