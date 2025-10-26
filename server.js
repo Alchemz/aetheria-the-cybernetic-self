@@ -15,6 +15,12 @@ const openai = new OpenAI({
 app.use(cors());
 app.use(express.json());
 
+// Request logging middleware for debugging
+app.use((req, res, next) => {
+  console.log(`📨 ${req.method} ${req.path}`);
+  next();
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', openai: !!process.env.OPENAI_API_KEY });
@@ -93,7 +99,8 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Backend API server running on port ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Backend API server running on http://0.0.0.0:${PORT}`);
   console.log(`🔑 OpenAI API Key: ${process.env.OPENAI_API_KEY ? 'Configured ✅' : 'Missing ❌'}`);
+  console.log(`✅ Ready to accept requests from Vite proxy`);
 });
