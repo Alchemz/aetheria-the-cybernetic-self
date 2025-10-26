@@ -1061,6 +1061,7 @@ export default function SleepSanctuary() { // Renamed from Foundation to SleepSa
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [currentPlayingTrack, setCurrentPlayingTrack] = useState(frequencyTracks[selectedCategory][0]);
 
+  const [user, setUser] = useState(null);
   const [chatInput, setChatInput] = useState('');
   const [chatMessages, setChatMessages] = useState([
     { role: 'assistant', content: 'Welcome to The Sanctuary. I am your Dream Assistant, here to guide you on your journey to master sleep, dreams, and consciousness. How was your sleep last night?' }
@@ -1081,6 +1082,20 @@ export default function SleepSanctuary() { // Renamed from Foundation to SleepSa
   const [speechRecognitionAvailable, setSpeechRecognitionAvailable] = useState(false);
   const swiperRef = useRef(null);
   const recognitionRef = useRef(null);
+
+  // Load user profile
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const userData = await auth.me();
+        setUser(userData);
+      } catch (error) {
+        // User not logged in - demo mode
+        console.log('Not authenticated, using demo mode');
+      }
+    };
+    loadUser();
+  }, []);
 
   // Set initial scroll position immediately
   useEffect(() => {
