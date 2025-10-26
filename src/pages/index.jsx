@@ -96,7 +96,7 @@ function PagesContent() {
         <Layout currentPageName={currentPage}>
             <Routes>            
                 
-                    <Route path="/" element={<Foundation />} />
+                    <Route path="/" element={<Portal />} />
                 
                 
                 <Route path="/foundation" element={<Foundation />} />

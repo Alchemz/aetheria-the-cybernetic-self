@@ -15,6 +15,11 @@ INNERSYNC is a Vite + React meditation and wellness platform featuring 3D graphi
 ## Recent Changes
 **Date**: October 26, 2025
 
+### Portal as Landing Page ✅ COMPLETED
+Changed the default landing page from Foundation to Portal:
+- Updated root route "/" to render Portal instead of Foundation
+- Portal with 3D graphics is now the first thing users see
+
 ### Dream Assistant Fix ✅ COMPLETED
 Fixed Dream Assistant chat functionality:
 - Added missing `user` state variable to foundation.jsx
