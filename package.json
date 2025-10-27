@@ -9,7 +9,13 @@
     "dev:all": "node server.js & vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cap:sync": "npx cap sync",
+    "cap:open:ios": "npx cap open ios",
+    "cap:open:android": "npx cap open android",
+    "cap:build": "npm run build && npx cap sync",
+    "ios": "npm run cap:build && npm run cap:open:ios",
+    "android": "npm run cap:build && npm run cap:open:android"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.4",
