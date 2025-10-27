@@ -72,104 +72,104 @@ export default function Synchrony() {
   useEffect(() => {
     if (!mountRef.current) return;
 
-    let renderer;
+    let renderer, scene, camera, centralLight, animationId;
+    
     try {
-      const scene = new THREE.Scene();
+      scene = new THREE.Scene();
       scene.background = new THREE.Color(0x000000);
       sceneRef.current = scene;
 
-      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
       camera.position.z = 15;
 
       renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       mountRef.current.appendChild(renderer.domElement);
+
+      // Central Light Source - CYAN
+      const lightGeometry = new THREE.SphereGeometry(1, 32, 32);
+      const lightMaterial = new THREE.MeshBasicMaterial({
+        color: 0x00FFFF,
+        transparent: true,
+        opacity: 0.8
+      });
+      centralLight = new THREE.Mesh(lightGeometry, lightMaterial);
+      scene.add(centralLight);
+      centralLightRef.current = centralLight;
+
+      // Add glow effect to central light - CYAN
+      const glowGeometry = new THREE.SphereGeometry(1.5, 32, 32);
+      const glowMaterial = new THREE.MeshBasicMaterial({
+        color: 0x00FFFF,
+        transparent: true,
+        opacity: 0.3,
+        side: THREE.BackSide
+      });
+      const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+      centralLight.add(glow);
+
+      // Grid background - CYAN
+      const gridHelper = new THREE.GridHelper(50, 50, 0x00FFFF, 0x003333);
+      gridHelper.position.y = -10;
+      gridHelper.material.opacity = 0.1;
+      gridHelper.material.transparent = true;
+      scene.add(gridHelper);
+
+      const clock = new THREE.Clock();
+
+      const animate = () => {
+        const elapsedTime = clock.getElapsedTime();
+        
+        // Pulsate central light based on meditation phase
+        let pulse = Math.sin(elapsedTime * 2) * 0.2 + 1;
+        
+        // Sync pulse with breath in active meditation
+        if (meditationPhase === 'boxBreathing') {
+          pulse = (breathProgress / 100) * 0.5 + 0.7;
+        } else if (meditationPhase === 'aumToning') {
+          pulse = (breathProgress / 100) * 0.8 + 0.6;
+        }
+        
+        centralLight.scale.set(pulse, pulse, pulse);
+        
+        // Rotate particles
+        particlesRef.current.forEach((particle, index) => {
+          const radius = 3 + (index % 5);
+          const speed = 0.3 + (index % 3) * 0.1;
+          const offset = (index * Math.PI * 2) / particlesRef.current.length;
+          
+          particle.position.x = Math.cos(elapsedTime * speed + offset) * radius;
+          particle.position.y = Math.sin(elapsedTime * speed * 0.5 + offset) * (radius * 0.5);
+          particle.position.z = Math.sin(elapsedTime * speed + offset) * radius;
+        });
+
+        renderer.render(scene, camera);
+        animationId = requestAnimationFrame(animate);
+      };
+
+      animate();
+
+      const handleResize = () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      };
+
+      window.addEventListener('resize', handleResize);
+
+      return () => {
+        window.removeEventListener('resize', handleResize);
+        if (animationId) cancelAnimationFrame(animationId);
+        if (mountRef.current && renderer && renderer.domElement) {
+          mountRef.current.removeChild(renderer.domElement);
+        }
+        if (renderer) renderer.dispose();
+      };
     } catch (error) {
       console.warn('WebGL not available, running without 3D graphics:', error);
-      return;
+      return () => {}; // Return empty cleanup function
     }
-
-    // Central Light Source - CYAN
-    const lightGeometry = new THREE.SphereGeometry(1, 32, 32);
-    const lightMaterial = new THREE.MeshBasicMaterial({
-      color: 0x00FFFF,
-      transparent: true,
-      opacity: 0.8
-    });
-    const centralLight = new THREE.Mesh(lightGeometry, lightMaterial);
-    scene.add(centralLight);
-    centralLightRef.current = centralLight;
-
-    // Add glow effect to central light - CYAN
-    const glowGeometry = new THREE.SphereGeometry(1.5, 32, 32);
-    const glowMaterial = new THREE.MeshBasicMaterial({
-      color: 0x00FFFF,
-      transparent: true,
-      opacity: 0.3,
-      side: THREE.BackSide
-    });
-    const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-    centralLight.add(glow);
-
-    // Grid background - CYAN
-    const gridHelper = new THREE.GridHelper(50, 50, 0x00FFFF, 0x003333);
-    gridHelper.position.y = -10;
-    gridHelper.material.opacity = 0.1;
-    gridHelper.material.transparent = true;
-    scene.add(gridHelper);
-
-    const clock = new THREE.Clock();
-    let animationId;
-
-    const animate = () => {
-      const elapsedTime = clock.getElapsedTime();
-      
-      // Pulsate central light based on meditation phase
-      let pulse = Math.sin(elapsedTime * 2) * 0.2 + 1;
-      
-      // Sync pulse with breath in active meditation
-      if (meditationPhase === 'boxBreathing') {
-        pulse = (breathProgress / 100) * 0.5 + 0.7;
-      } else if (meditationPhase === 'aumToning') {
-        pulse = (breathProgress / 100) * 0.8 + 0.6;
-      }
-      
-      centralLight.scale.set(pulse, pulse, pulse);
-      
-      // Rotate particles
-      particlesRef.current.forEach((particle, index) => {
-        const radius = 3 + (index % 5);
-        const speed = 0.3 + (index % 3) * 0.1;
-        const offset = (index * Math.PI * 2) / particlesRef.current.length;
-        
-        particle.position.x = Math.cos(elapsedTime * speed + offset) * radius;
-        particle.position.y = Math.sin(elapsedTime * speed * 0.5 + offset) * (radius * 0.5);
-        particle.position.z = Math.sin(elapsedTime * speed + offset) * radius;
-      });
-
-      renderer.render(scene, camera);
-      animationId = requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animationId);
-      if (mountRef.current && renderer.domElement) {
-        mountRef.current.removeChild(renderer.domElement);
-      }
-      renderer.dispose();
-    };
   }, [meditationPhase, breathProgress]);
 
   // Update particle count - CYAN particles
