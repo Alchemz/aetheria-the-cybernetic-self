@@ -12,18 +12,27 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-// Initialize Supabase client using environment variables (secure)
-if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
-  console.error('❌ Missing Supabase credentials in environment variables');
-  console.error('Please set SUPABASE_URL and SUPABASE_ANON_KEY in Replit Secrets');
-  process.exit(1);
+// Initialize Supabase client (optional - used for caching only)
+let supabase = null;
+let supabaseAvailable = false;
+
+try {
+  if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+    // Clean up environment variables (fix Replit Secrets formatting issues)
+    const SUPABASE_URL = process.env.SUPABASE_URL.replace(/^=+/, '');
+    const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY.replace(/^=+/, '');
+    
+    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    supabaseAvailable = true;
+    console.log('✅ Supabase connected (caching enabled)');
+  } else {
+    console.warn('⚠️  Supabase credentials not found - cosmic briefing caching disabled');
+    console.warn('   Set SUPABASE_URL and SUPABASE_ANON_KEY in Replit Secrets to enable caching');
+  }
+} catch (error) {
+  console.error('⚠️  Failed to initialize Supabase - cosmic briefing caching disabled');
+  console.error('   Error:', error.message);
 }
-
-// Clean up environment variables (fix Replit Secrets formatting issues)
-const SUPABASE_URL = process.env.SUPABASE_URL.replace(/^=+/, '');
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY.replace(/^=+/, '');
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Middleware
 app.use(cors());
@@ -118,20 +127,31 @@ app.get('/api/cosmic-briefing', async (req, res) => {
   try {
     const today = new Date().toISOString().split('T')[0];
     
-    // Check if briefing already exists for today
-    const { data: existingBriefing, error: fetchError } = await supabase
-      .from('cosmic_briefings')
-      .select('*')
-      .eq('date', today)
-      .single();
+    // Check if briefing already exists for today (only if Supabase is available)
+    if (supabaseAvailable && supabase) {
+      try {
+        const { data: existingBriefing, error: fetchError } = await supabase
+          .from('cosmic_briefings')
+          .select('*')
+          .eq('date', today)
+          .single();
 
-    if (existingBriefing && !fetchError) {
-      console.log('📖 Returning cached cosmic briefing for', today);
-      return res.json({
-        success: true,
-        briefing: existingBriefing,
-        cached: true
-      });
+        // Check for error object from Supabase
+        if (fetchError) {
+          console.warn('⚠️  Cache lookup error:', fetchError.message || fetchError);
+          // Continue to generate fresh briefing
+        } else if (existingBriefing) {
+          console.log('📖 Returning cached cosmic briefing for', today);
+          return res.json({
+            success: true,
+            briefing: existingBriefing,
+            cached: true
+          });
+        }
+      } catch (cacheError) {
+        // Handle thrown exceptions (e.g., network errors, malformed responses)
+        console.warn('⚠️  Cache lookup exception, generating fresh briefing:', cacheError.message);
+      }
     }
 
     console.log('✨ Generating new cosmic briefing for', today);
@@ -197,34 +217,46 @@ Return a JSON object with a "themes" key containing an array of strings. Example
       cosmicThemes = ['Cosmic Alignment', 'Universal Flow', 'Inner Wisdom'];
     }
 
-    // Store the briefing in Supabase
-    const { data: newBriefing, error: insertError } = await supabase
-      .from('cosmic_briefings')
-      .insert({
+    // Store the briefing in Supabase (only if available)
+    if (supabaseAvailable && supabase) {
+      try {
+        const { data: newBriefing, error: insertError } = await supabase
+          .from('cosmic_briefings')
+          .insert({
+            date: today,
+            briefing_text: briefingText,
+            cosmic_themes: cosmicThemes
+          })
+          .select()
+          .single();
+
+        // Check for error object from Supabase
+        if (insertError) {
+          console.warn('⚠️  Failed to cache briefing:', insertError.message || insertError);
+          // Continue to return uncached briefing
+        } else if (newBriefing) {
+          console.log('💾 Briefing cached successfully');
+          return res.json({
+            success: true,
+            briefing: newBriefing,
+            cached: false
+          });
+        }
+      } catch (storageError) {
+        // Handle thrown exceptions (e.g., network errors, malformed responses)
+        console.warn('⚠️  Briefing storage exception:', storageError.message);
+        // Continue to return uncached briefing
+      }
+    }
+
+    // Return the briefing even if storage failed or Supabase is unavailable
+    res.json({
+      success: true,
+      briefing: {
         date: today,
         briefing_text: briefingText,
         cosmic_themes: cosmicThemes
-      })
-      .select()
-      .single();
-
-    if (insertError) {
-      console.error('Failed to store briefing:', insertError);
-      // Return the briefing anyway even if storage failed
-      return res.json({
-        success: true,
-        briefing: {
-          date: today,
-          briefing_text: briefingText,
-          cosmic_themes: cosmicThemes
-        },
-        cached: false
-      });
-    }
-
-    res.json({
-      success: true,
-      briefing: newBriefing,
+      },
       cached: false
     });
 
