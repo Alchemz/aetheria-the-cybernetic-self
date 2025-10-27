@@ -13,6 +13,20 @@ INNERSYNC is a Vite + React meditation and wellness platform featuring 3D graphi
 - **Database**: Supabase PostgreSQL
 
 ## Recent Changes
+**Date**: October 27, 2025
+
+### Today's Cosmic Briefing Feature ✅ COMPLETED
+Implemented AI-powered daily cosmic briefing in the Cosmic Observatory:
+- **Backend API**: `/api/cosmic-briefing` endpoint generates detailed astrological briefings
+- **OpenAI Integration**: Uses GPT-4o-mini to create 300-400 word cosmic briefings
+- **Theme Extraction**: Automatically extracts 3-4 key themes using OpenAI JSON mode
+- **Caching System**: Checks Supabase for existing briefing before generating new one
+- **Graceful Fallback**: Returns briefing even if database storage fails
+- **Frontend Integration**: Cosmic Observatory page displays briefings with themes
+- **Security**: Uses environment variables for Supabase credentials (not hardcoded)
+
+**Note**: To enable briefing caching, create the `cosmic_briefings` table in your Supabase database (see SQL below).
+
 **Date**: October 26, 2025
 
 ### Portal as Landing Page ✅ COMPLETED
@@ -108,8 +122,25 @@ The app now uses **Supabase** for authentication, but BYPASS_AUTH is still enabl
 }
 ```
 
-### Supabase Setup Required
-To complete the migration, you need to:
+### Supabase Database Tables
+
+#### Cosmic Briefings Table (Optional - for Today's Briefing feature)
+To enable caching for the Cosmic Observatory's "Today's Briefing" feature, run this SQL in your Supabase SQL Editor:
+
+```sql
+CREATE TABLE IF NOT EXISTS cosmic_briefings (
+  id SERIAL PRIMARY KEY,
+  date DATE UNIQUE NOT NULL,
+  briefing_text TEXT NOT NULL,
+  cosmic_themes TEXT[] DEFAULT '{}',
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+**Note**: The cosmic briefing feature works without this table, but briefings will be regenerated on each request instead of being cached.
+
+#### User Profiles Table
+To complete the Supabase authentication migration, you need to:
 
 1. **Create Database Schema** in your Supabase project:
 ```sql

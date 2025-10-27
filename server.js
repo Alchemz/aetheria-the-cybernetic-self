@@ -12,11 +12,18 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.SUPABASE_URL || 'https://xhxndxjfqtpfhnfczfwz.supabase.co',
-  process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoeG5keGpmcXRwZmhuZmN6Znd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDUyNDAsImV4cCI6MjA3NzEyMTI0MH0.9hLR7iMQBa0F9p_TwhQTIe4n1PqXGHPjzOBx5WDMGRA'
-);
+// Initialize Supabase client using environment variables (secure)
+if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+  console.error('❌ Missing Supabase credentials in environment variables');
+  console.error('Please set SUPABASE_URL and SUPABASE_ANON_KEY in Replit Secrets');
+  process.exit(1);
+}
+
+// Clean up environment variables (fix Replit Secrets formatting issues)
+const SUPABASE_URL = process.env.SUPABASE_URL.replace(/^=+/, '');
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY.replace(/^=+/, '');
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Middleware
 app.use(cors());
@@ -172,7 +179,7 @@ DO NOT make it personalized. This is a collective briefing for all of humanity.`
 
 ${briefingText}
 
-Return ONLY a JSON array of strings, nothing else. Example: ["Emotional clarity", "Creative awakening", "Spiritual alignment"]`;
+Return a JSON object with a "themes" key containing an array of strings. Example: {"themes": ["Emotional clarity", "Creative awakening", "Spiritual alignment"]}`;
 
     const themesCompletion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
