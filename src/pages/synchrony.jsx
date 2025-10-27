@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { ArrowLeft } from 'lucide-react';
 import { auth } from '@/api/supabaseClient';
 import { Button } from '@/components/ui/button';
+import { APP_CONFIG } from '@/config';
 
 export default function Synchrony() {
   const mountRef = useRef(null);
@@ -316,10 +317,13 @@ export default function Synchrony() {
 
   const handleJoinSession = async () => {
     try {
-      const user = await auth.me();
-      if (!user) {
-        alert('Please login to join the session');
-        return;
+      // In demo mode, skip auth check
+      if (!APP_CONFIG.BYPASS_AUTH) {
+        const user = await auth.me();
+        if (!user) {
+          alert('Please login to join the session');
+          return;
+        }
       }
 
       setHasJoined(true);
@@ -328,6 +332,13 @@ export default function Synchrony() {
       setParticipantCount(prev => prev + 1);
     } catch (error) {
       console.error('Error joining session:', error);
+      // Even if auth fails, allow joining in demo mode
+      if (APP_CONFIG.BYPASS_AUTH) {
+        setHasJoined(true);
+        setMeditationPhase('boxBreathing');
+        setPhaseTimer(0);
+        setParticipantCount(prev => prev + 1);
+      }
     }
   };
 
