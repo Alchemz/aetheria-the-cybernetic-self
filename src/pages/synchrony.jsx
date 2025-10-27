@@ -48,24 +48,22 @@ export default function Synchrony() {
     return new Date(japanISOString);
   }, []);
 
-  // Calculate next 11 PM Japan time
+  // Calculate next session time - DEMO MODE: Starting in 1 minute!
   const getNextSessionTime = useCallback(() => {
     const now = new Date();
-    let targetDate = getJapanDateTime(now, 23, 0, 0); 
-    
-    if (targetDate.getTime() <= now.getTime() + 500) { 
-      targetDate = getJapanDateTime(now, 23, 0, 0, 1);
-    }
+    // Start session 1 minute from now
+    const targetDate = new Date(now.getTime() + 60 * 1000); // 1 minute = 60,000ms
     return targetDate;
-  }, [getJapanDateTime]);
+  }, []);
 
-  // Check if session should be active (11:00 PM to 11:15 PM Japan time)
+  // Check if session should be active - DEMO MODE: 15 minute window starting in 1 minute
   const checkSessionActive = useCallback(() => {
     const now = new Date();
-    const japanHour = parseInt(now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo', hour: 'numeric', hourCycle: 'h23' }));
-    const japanMinute = parseInt(now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo', minute: 'numeric' }));
+    const sessionStart = new Date(now.getTime() + 60 * 1000); // Session starts 1 min from now
+    const sessionEnd = new Date(sessionStart.getTime() + 15 * 60 * 1000); // 15 minutes after start
     
-    return japanHour === 23 && japanMinute >= 0 && japanMinute < 15;
+    // Active if current time is between start and end
+    return now.getTime() >= sessionStart.getTime() && now.getTime() < sessionEnd.getTime();
   }, []);
 
   // Three.js scene setup
