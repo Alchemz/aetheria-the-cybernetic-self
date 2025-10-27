@@ -110,8 +110,15 @@ export default function CosmicObservatory() {
 
   const loadCosmicBriefing = async () => {
     try {
-      const response = await base44.functions.invoke('generateDailyCosmicBriefing', {});
-      setCosmicBriefing(response.data.briefing);
+      const response = await fetch('/api/cosmic-briefing');
+      const data = await response.json();
+      
+      if (data.success) {
+        setCosmicBriefing(data.briefing);
+        console.log(data.cached ? '📖 Loaded cached cosmic briefing' : '✨ Generated new cosmic briefing');
+      } else {
+        console.error('Failed to load cosmic briefing:', data.error);
+      }
     } catch (error) {
       console.error('Failed to load cosmic briefing:', error);
     } finally {

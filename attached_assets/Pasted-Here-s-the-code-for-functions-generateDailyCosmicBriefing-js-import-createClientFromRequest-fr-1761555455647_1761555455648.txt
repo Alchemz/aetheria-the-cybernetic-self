@@ -1,0 +1,98 @@
+Here's the code for functions/generateDailyCosmicBriefing.js:
+
+import { createClientFromRequest } from 'npm:@base44/sdk@0.7.1';
+
+Deno.serve(async (req) => {
+  try {
+    const base44 = createClientFromRequest(req);
+    
+    // Get today's date
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Check if briefing already exists for today
+    const existingBriefings = await base44.asServiceRole.entities.CosmicBriefing.filter({
+      date: today
+    });
+    
+    if (existingBriefings.length > 0) {
+      return Response.json({
+        success: true,
+        briefing: existingBriefings[0],
+        cached: true
+      });
+    }
+    
+    // Generate new briefing
+    const prompt = `You are a master astrologer and cosmic energy interpreter. Generate a detailed daily cosmic briefing for ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.
+
+IMPORTANT INSTRUCTIONS:
+1. Analyze the current planetary transits and their meaning
+2. Consider the moon phase and its influence
+3. Note any significant astrological events (retrogrades, eclipses, planetary ingresses)
+4. Explain the collective energy available to humanity today
+5. Provide practical guidance for working with today's cosmic currents
+6. Include any powerful aspects between planets
+7. Mention which zodiac signs are most activated today
+8. Keep it empowering, insightful, and non-dogmatic
+
+Write in a tone that blends ancient cosmic wisdom with modern understanding. Be specific about planetary positions when relevant. Make it approximately 300-400 words.
+
+Format:
+- Start with the date and a captivating title
+- Main briefing text (flowing paragraphs)
+- End with a "Cosmic Invitation" - one practical action for today
+
+DO NOT make it personalized. This is a collective briefing for all of humanity.`;
+
+    const briefingText = await base44.integrations.Core.InvokeLLM({
+      prompt,
+      add_context_from_internet: true // Get real astronomical data
+    });
+
+    // Extract themes
+    const themesPrompt = `Based on this cosmic briefing, extract 3-4 key cosmic themes as short phrases (3-5 words each):
+
+${briefingText}
+
+Return ONLY a JSON array of strings, nothing else.`;
+
+    const themesResponse = await base44.integrations.Core.InvokeLLM({
+      prompt: themesPrompt,
+      response_json_schema: {
+        type: "object",
+        properties: {
+          themes: {
+            type: "array",
+            items: { type: "string" }
+          }
+        }
+      }
+    });
+
+    // Store the briefing
+    const newBriefing = await base44.asServiceRole.entities.CosmicBriefing.create({
+      date: today,
+      briefing_text: briefingText,
+      cosmic_themes: themesResponse.themes || []
+    });
+
+    return Response.json({
+      success: true,
+      briefing: newBriefing,
+      cached: false
+    });
+
+  } catch (error) {
+    console.error('Cosmic briefing generation error:', error);
+    return Response.json({ 
+      error: 'Failed to generate cosmic briefing',
+      details: error.message 
+    }, { status: 500 });
+  }
+});
+This function:
+
+Checks if a briefing for the current day already exists in the CosmicBriefing entity to avoid regenerating it.
+If not, it uses the Core.InvokeLLM integration to generate a detailed cosmic briefing based on a specific prompt, using internet context for real-time astrological data.
+It then uses another InvokeLLM call to extract key themes from the generated briefing.
+Finally, it stores the briefing and its themes in the CosmicBriefing entity and returns it.

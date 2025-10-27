@@ -2,6 +2,7 @@
 import express from 'express';
 import cors from 'cors';
 import OpenAI from 'openai';
+import { createClient } from '@supabase/supabase-js';
 
 const app = express();
 const PORT = 3000;
@@ -10,6 +11,12 @@ const PORT = 3000;
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
+
+// Initialize Supabase client
+const supabase = createClient(
+  process.env.SUPABASE_URL || 'https://xhxndxjfqtpfhnfczfwz.supabase.co',
+  process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoeG5keGpmcXRwZmhuZmN6Znd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDUyNDAsImV4cCI6MjA3NzEyMTI0MH0.9hLR7iMQBa0F9p_TwhQTIe4n1PqXGHPjzOBx5WDMGRA'
+);
 
 // Middleware
 app.use(cors());
@@ -94,6 +101,130 @@ app.post('/api/chat', async (req, res) => {
     console.error('OpenAI error:', error);
     res.status(500).json({ 
       error: 'Failed to generate response',
+      details: error.message 
+    });
+  }
+});
+
+// Cosmic Briefing endpoint
+app.get('/api/cosmic-briefing', async (req, res) => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Check if briefing already exists for today
+    const { data: existingBriefing, error: fetchError } = await supabase
+      .from('cosmic_briefings')
+      .select('*')
+      .eq('date', today)
+      .single();
+
+    if (existingBriefing && !fetchError) {
+      console.log('📖 Returning cached cosmic briefing for', today);
+      return res.json({
+        success: true,
+        briefing: existingBriefing,
+        cached: true
+      });
+    }
+
+    console.log('✨ Generating new cosmic briefing for', today);
+
+    // Generate new briefing using OpenAI
+    const todayFormatted = new Date().toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+
+    const briefingPrompt = `You are a master astrologer and cosmic energy interpreter. Generate a detailed daily cosmic briefing for ${todayFormatted}.
+
+IMPORTANT INSTRUCTIONS:
+1. Analyze the current planetary transits and their meaning
+2. Consider the moon phase and its influence
+3. Note any significant astrological events (retrogrades, eclipses, planetary ingresses)
+4. Explain the collective energy available to humanity today
+5. Provide practical guidance for working with today's cosmic currents
+6. Include any powerful aspects between planets
+7. Mention which zodiac signs are most activated today
+8. Keep it empowering, insightful, and non-dogmatic
+
+Write in a tone that blends ancient cosmic wisdom with modern understanding. Be specific about planetary positions when relevant. Make it approximately 300-400 words.
+
+Format:
+- Start with the date and a captivating title
+- Main briefing text (flowing paragraphs)
+- End with a "Cosmic Invitation" - one practical action for today
+
+DO NOT make it personalized. This is a collective briefing for all of humanity.`;
+
+    const briefingCompletion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: briefingPrompt }],
+      temperature: 0.8,
+      max_tokens: 800
+    });
+
+    const briefingText = briefingCompletion.choices[0].message.content;
+
+    // Extract themes using JSON mode
+    const themesPrompt = `Based on this cosmic briefing, extract 3-4 key cosmic themes as short phrases (3-5 words each):
+
+${briefingText}
+
+Return ONLY a JSON array of strings, nothing else. Example: ["Emotional clarity", "Creative awakening", "Spiritual alignment"]`;
+
+    const themesCompletion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: themesPrompt }],
+      response_format: { type: 'json_object' },
+      temperature: 0.5
+    });
+
+    let cosmicThemes = [];
+    try {
+      const themesData = JSON.parse(themesCompletion.choices[0].message.content);
+      cosmicThemes = themesData.themes || Object.values(themesData)[0] || [];
+    } catch (e) {
+      console.error('Failed to parse themes:', e);
+      cosmicThemes = ['Cosmic Alignment', 'Universal Flow', 'Inner Wisdom'];
+    }
+
+    // Store the briefing in Supabase
+    const { data: newBriefing, error: insertError } = await supabase
+      .from('cosmic_briefings')
+      .insert({
+        date: today,
+        briefing_text: briefingText,
+        cosmic_themes: cosmicThemes
+      })
+      .select()
+      .single();
+
+    if (insertError) {
+      console.error('Failed to store briefing:', insertError);
+      // Return the briefing anyway even if storage failed
+      return res.json({
+        success: true,
+        briefing: {
+          date: today,
+          briefing_text: briefingText,
+          cosmic_themes: cosmicThemes
+        },
+        cached: false
+      });
+    }
+
+    res.json({
+      success: true,
+      briefing: newBriefing,
+      cached: false
+    });
+
+  } catch (error) {
+    console.error('Cosmic briefing generation error:', error);
+    res.status(500).json({ 
+      error: 'Failed to generate cosmic briefing',
       details: error.message 
     });
   }
