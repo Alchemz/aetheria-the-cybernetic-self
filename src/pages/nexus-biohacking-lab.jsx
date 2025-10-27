@@ -823,7 +823,7 @@ export default function BiohackingLab() {
         </Link>
 
         <div className="lab-header">
-          <h1 className="lab-title">PRIMAL HABITS LAB</h1>
+          <h1 className="lab-title">BIOHACKING LAB</h1>
           <p className="lab-subtitle">
             Evidence-based ancestral practices for optimizing human performance and longevity
           </p>
