@@ -48,22 +48,18 @@ export default function Synchrony() {
     return new Date(japanISOString);
   }, []);
 
-  // Calculate next session time - DEMO MODE: Starting in 1 minute!
+  // Calculate next session time - DEMO MODE: ACTIVE NOW!
   const getNextSessionTime = useCallback(() => {
     const now = new Date();
-    // Start session 1 minute from now
-    const targetDate = new Date(now.getTime() + 60 * 1000); // 1 minute = 60,000ms
+    // Session already started (show as ending in 15 minutes)
+    const targetDate = new Date(now.getTime() + 15 * 60 * 1000); // Ends in 15 minutes
     return targetDate;
   }, []);
 
-  // Check if session should be active - DEMO MODE: 15 minute window starting in 1 minute
+  // Check if session should be active - DEMO MODE: ACTIVE NOW!
   const checkSessionActive = useCallback(() => {
-    const now = new Date();
-    const sessionStart = new Date(now.getTime() + 60 * 1000); // Session starts 1 min from now
-    const sessionEnd = new Date(sessionStart.getTime() + 15 * 60 * 1000); // 15 minutes after start
-    
-    // Active if current time is between start and end
-    return now.getTime() >= sessionStart.getTime() && now.getTime() < sessionEnd.getTime();
+    // Always return true so session is active immediately
+    return true;
   }, []);
 
   // Three.js scene setup
