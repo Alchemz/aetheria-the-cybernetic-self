@@ -842,7 +842,7 @@ export default function SovereignPortal() {
         .synchrony-button-overlay {
           position: fixed;
           bottom: 2rem;
-          right: 7rem;
+          right: 9.5rem;
           z-index: 999;
           opacity: 0;
           transform: translateX(20px) scale(0.8);
