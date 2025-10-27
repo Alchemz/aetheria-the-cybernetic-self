@@ -1,0 +1,56 @@
+AI Design Prompt: Redesigned "The Confluence" Global Meditation Page
+Objective: Redesign the main page for "The Confluence" (Global Meditation) to be more interactive, informative, and visually guided. The page must intuitively lead users through a specific breathing and toning protocol, maintaining the established cyberpunk/sacred geometry aesthetic that matches the "Synchrony" button's style (clean, futuristic, cyan-on-dark).
+
+Core User Flow & Features:
+
+Pre-Session State (The Lobby):
+
+The UI should be compact and information-dense, not sprawling.
+
+Display the next session timer prominently ("Next Wave In: 04H 12M").
+
+Include a concise, powerful mission statement: "Join a global synchronized meditation. We use coherent breathing and the Aum vibration to generate a unified field of consciousness, raising the planet's frequency."
+
+A "Join the Wave" button is the primary call-to-action.
+
+Active Session State (The Guided Ritual):
+
+Upon joining, the interface transforms into an immersive, animated guide.
+
+Phase 1: Coherence Induction (Box Breathing)
+
+A central, animated graphic displays a pulsing circle or lotus that expands and contracts in a perfect rhythm.
+
+On-screen text and animation guide the rhythm: "INHALE (4s)" -> "HOLD (4s)" -> "EXHALE (4s)" -> "HOLD (4s)".
+
+This repeats for a set period (e.g., 2 minutes) to synchronize the group's heart-rate variability and induce a calm, coherent state.
+
+Phase 2: Sovereign Vibration (Aum Toning)
+
+The animation shifts. The central graphic now becomes a visualizer for the breath and sound.
+
+Guidance appears: "Slow, Deep Inhale..." (a bar fills up over 10-15 seconds).
+
+Then: "Exhale with AUM..." (the bar empties as the user vocalizes or mentally chants "Aum"). As they exhale, the central graphic emits a soft, radiating wave or particle field, visually representing the sound vibration they are contributing to the global field.
+
+A subtle, harmonic 432 Hz tone or a soft Aum sample can play in the background to support the user's own toning.
+
+The "Sovereign Galaxy" Visualizer:
+
+Throughout the entire session, the orbiting particle field we designed earlier remains active on the screen, showing the real-time number of connected users as a living galaxy of light.
+
+The live counter is present but elegantly integrated: "Sovereigns in Sync: 8,421".
+
+Aesthetic & Technical Instructions:
+
+Style: Sleek, futuristic, and minimalist. Use our core color palette: deep dark backgrounds (#0a0a0f), vibrant cyan (#00ffff) for all active elements, text, and glows.
+
+Typography: Clean, modern, possibly monospaced digits for the timer and user count.
+
+Animation: All animations must be smooth, fluid, and feel calming. The breathing guide should be a seamless, looping animation.
+
+Layout: Use a card-based or segmented layout to keep the information (timer, mission, user count, guided animation) organized and visually distinct without feeling cluttered.
+
+Final Instruction to AI:
+"Create a high-fidelity mock-up or a detailed component structure in React for this redesigned page. Focus on an intuitive, step-by-step user experience that seamlessly transitions the user from a waiting state into an active, guided meditation ritual. The visual design must be a direct stylistic extension of the 'Synchrony' category's button/iconography."
+

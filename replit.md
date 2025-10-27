@@ -15,6 +15,24 @@ INNERSYNC is a Vite + React meditation and wellness platform featuring 3D graphi
 ## Recent Changes
 **Date**: October 27, 2025
 
+### The Synchrony Redesign ✅ COMPLETED
+Redesigned the global meditation page with interactive guided breathing protocols:
+- **Cyan Aesthetic**: Changed from golden to cyan (#00FFFF) to match Portal's Synchrony button
+- **Pre-Session Lobby**: Compact card-based layout with mission statement, session timer, and live participant count
+- **Phase 1 - Box Breathing**: Animated pulsing circle guides 4-4-4-4 breathing rhythm (2 minutes)
+- **Phase 2 - Aum Toning**: Breath visualizer bar for 10s inhale, 15s exhale with radiating wave effects
+- **Auto-Progression**: Automatically transitions from box breathing to Aum toning after 2 minutes
+- **Sovereign Galaxy**: Live 3D particle field showing connected users as orbiting cyan lights
+- **Session Timing**: Daily at 11 PM Japan time (15-minute sessions)
+- **Graceful Degradation**: Works without WebGL (fallback for browsers without 3D support)
+
+**User Flow**:
+1. Lobby shows "Next Wave In" countdown timer and mission statement
+2. When session is active, "JOIN THE WAVE" button appears
+3. Clicking joins → starts Phase 1 (box breathing with animated circle)
+4. After 2 minutes → auto-transitions to Phase 2 (Aum toning with breath bar)
+5. Throughout: 3D particle field pulses in sync with breath
+
 ### Today's Cosmic Briefing Feature ✅ COMPLETED
 Implemented AI-powered daily cosmic briefing in the Cosmic Observatory:
 - **Backend API**: `/api/cosmic-briefing` endpoint generates detailed astrological briefings

@@ -12,24 +12,29 @@ export default function Synchrony() {
   const particlesRef = useRef([]);
   const centralLightRef = useRef(null);
   
-  const [participantCount, setParticipantCount] = useState(0);
-  const [timeUntilNext, setTimeUntilNext] = useState({ hours: 0, minutes: 0, seconds: 0 }); // Initial state is 0, will be calculated on mount
+  const [participantCount, setParticipantCount] = useState(8421); // Simulated count
+  const [timeUntilNext, setTimeUntilNext] = useState({ hours: 0, minutes: 0, seconds: 0 });
   const [sessionActive, setSessionActive] = useState(false);
   const [hasJoined, setHasJoined] = useState(false);
   const [sessionTime, setSessionTime] = useState(900); // 15 minutes in seconds
+  
+  // New states for guided meditation
+  const [meditationPhase, setMeditationPhase] = useState('lobby'); // 'lobby', 'boxBreathing', 'aumToning'
+  const [breathPhase, setBreathPhase] = useState('inhale'); // 'inhale', 'hold1', 'exhale', 'hold2'
+  const [breathProgress, setBreathProgress] = useState(0); // 0-100
+  const [phaseTimer, setPhaseTimer] = useState(0); // Seconds in current phase
 
   // Helper to create a Date object representing a specific time in Asia/Tokyo
   const getJapanDateTime = useCallback((date, hour, minute, second, addDays = 0) => {
     const d = new Date(date);
-    d.setDate(d.getDate() + addDays); // Apply day offset first
+    d.setDate(d.getDate() + addDays);
 
-    // Use Intl.DateTimeFormat to get date components in Asia/Tokyo timezone
     const options = {
         timeZone: 'Asia/Tokyo',
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
-        hourCycle: 'h23' // Ensures 24-hour format
+        hourCycle: 'h23'
     };
     const formatter = new Intl.DateTimeFormat('en-US', options);
     const parts = formatter.formatToParts(d);
@@ -38,24 +43,18 @@ export default function Synchrony() {
     const month = parts.find(p => p.type === 'month').value;
     const day = parts.find(p => p.type === 'day').value;
     
-    // Construct an ISO 8601 string for the target time in Japan timezone with explicit offset
-    // Asia/Tokyo (JST) is UTC+09:00 and does not observe Daylight Saving Time.
     const japanISOString = `${year}-${month}-${day}T${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}.000+09:00`;
     
-    // Parse this string to get a Date object that internally represents that exact moment in UTC.
     return new Date(japanISOString);
   }, []);
 
   // Calculate next 11 PM Japan time
   const getNextSessionTime = useCallback(() => {
     const now = new Date();
-    
-    // Target 11 PM Japan time today
     let targetDate = getJapanDateTime(now, 23, 0, 0); 
     
-    // If targetDate is already in the past (or very close, within 500ms buffer), advance to tomorrow
     if (targetDate.getTime() <= now.getTime() + 500) { 
-      targetDate = getJapanDateTime(now, 23, 0, 0, 1); // 11 PM Japan time tomorrow
+      targetDate = getJapanDateTime(now, 23, 0, 0, 1);
     }
     return targetDate;
   }, [getJapanDateTime]);
@@ -63,34 +62,38 @@ export default function Synchrony() {
   // Check if session should be active (11:00 PM to 11:15 PM Japan time)
   const checkSessionActive = useCallback(() => {
     const now = new Date();
-    // Get current hour and minute in Japan time
     const japanHour = parseInt(now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo', hour: 'numeric', hourCycle: 'h23' }));
     const japanMinute = parseInt(now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo', minute: 'numeric' }));
     
-    // Session is active between 11:00 PM and 11:15 PM Japan time
     return japanHour === 23 && japanMinute >= 0 && japanMinute < 15;
   }, []);
 
-
+  // Three.js scene setup
   useEffect(() => {
     if (!mountRef.current) return;
 
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
-    sceneRef.current = scene;
+    let renderer;
+    try {
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x000000);
+      sceneRef.current = scene;
 
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 15;
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.z = 15;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    mountRef.current.appendChild(renderer.domElement);
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      mountRef.current.appendChild(renderer.domElement);
+    } catch (error) {
+      console.warn('WebGL not available, running without 3D graphics:', error);
+      return;
+    }
 
-    // Central Light Source - GOLDEN
+    // Central Light Source - CYAN
     const lightGeometry = new THREE.SphereGeometry(1, 32, 32);
     const lightMaterial = new THREE.MeshBasicMaterial({
-      color: 0xFFD700,
+      color: 0x00FFFF,
       transparent: true,
       opacity: 0.8
     });
@@ -98,10 +101,10 @@ export default function Synchrony() {
     scene.add(centralLight);
     centralLightRef.current = centralLight;
 
-    // Add glow effect to central light - GOLDEN
+    // Add glow effect to central light - CYAN
     const glowGeometry = new THREE.SphereGeometry(1.5, 32, 32);
     const glowMaterial = new THREE.MeshBasicMaterial({
-      color: 0xFFD700,
+      color: 0x00FFFF,
       transparent: true,
       opacity: 0.3,
       side: THREE.BackSide
@@ -109,8 +112,8 @@ export default function Synchrony() {
     const glow = new THREE.Mesh(glowGeometry, glowMaterial);
     centralLight.add(glow);
 
-    // Grid background
-    const gridHelper = new THREE.GridHelper(50, 50, 0xFFD700, 0x333300);
+    // Grid background - CYAN
+    const gridHelper = new THREE.GridHelper(50, 50, 0x00FFFF, 0x003333);
     gridHelper.position.y = -10;
     gridHelper.material.opacity = 0.1;
     gridHelper.material.transparent = true;
@@ -122,8 +125,16 @@ export default function Synchrony() {
     const animate = () => {
       const elapsedTime = clock.getElapsedTime();
       
-      // Pulsate central light
-      const pulse = Math.sin(elapsedTime * 2) * 0.2 + 1;
+      // Pulsate central light based on meditation phase
+      let pulse = Math.sin(elapsedTime * 2) * 0.2 + 1;
+      
+      // Sync pulse with breath in active meditation
+      if (meditationPhase === 'boxBreathing') {
+        pulse = (breathProgress / 100) * 0.5 + 0.7;
+      } else if (meditationPhase === 'aumToning') {
+        pulse = (breathProgress / 100) * 0.8 + 0.6;
+      }
+      
       centralLight.scale.set(pulse, pulse, pulse);
       
       // Rotate particles
@@ -159,9 +170,9 @@ export default function Synchrony() {
       }
       renderer.dispose();
     };
-  }, []);
+  }, [meditationPhase, breathProgress]);
 
-  // Update particle count when participantCount changes
+  // Update particle count - CYAN particles
   useEffect(() => {
     if (!sceneRef.current) return;
 
@@ -169,23 +180,19 @@ export default function Synchrony() {
     const targetCount = participantCount;
 
     if (targetCount > currentCount) {
-      // Add new particles - GOLDEN
       for (let i = currentCount; i < targetCount; i++) {
         const particleGeometry = new THREE.SphereGeometry(0.08, 16, 16);
         const particleMaterial = new THREE.MeshBasicMaterial({
-          color: 0xFFD700,
+          color: 0x00FFFF,
           transparent: true,
           opacity: 0.9
         });
         const particle = new THREE.Mesh(particleGeometry, particleMaterial);
         
-        // No particle glow in the new specification
-        
         sceneRef.current.add(particle);
         particlesRef.current.push(particle);
       }
     } else if (targetCount < currentCount) {
-      // Remove particles
       for (let i = currentCount - 1; i >= targetCount; i--) {
         const particle = particlesRef.current[i];
         sceneRef.current.remove(particle);
@@ -194,7 +201,7 @@ export default function Synchrony() {
     }
   }, [participantCount]);
 
-  // Timer countdown
+  // Timer countdown for session
   useEffect(() => {
     const updateSessionState = () => {
       const now = new Date();
@@ -202,24 +209,22 @@ export default function Synchrony() {
 
       if (currentIsActive) {
         setSessionActive(true);
-        // Calculate remaining time for the session
         const japanMinute = parseInt(now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo', minute: 'numeric' }));
         const japanSecond = parseInt(now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo', second: 'numeric' }));
-        const secondsElapsedInSession = (japanMinute % 15) * 60 + japanSecond; // Ensures it's within the 15 min window
-        const remainingSeconds = Math.max(0, 900 - secondsElapsedInSession); // 15 minutes = 900 seconds
+        const secondsElapsedInSession = (japanMinute % 15) * 60 + japanSecond;
+        const remainingSeconds = Math.max(0, 900 - secondsElapsedInSession);
         setSessionTime(remainingSeconds);
-        setTimeUntilNext({ hours: 0, minutes: 0, seconds: 0 }); // No "until next" if currently active
+        setTimeUntilNext({ hours: 0, minutes: 0, seconds: 0 });
       } else {
-        // Session is not active
         setSessionActive(false);
-        setHasJoined(false); // User is no longer considered "joined" for a session that just ended
-        setSessionTime(900); // Reset session time for next session
+        setHasJoined(false);
+        setMeditationPhase('lobby');
+        setSessionTime(900);
 
-        // Calculate time until next session
         const nextSession = getNextSessionTime();
-        const diff = nextSession.getTime() - now.getTime(); // Difference in milliseconds
+        const diff = nextSession.getTime() - now.getTime();
 
-        if (diff <= 0) { // If diff is negative (should be rare due to getNextSessionTime logic), just show 0
+        if (diff <= 0) {
              setTimeUntilNext({ hours: 0, minutes: 0, seconds: 0 }); 
         } else {
             const hours = Math.floor(diff / (1000 * 60 * 60));
@@ -230,13 +235,90 @@ export default function Synchrony() {
       }
     };
 
-    // Run once immediately on mount to set initial state
     updateSessionState();
-
     const interval = setInterval(updateSessionState, 1000);
+    return () => clearInterval(interval);
+  }, [checkSessionActive, getJapanDateTime, getNextSessionTime]);
+
+  // Breathing animation for box breathing (4-4-4-4)
+  useEffect(() => {
+    if (meditationPhase !== 'boxBreathing') return;
+
+    const breathCycleDuration = 16000; // 16 seconds total (4s each phase)
+    const phaseDuration = 4000; // 4 seconds per phase
+    
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const cyclePosition = now % breathCycleDuration;
+      
+      if (cyclePosition < phaseDuration) {
+        // Phase 1: Inhale (0-4s)
+        setBreathPhase('inhale');
+        setBreathProgress((cyclePosition / phaseDuration) * 100);
+      } else if (cyclePosition < phaseDuration * 2) {
+        // Phase 2: Hold (4-8s)
+        setBreathPhase('hold1');
+        setBreathProgress(100);
+      } else if (cyclePosition < phaseDuration * 3) {
+        // Phase 3: Exhale (8-12s)
+        setBreathPhase('exhale');
+        setBreathProgress(100 - ((cyclePosition - phaseDuration * 2) / phaseDuration) * 100);
+      } else {
+        // Phase 4: Hold (12-16s)
+        setBreathPhase('hold2');
+        setBreathProgress(0);
+      }
+    }, 50);
 
     return () => clearInterval(interval);
-  }, [checkSessionActive, getJapanDateTime, getNextSessionTime]); // Depend on memoized functions
+  }, [meditationPhase]);
+
+  // Breathing animation for Aum toning (slower, deeper)
+  useEffect(() => {
+    if (meditationPhase !== 'aumToning') return;
+
+    const breathCycleDuration = 25000; // 25 seconds total (10s inhale, 15s exhale)
+    const inhaleDuration = 10000; // 10 seconds inhale
+    const exhaleDuration = 15000; // 15 seconds exhale with Aum
+    
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const cyclePosition = now % breathCycleDuration;
+      
+      if (cyclePosition < inhaleDuration) {
+        // Inhale phase (0-10s)
+        setBreathPhase('inhale');
+        setBreathProgress((cyclePosition / inhaleDuration) * 100);
+      } else {
+        // Exhale with AUM (10-25s)
+        setBreathPhase('exhale');
+        setBreathProgress(100 - ((cyclePosition - inhaleDuration) / exhaleDuration) * 100);
+      }
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, [meditationPhase]);
+
+  // Phase progression timer (box breathing for 2 minutes, then Aum toning)
+  useEffect(() => {
+    if (meditationPhase === 'boxBreathing' || meditationPhase === 'aumToning') {
+      const interval = setInterval(() => {
+        setPhaseTimer(prev => {
+          const newTime = prev + 1;
+          
+          // After 2 minutes of box breathing, switch to Aum toning
+          if (meditationPhase === 'boxBreathing' && newTime >= 120) {
+            setMeditationPhase('aumToning');
+            return 0;
+          }
+          
+          return newTime;
+        });
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [meditationPhase]);
 
   const handleJoinSession = async () => {
     try {
@@ -247,13 +329,9 @@ export default function Synchrony() {
       }
 
       setHasJoined(true);
+      setMeditationPhase('boxBreathing');
+      setPhaseTimer(0);
       setParticipantCount(prev => prev + 1);
-      
-      // In production, this would update the backend
-      // await base44.entities.MeditationSession.update(sessionId, {
-      //   participants: [...participants, user.email],
-      //   participant_count: participantCount + 1
-      // });
     } catch (error) {
       console.error('Error joining session:', error);
     }
@@ -263,6 +341,21 @@ export default function Synchrony() {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const getBreathInstruction = () => {
+    if (meditationPhase === 'boxBreathing') {
+      switch (breathPhase) {
+        case 'inhale': return 'INHALE (4s)';
+        case 'hold1': return 'HOLD (4s)';
+        case 'exhale': return 'EXHALE (4s)';
+        case 'hold2': return 'HOLD (4s)';
+        default: return 'BREATHE';
+      }
+    } else if (meditationPhase === 'aumToning') {
+      return breathPhase === 'inhale' ? 'SLOW, DEEP INHALE...' : 'EXHALE WITH AUM...';
+    }
+    return '';
   };
 
   return (
@@ -299,7 +392,7 @@ export default function Synchrony() {
           display: flex;
           flex-direction: column;
           align-items: center;
-          justify-content: space-between;
+          justify-content: center;
           padding: 2rem;
         }
 
@@ -313,7 +406,7 @@ export default function Synchrony() {
           align-items: center;
           gap: 8px;
           text-decoration: none;
-          color: #FFD700;
+          color: #00FFFF;
           font-family: 'Orbitron', monospace;
           font-size: 14px;
           font-weight: 600;
@@ -322,177 +415,308 @@ export default function Synchrony() {
         }
 
         .back-button:hover {
-          color: #FFF2CC;
+          color: #00D4FF;
           transform: translateX(-3px);
         }
 
-        .hud-top {
-          width: 100%;
-          max-width: 500px;
-          text-align: center;
-          margin-top: 1rem;
+        /* LOBBY STATE */
+        .lobby-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 2rem;
+          max-width: 600px;
+          pointer-events: all;
         }
 
-        .session-title {
+        .lobby-title {
           font-family: 'Orbitron', monospace;
-          font-size: 1.5rem;
+          font-size: 2.5rem;
           font-weight: 900;
           letter-spacing: 0.2em;
-          color: #FFF8DC;
-          text-shadow: 0 0 20px rgba(255, 248, 220, 0.6);
-          margin-bottom: 0.5rem;
+          color: #00FFFF;
+          text-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+          text-align: center;
+          margin-bottom: 0;
         }
 
-        .session-subtitle {
-          font-size: 0.8rem;
-          color: rgba(255, 248, 220, 0.7);
+        .info-card {
+          background: rgba(0, 31, 63, 0.9);
+          backdrop-filter: blur(15px);
+          border: 2px solid rgba(0, 255, 255, 0.3);
+          border-radius: 20px;
+          padding: 2rem;
+          box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.7),
+            inset 0 1px 0 rgba(0, 255, 255, 0.2);
+          width: 100%;
+        }
+
+        .timer-large {
+          text-align: center;
+          margin-bottom: 1.5rem;
+        }
+
+        .timer-label {
+          font-family: 'Orbitron', monospace;
+          font-size: 0.75rem;
+          color: rgba(0, 255, 255, 0.8);
+          letter-spacing: 0.2em;
+          margin-bottom: 0.75rem;
+          text-transform: uppercase;
+        }
+
+        .timer-value {
+          font-family: 'Orbitron', monospace;
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: #00FFFF;
+          text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+          letter-spacing: 0.1em;
+        }
+
+        .mission-statement {
+          color: rgba(255, 255, 255, 0.9);
+          font-size: 1.1rem;
+          line-height: 1.7;
+          text-align: center;
+          margin-bottom: 1.5rem;
+        }
+
+        .participant-display {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.75rem;
+          padding: 1rem;
+          background: rgba(0, 255, 255, 0.1);
+          border-radius: 10px;
+          border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .participant-label {
+          font-family: 'Orbitron', monospace;
+          font-size: 0.7rem;
+          color: rgba(0, 255, 255, 0.8);
           letter-spacing: 0.15em;
           text-transform: uppercase;
         }
 
-        .hud-center {
+        .participant-count {
+          font-family: 'Orbitron', monospace;
+          font-size: 1.8rem;
+          font-weight: 900;
+          color: #00FFFF;
+          text-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+        }
+
+        .join-wave-button {
+          background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(0, 212, 255, 0.1));
+          border: 2px solid #00FFFF;
+          color: #00FFFF;
+          padding: 1.2rem 3rem;
+          font-family: 'Orbitron', monospace;
+          font-size: 1.1rem;
+          font-weight: 700;
+          letter-spacing: 0.2em;
+          cursor: pointer;
+          transition: all 0.4s ease;
+          border-radius: 50px;
+          text-transform: uppercase;
+          box-shadow: 
+            0 0 30px rgba(0, 255, 255, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+          width: 100%;
+          margin-top: 1rem;
+        }
+
+        .join-wave-button:hover:not(:disabled) {
+          background: linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(0, 212, 255, 0.2));
+          box-shadow: 0 0 50px rgba(0, 255, 255, 0.8);
+          transform: scale(1.05);
+        }
+
+        .join-wave-button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+          box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        }
+
+        /* ACTIVE MEDITATION STATE */
+        .meditation-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 2rem;
+          width: 100%;
+          max-width: 700px;
+          pointer-events: all;
+        }
+
+        .phase-indicator {
+          font-family: 'Orbitron', monospace;
+          font-size: 0.9rem;
+          color: rgba(0, 255, 255, 0.7);
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          text-align: center;
+        }
+
+        .breath-guide {
+          width: 100%;
+          max-width: 500px;
           display: flex;
           flex-direction: column;
           align-items: center;
           gap: 2rem;
         }
 
-        .timer-display {
-          background: rgba(0, 31, 63, 0.85);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 215, 0, 0.2);
-          padding: 1.5rem 2.5rem;
-          border-radius: 15px;
+        .breath-circle-container {
+          position: relative;
+          width: 300px;
+          height: 300px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .breath-circle {
+          width: 200px;
+          height: 200px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(0, 255, 255, 0.3), rgba(0, 212, 255, 0.1));
+          border: 3px solid #00FFFF;
           box-shadow: 
-            0 4px 20px rgba(0, 0, 0, 0.5),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1);
-          pointer-events: all;
+            0 0 40px rgba(0, 255, 255, 0.6),
+            inset 0 0 40px rgba(0, 255, 255, 0.2);
+          transition: all 0.1s ease-out;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
-        .timer-label {
+        .breath-instruction {
           font-family: 'Orbitron', monospace;
-          font-size: 0.7rem;
-          color: rgba(255, 248, 220, 0.8);
-          letter-spacing: 0.15em;
-          margin-bottom: 0.5rem;
-          text-align: center;
-        }
-
-        .timer-value {
-          font-family: 'Orbitron', monospace;
-          font-size: 2rem;
+          font-size: 1.3rem;
           font-weight: 700;
-          color: #FFF8DC;
-          text-shadow: 0 0 15px rgba(255, 248, 220, 0.5);
+          color: #00FFFF;
+          text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
           letter-spacing: 0.1em;
-        }
-
-        .participant-counter {
-          background: rgba(0, 31, 63, 0.85);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 215, 0, 0.2);
-          padding: 1.5rem 2.5rem;
-          border-radius: 15px;
-          box-shadow: 
-            0 4px 20px rgba(0, 0, 0, 0.5),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1);
           text-align: center;
-          min-width: 280px;
         }
 
-        .counter-label {
-          font-family: 'Orbitron', monospace;
-          font-size: 0.7rem;
-          color: rgba(255, 248, 220, 0.8);
-          letter-spacing: 0.15em;
-          margin-bottom: 0.5rem;
-        }
-
-        .counter-value {
-          font-family: 'Orbitron', monospace;
-          font-size: 2.5rem;
-          font-weight: 900;
-          color: #FFF8DC;
-          text-shadow: 0 0 20px rgba(255, 248, 220, 0.6);
-          letter-spacing: 0.05em;
-        }
-
-        .hud-bottom {
+        .breath-bar-container {
           width: 100%;
           max-width: 400px;
+          height: 60px;
+          background: rgba(0, 31, 63, 0.8);
+          border-radius: 30px;
+          border: 2px solid rgba(0, 255, 255, 0.3);
+          overflow: hidden;
+          position: relative;
+        }
+
+        .breath-bar {
+          height: 100%;
+          background: linear-gradient(90deg, #00FFFF, #00D4FF);
+          transition: width 0.1s ease-out;
+          box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
           display: flex;
-          flex-direction: column; /* Changed to column for better stacking */
-          align-items: center; /* Center items in column */
-          gap: 1rem; /* Space between button and status */
-          margin-bottom: 2rem;
-          pointer-events: all;
+          align-items: center;
+          justify-content: flex-end;
+          padding-right: 1.5rem;
         }
 
-        .join-button {
-          background: rgba(255, 215, 0, 0.1);
-          border: 2px solid #FFD700;
-          color: #FFF8DC;
-          padding: 1rem 3rem;
+        .bar-label {
           font-family: 'Orbitron', monospace;
-          font-size: 1rem;
+          font-size: 0.9rem;
           font-weight: 700;
-          letter-spacing: 0.15em;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          border-radius: 50px;
-          text-transform: uppercase;
-          box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-        }
-
-        .join-button:hover:not(:disabled) {
-          background: rgba(255, 215, 0, 0.2);
-          box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
-          transform: scale(1.05);
-        }
-
-        .join-button:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-
-        .join-button.joined {
-          background: rgba(255, 215, 0, 0.3);
-          border-color: #FFD700;
-        }
-
-        .session-status {
-          font-family: 'Rajdhani', sans-serif;
-          font-size: 1rem;
-          color: rgba(255, 215, 0, 0.7);
-          text-align: center;
+          color: #000;
           letter-spacing: 0.1em;
+        }
+
+        .aum-wave {
+          position: absolute;
+          width: 200px;
+          height: 200px;
+          border-radius: 50%;
+          border: 2px solid #00FFFF;
+          opacity: 0;
+          animation: wave-pulse 3s ease-out infinite;
+        }
+
+        @keyframes wave-pulse {
+          0% {
+            transform: scale(1);
+            opacity: 0.8;
+          }
+          100% {
+            transform: scale(2.5);
+            opacity: 0;
+          }
+        }
+
+        .sovereigns-counter {
+          position: absolute;
+          top: 2rem;
+          right: 2rem;
+          background: rgba(0, 31, 63, 0.9);
+          backdrop-filter: blur(10px);
+          border: 2px solid rgba(0, 255, 255, 0.3);
+          border-radius: 15px;
+          padding: 1rem 1.5rem;
+          pointer-events: all;
+          text-align: center;
+        }
+
+        .counter-label-small {
+          font-family: 'Orbitron', monospace;
+          font-size: 0.6rem;
+          color: rgba(0, 255, 255, 0.8);
+          letter-spacing: 0.15em;
+          margin-bottom: 0.3rem;
+          text-transform: uppercase;
+        }
+
+        .counter-value-small {
+          font-family: 'Orbitron', monospace;
+          font-size: 1.5rem;
+          font-weight: 900;
+          color: #00FFFF;
+          text-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
         }
 
         @media (max-width: 768px) {
-          .hud-top {
-            max-width: 90%;
-          }
-
-          .session-title {
-            font-size: 1.2rem;
-          }
-
-          .timer-display,
-          .participant-counter {
-            padding: 1rem 1.5rem;
+          .lobby-title {
+            font-size: 1.8rem;
           }
 
           .timer-value {
-            font-size: 1.5rem;
-          }
-
-          .counter-value {
             font-size: 2rem;
           }
 
-          .join-button {
-            padding: 0.8rem 2rem;
-            font-size: 0.9rem;
+          .mission-statement {
+            font-size: 1rem;
+          }
+
+          .breath-circle-container {
+            width: 250px;
+            height: 250px;
+          }
+
+          .breath-circle {
+            width: 150px;
+            height: 150px;
+          }
+
+          .breath-instruction {
+            font-size: 1rem;
+          }
+
+          .sovereigns-counter {
+            top: 1rem;
+            right: 1rem;
+            padding: 0.75rem 1rem;
           }
         }
       `}</style>
@@ -505,50 +729,116 @@ export default function Synchrony() {
           Back to Portal
         </Link>
 
-        <div className="hud-top">
-          <h2 className="session-title">SYNCHRONY</h2>
-          <p className="session-subtitle">GLOBAL CONSCIOUSNESS FIELD ACTIVATION</p>
-        </div>
-
-        <div className="hud-center">
-          <div className="participant-counter">
-            <div className="counter-label">SOVEREIGNS IN SYNC</div>
-            <div className="counter-value">{participantCount.toLocaleString()}</div>
-          </div>
-
-          <div className="timer-display">
-            <div className="timer-label">
-              {sessionActive ? 'SESSION TIME REMAINING' : 'NEXT ACTIVATION IN'}
-            </div>
-            <div className="timer-value">
+        {meditationPhase === 'lobby' && (
+          <div className="lobby-container">
+            <h1 className="lobby-title">THE SYNCHRONY</h1>
+            
+            <div className="info-card">
               {sessionActive ? (
-                formatTime(sessionTime)
+                <>
+                  <div className="timer-large">
+                    <div className="timer-label">SESSION ACTIVE - TIME REMAINING</div>
+                    <div className="timer-value">{formatTime(sessionTime)}</div>
+                  </div>
+                  
+                  <p className="mission-statement">
+                    Join a global synchronized meditation. We use coherent breathing and the Aum vibration 
+                    to generate a unified field of consciousness, raising the planet's frequency.
+                  </p>
+
+                  <div className="participant-display">
+                    <span className="participant-label">Sovereigns in Sync:</span>
+                    <span className="participant-count">{participantCount.toLocaleString()}</span>
+                  </div>
+
+                  <button className="join-wave-button" onClick={handleJoinSession}>
+                    JOIN THE WAVE
+                  </button>
+                </>
               ) : (
-                `${timeUntilNext.hours.toString().padStart(2, '0')}H ${timeUntilNext.minutes.toString().padStart(2, '0')}M ${timeUntilNext.seconds.toString().padStart(2, '0')}S`
+                <>
+                  <div className="timer-large">
+                    <div className="timer-label">NEXT WAVE IN</div>
+                    <div className="timer-value">
+                      {timeUntilNext.hours.toString().padStart(2, '0')}H {timeUntilNext.minutes.toString().padStart(2, '0')}M
+                    </div>
+                  </div>
+                  
+                  <p className="mission-statement">
+                    Join a global synchronized meditation. We use coherent breathing and the Aum vibration 
+                    to generate a unified field of consciousness, raising the planet's frequency.
+                  </p>
+
+                  <div className="participant-display">
+                    <span className="participant-label">Global Community:</span>
+                    <span className="participant-count">{participantCount.toLocaleString()}</span>
+                  </div>
+
+                  <button className="join-wave-button" disabled>
+                    AWAITING NEXT SESSION
+                  </button>
+                </>
               )}
             </div>
           </div>
-        </div>
+        )}
 
-        <div className="hud-bottom">
-          {sessionActive ? (
-            <>
-              {!hasJoined ? (
-                <button className="join-button" onClick={handleJoinSession}>
-                  JOIN THE FIELD
-                </button>
-              ) : (
-                <div className="session-status">
-                  YOU ARE SYNCHRONIZED ✦ HOLD THE FREQUENCY
+        {(meditationPhase === 'boxBreathing' || meditationPhase === 'aumToning') && (
+          <>
+            <div className="sovereigns-counter">
+              <div className="counter-label-small">SOVEREIGNS IN SYNC</div>
+              <div className="counter-value-small">{participantCount.toLocaleString()}</div>
+            </div>
+
+            <div className="meditation-container">
+              <div className="phase-indicator">
+                {meditationPhase === 'boxBreathing' ? 'PHASE 1: COHERENCE INDUCTION' : 'PHASE 2: SOVEREIGN VIBRATION'}
+              </div>
+
+              {meditationPhase === 'boxBreathing' && (
+                <div className="breath-guide">
+                  <div className="breath-circle-container">
+                    <div 
+                      className="breath-circle" 
+                      style={{
+                        transform: `scale(${0.7 + (breathProgress / 100) * 0.6})`
+                      }}
+                    >
+                      <div className="breath-instruction">{getBreathInstruction()}</div>
+                    </div>
+                  </div>
                 </div>
               )}
-            </>
-          ) : (
-            <div className="session-status">
-              NEXT GLOBAL MEDITATION APPROACHING
+
+              {meditationPhase === 'aumToning' && (
+                <div className="breath-guide">
+                  <div className="breath-circle-container">
+                    <div className="breath-circle">
+                      <div className="breath-instruction">{getBreathInstruction()}</div>
+                    </div>
+                    {breathPhase === 'exhale' && breathProgress < 80 && (
+                      <>
+                        <div className="aum-wave" style={{ animationDelay: '0s' }}></div>
+                        <div className="aum-wave" style={{ animationDelay: '1s' }}></div>
+                        <div className="aum-wave" style={{ animationDelay: '2s' }}></div>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="breath-bar-container">
+                    <div className="breath-bar" style={{ width: `${breathProgress}%` }}>
+                      {breathProgress > 30 && (
+                        <span className="bar-label">
+                          {breathPhase === 'inhale' ? 'INHALE' : 'AUM'}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </div>
   );
