@@ -751,13 +751,13 @@ export default function SovereignPortal() {
           position: absolute;
           width: 100%;
           height: 100%;
-          border: 3px solid #00FFFF;
+          border: 3px solid #4A9EFF;
           border-radius: 50%;
           box-shadow: 
-            0 0 15px #00FFFF,
-            0 0 30px #00FFFF,
-            0 0 45px rgba(0, 255, 255, 0.5),
-            inset 0 0 15px #00FFFF;
+            0 0 15px #4A9EFF,
+            0 0 30px #4A9EFF,
+            0 0 45px rgba(74, 158, 255, 0.5),
+            inset 0 0 15px #4A9EFF;
           animation: portal-pulse 3s ease-in-out infinite alternate;
         }
 
@@ -770,8 +770,8 @@ export default function SovereignPortal() {
           border-radius: 50%;
           background: radial-gradient(circle, 
             rgba(10, 20, 50, 0.9) 0%, 
-            rgba(0, 128, 128, 0.6) 40%,
-            rgba(0, 255, 255, 0.3) 70%,
+            rgba(30, 80, 150, 0.6) 40%,
+            rgba(74, 158, 255, 0.3) 70%,
             transparent 100%
           );
           opacity: 0.8;
@@ -784,9 +784,9 @@ export default function SovereignPortal() {
           height: 100%;
           border-radius: 50%;
           background: 
-            radial-gradient(circle at 20% 30%, rgba(0, 255, 255, 0.15) 2%, transparent 20%),
-            radial-gradient(circle at 70% 60%, rgba(0, 255, 255, 0.15) 2%, transparent 20%),
-            radial-gradient(circle at 50% 80%, rgba(0, 255, 255, 0.15) 2%, transparent 20%);
+            radial-gradient(circle at 20% 30%, rgba(74, 158, 255, 0.15) 2%, transparent 20%),
+            radial-gradient(circle at 70% 60%, rgba(74, 158, 255, 0.15) 2%, transparent 20%),
+            radial-gradient(circle at 50% 80%, rgba(74, 158, 255, 0.15) 2%, transparent 20%);
           animation: particle-shimmer 4s ease-in-out infinite alternate;
           pointer-events: none;
         }
@@ -809,17 +809,17 @@ export default function SovereignPortal() {
         @keyframes portal-pulse {
           from {
             box-shadow: 
-              0 0 15px #00FFFF,
-              0 0 30px #00FFFF,
-              0 0 45px rgba(0, 255, 255, 0.5),
-              inset 0 0 15px #00FFFF;
+              0 0 15px #4A9EFF,
+              0 0 30px #4A9EFF,
+              0 0 45px rgba(74, 158, 255, 0.5),
+              inset 0 0 15px #4A9EFF;
           }
           to {
             box-shadow: 
-              0 0 25px #00FFFF,
-              0 0 50px #00FFFF,
-              0 0 70px rgba(0, 255, 255, 0.8),
-              inset 0 0 25px #00FFFF;
+              0 0 25px #4A9EFF,
+              0 0 50px #4A9EFF,
+              0 0 70px rgba(74, 158, 255, 0.8),
+              inset 0 0 25px #4A9EFF;
           }
         }
 
@@ -863,29 +863,29 @@ export default function SovereignPortal() {
         }
 
         .synchrony-glass-button:hover .synchrony-title {
-          text-shadow: 0 0 25px #00FFFF, 0 0 35px #00FFFF;
+          text-shadow: 0 0 25px #4A9EFF, 0 0 35px #4A9EFF;
           transform: scale(1.05);
         }
 
         .synchrony-glass-button:hover .synchrony-subtitle {
-          color: rgba(0, 255, 255, 0.9);
+          color: rgba(74, 158, 255, 0.9);
         }
 
         .synchrony-title {
           font-family: 'Orbitron', monospace;
           font-size: 1rem;
           font-weight: 700;
-          color: #00FFFF;
+          color: #4A9EFF;
           letter-spacing: 0.12em;
           margin-bottom: 0.2rem;
-          text-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+          text-shadow: 0 0 15px rgba(74, 158, 255, 0.6);
           transition: all 0.3s ease;
         }
 
         .synchrony-subtitle {
           font-family: 'Inter', sans-serif;
           font-size: 0.6rem;
-          color: rgba(0, 255, 255, 0.6);
+          color: rgba(74, 158, 255, 0.6);
           letter-spacing: 0.08em;
           text-transform: lowercase;
           transition: all 0.3s ease;
