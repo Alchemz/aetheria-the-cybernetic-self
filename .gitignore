@@ -31,4 +31,5 @@ ios/App/App/public
 android/app/src/main/assets/public
 android/app/build
 android/build
+android/local.properties
 .gradle
