@@ -1021,7 +1021,7 @@ Respond as ATHENA, providing insightful, relevant, and actionable guidance based
         <div className="hw-bottom-nav">
           <Link to="/heartwave-console" className="hw-nav-btn">
             <Target size={24} />
-            <span>Console</span>
+            <span>Routine</span>
           </Link>
           <Link to="/heartwave-protocols" className="hw-nav-btn">
             <Flame size={24} />

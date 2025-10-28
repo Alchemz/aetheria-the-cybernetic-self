@@ -1037,7 +1037,7 @@ export default function HeartWaveConsole() {
             <Link to="/portal" className="console-back" style={{textDecoration: 'none'}}>
               <ArrowLeft size={24} />
             </Link>
-            <h1 className="console-title">HABIT CONSOLE</h1>
+            <h1 className="console-title">DAILY ROUTINE</h1>
             <div style={{ width: 24 }} />
           </div>
           <p className="hw-subtitle"> 
@@ -1121,7 +1121,7 @@ export default function HeartWaveConsole() {
         <div className="heartwave-bottom-nav"> 
           <div className="heartwave-nav-btn active"> 
             <Target size={24} />
-            <span>Console</span>
+            <span>Routine</span>
           </div>
           <Link to="/heartwave-protocols" className="heartwave-nav-btn"> 
             <Flame size={24} />

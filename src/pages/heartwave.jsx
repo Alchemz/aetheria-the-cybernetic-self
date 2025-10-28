@@ -951,7 +951,7 @@ export default function TheTemple() {
           <div className="heartwave-bottom-nav">
             <Link to="/heartwave-console" className="heartwave-nav-btn">
               <Target size={24} />
-              <span>Console</span>
+              <span>Routine</span>
             </Link>
             <div className="heartwave-nav-btn active">
               <Flame size={24} />
