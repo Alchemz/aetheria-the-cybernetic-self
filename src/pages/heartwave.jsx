@@ -705,6 +705,37 @@ export default function TheTemple() {
               color: rgba(255, 255, 255, 0.3);
             }
 
+            .update-routine-btn {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 0.6rem;
+              background: linear-gradient(135deg, #00A86B 0%, #008557 100%);
+              border: 1px solid #00A86B;
+              color: white;
+              padding: 0.9rem 1.5rem;
+              font-family: 'Orbitron', monospace;
+              font-size: 0.85rem;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              text-decoration: none;
+              box-shadow: 0 0 15px rgba(0, 168, 107, 0.3);
+              margin-bottom: 2rem;
+            }
+
+            .update-routine-btn:hover {
+              background: linear-gradient(135deg, #00C97F 0%, #00A86B 100%);
+              box-shadow: 0 0 25px rgba(0, 168, 107, 0.6);
+              transform: translateY(-2px);
+            }
+
+            .update-routine-btn:active {
+              transform: translateY(0);
+            }
+
             .heartwave-biomods-grid {
               display: grid;
               grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -907,6 +938,11 @@ export default function TheTemple() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
+
+            <Link to="/heartwave-console" className="update-routine-btn">
+              <Target size={18} />
+              <span>Update Routine Stack</span>
+            </Link>
           </div>
 
           <div className="heartwave-biomods-grid">
