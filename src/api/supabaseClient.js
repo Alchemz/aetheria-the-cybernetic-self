@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { APP_CONFIG } from '../config';
 
 // Supabase credentials
 // Note: These are public keys - safe to commit (anon key is meant for client-side use)
@@ -17,6 +18,33 @@ export const auth = {
 
   // Get current user with profile data
   me: async () => {
+    // Demo mode - use localStorage
+    if (APP_CONFIG.BYPASS_AUTH) {
+      const demoProfile = localStorage.getItem('demo_profile');
+      if (demoProfile) {
+        return JSON.parse(demoProfile);
+      }
+      // Return default demo user
+      const defaultProfile = {
+        id: 'demo-user',
+        email: 'demo@innersync.app',
+        full_name: 'Demo User',
+        birth_date: '',
+        birth_time: '',
+        birth_location: '',
+        subscription_status: 'active',
+        subscribed_products: ['heartwave'],
+        subscription_type: 'demo',
+        trial_start_date: null,
+        trial_end_date: null,
+        has_used_trial: false,
+        active_bio_mods: [],
+      };
+      localStorage.setItem('demo_profile', JSON.stringify(defaultProfile));
+      return defaultProfile;
+    }
+
+    // Normal mode - use Supabase
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) throw new Error('Not authenticated');
 
@@ -51,6 +79,30 @@ export const auth = {
 
   // Update user profile
   updateMe: async (updates) => {
+    // Demo mode - use localStorage
+    if (APP_CONFIG.BYPASS_AUTH) {
+      const demoProfile = localStorage.getItem('demo_profile');
+      const currentProfile = demoProfile ? JSON.parse(demoProfile) : {
+        id: 'demo-user',
+        email: 'demo@innersync.app',
+        full_name: 'Demo User',
+        subscription_status: 'active',
+        subscribed_products: ['heartwave'],
+        subscription_type: 'demo',
+        active_bio_mods: [],
+      };
+      
+      const updatedProfile = {
+        ...currentProfile,
+        ...updates,
+        updated_at: new Date().toISOString(),
+      };
+      
+      localStorage.setItem('demo_profile', JSON.stringify(updatedProfile));
+      return updatedProfile;
+    }
+
+    // Normal mode - use Supabase
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
 
