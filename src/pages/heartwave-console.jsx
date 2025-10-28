@@ -9,13 +9,14 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Plus, Check, Info, Target, Flame, Zap, X, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { auth } from "@/api/supabaseClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import SubscriptionGuard from '../components/SubscriptionGuard';
 
 export default function HeartWaveConsole() {
   const waveCanvasRef = useRef(null);
+  const location = useLocation();
   const [user, setUser] = useState(null);
   const [habits, setHabits] = useState([]);
   const [selectedHabit, setSelectedHabit] = useState(null);
@@ -33,6 +34,11 @@ export default function HeartWaveConsole() {
     loadUserData();
     initWaveAnimation();
   }, []);
+
+  // Refresh data when navigating to this page
+  useEffect(() => {
+    loadUserData();
+  }, [location]);
 
   const loadUserData = async () => {
     try {
