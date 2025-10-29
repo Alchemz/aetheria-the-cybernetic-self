@@ -730,6 +730,7 @@ export default function SovereignPortal() {
         .floating-portal-widget {
           position: fixed;
           bottom: 2rem;
+          bottom: calc(2rem + env(safe-area-inset-bottom));
           right: 2rem;
           z-index: 1000;
           cursor: pointer;
@@ -842,6 +843,7 @@ export default function SovereignPortal() {
         .synchrony-button-overlay {
           position: fixed;
           bottom: 2rem;
+          bottom: calc(2rem + env(safe-area-inset-bottom));
           right: 9.5rem;
           z-index: 999;
           opacity: 0;
@@ -894,6 +896,7 @@ export default function SovereignPortal() {
         @media (max-width: 768px) {
           .floating-portal-widget {
             bottom: 1.5rem;
+            bottom: calc(1.5rem + env(safe-area-inset-bottom));
             right: 1.5rem;
             --portal-size: 60px;
           }
