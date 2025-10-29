@@ -31,6 +31,7 @@ INNERSYNC is a meditation and wellness platform built with Vite and React, featu
 - **Dream Assistant**: Provides dream interpretation and sleep guidance, leveraging user profile and dream journal context.
 - **Athena AI**: Offers bio-protocol optimization, science explanations, and habit adjustments, utilizing user profile and active bio-mods context.
 - **Resonator (Audio Library)**: Features 6 categories of healing frequencies (Deep Sleep, Lucid Dreaming, Chakra Alignment, Astral Projection, Theta Waves, Solfeggio) with downloadable MP3s and iOS-specific background playback support. Audio files hosted on Backblaze B2.
+- **Meditation Chamber & Healing Lab**: Four categories of audio content (Guided Meditations, Heart Coherence, Healing Frequencies, Focus) with download functionality and iOS background playback support. Includes 11 total tracks with 3D particle field visualization. All audio hosted on Backblaze B2.
 
 ### System Design Choices
 - **Secure Client-Server Architecture**: Frontend (Vite/React) on Port 5000, Backend (Express.js) on Port 3000. Frontend proxies API requests to the backend to protect API keys.
