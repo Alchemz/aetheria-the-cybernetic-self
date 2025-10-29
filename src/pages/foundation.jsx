@@ -1938,8 +1938,13 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
     }
   };
 
-  // Detect if on iOS
-  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  // Detect if on iOS (including iPadOS 13+)
+  const isIOS = (() => {
+    const ua = navigator.userAgent;
+    const isIOSUA = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    const isIPadOS = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+    return isIOSUA || isIPadOS;
+  })();
 
   return (
     <SubscriptionGuard requiredProduct="sanctuary">

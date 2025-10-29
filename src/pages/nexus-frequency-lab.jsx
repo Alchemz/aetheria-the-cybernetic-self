@@ -14,8 +14,13 @@ export default function MeditationChamber() {
   const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
-    const checkIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    setIsIOS(checkIOS);
+    const checkIOS = () => {
+      const ua = navigator.userAgent;
+      const isIOSUA = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+      const isIPadOS = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+      return isIOSUA || isIPadOS;
+    };
+    setIsIOS(checkIOS());
   }, []);
 
   const categories = {
