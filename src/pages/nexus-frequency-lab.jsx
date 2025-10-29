@@ -277,7 +277,7 @@ export default function MeditationChamber() {
         .chamber-content {
           position: relative;
           z-index: 10;
-          padding: 80px 20px 120px;
+          padding: calc(80px + env(safe-area-inset-top)) 20px calc(120px + env(safe-area-inset-bottom));
           max-width: 1200px;
           margin: 0 auto;
         }
@@ -464,6 +464,7 @@ export default function MeditationChamber() {
         .track-controls {
           display: flex;
           gap: 10px;
+          flex-wrap: wrap;
         }
 
         .track-button {
@@ -489,6 +490,71 @@ export default function MeditationChamber() {
           color: #000;
         }
 
+        .track-download-button {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: transparent;
+          border: 1px solid #FF6B9D;
+          color: #FF6B9D;
+          padding: 8px 12px;
+          font-family: 'Orbitron', monospace;
+          font-size: 0.7rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+
+        .track-download-button:hover {
+          background: #FF6B9D;
+          color: black;
+          box-shadow: 0 0 15px rgba(255, 107, 157, 0.5);
+        }
+
+        .track-background-play-button {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: rgba(226, 88, 34, 0.2);
+          border: 2px solid #E25822;
+          color: #FF8C42;
+          padding: 8px 12px;
+          font-family: 'Orbitron', monospace;
+          font-size: 0.7rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          font-weight: 600;
+        }
+
+        .track-background-play-button:hover {
+          background: #E25822;
+          color: black;
+          box-shadow: 0 0 15px rgba(226, 88, 34, 0.5);
+          transform: translateY(-1px);
+        }
+
+        .ios-background-tip {
+          background: rgba(255, 140, 66, 0.1);
+          border: 1px solid rgba(255, 140, 66, 0.3);
+          padding: 1rem;
+          margin-bottom: 1.5rem;
+          font-size: 0.75rem;
+          color: rgba(255, 255, 255, 0.8);
+          line-height: 1.5;
+          text-align: center;
+        }
+
+        .ios-background-tip-title {
+          font-family: 'Orbitron', monospace;
+          color: #FF8C42;
+          font-size: 0.8rem;
+          margin-bottom: 0.5rem;
+          letter-spacing: 0.05em;
+        }
+
         .player-bar {
           position: fixed;
           bottom: 0;
@@ -497,6 +563,7 @@ export default function MeditationChamber() {
           background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(20, 10, 15, 0.95));
           border-top: 2px solid #FF6B9D;
           padding: 20px;
+          padding-bottom: calc(20px + env(safe-area-inset-bottom));
           z-index: 1000;
           display: flex;
           align-items: center;
@@ -627,6 +694,13 @@ export default function MeditationChamber() {
             <p className="category-desc">{categories[currentCategory].description}</p>
           </div>
 
+          {isIOS && (
+            <div className="ios-background-tip">
+              <div className="ios-background-tip-title">iOS BACKGROUND AUDIO</div>
+              Tap "Play in Background" to open in Safari for native background playback with lock screen controls. Perfect for meditation sessions.
+            </div>
+          )}
+
           <div className="tracks-list">
             {categories[currentCategory].tracks.map(track => (
               <div
@@ -648,9 +722,24 @@ export default function MeditationChamber() {
                       <Play size={20} />
                     )}
                   </button>
-                  <button className="track-button">
-                    <Download size={20} />
+                  <button 
+                    className="track-download-button"
+                    onClick={() => handleDownload(track)}
+                    title="Download"
+                  >
+                    <Download size={16} />
+                    <span>Download</span>
                   </button>
+                  {isIOS && (
+                    <button 
+                      className="track-background-play-button"
+                      onClick={() => handleBackgroundPlay(track)}
+                      title="Play in Background (iOS)"
+                    >
+                      <ExternalLink size={16} />
+                      <span>Play in Background</span>
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
