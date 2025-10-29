@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import * as THREE from 'three';
-import { ArrowLeft, Play, Pause, Volume2, Download } from 'lucide-react';
+import { ArrowLeft, Play, Pause, Volume2, Download, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function MeditationChamber() {
@@ -11,6 +11,12 @@ export default function MeditationChamber() {
   const [currentCategory, setCurrentCategory] = useState('guided');
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(null);
+  const [isIOS, setIsIOS] = useState(false);
+
+  useEffect(() => {
+    const checkIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    setIsIOS(checkIOS);
+  }, []);
 
   const categories = {
     guided: {
@@ -224,6 +230,25 @@ export default function MeditationChamber() {
       });
       setIsPlaying(true);
     }
+  };
+
+  const handleDownload = (track) => {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      window.open(track.url, '_blank');
+    } else {
+      const link = document.createElement('a');
+      link.href = track.url;
+      link.download = `${track.name}.mp3`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  const handleBackgroundPlay = (track) => {
+    window.open(track.url, '_blank');
   };
 
   return (
