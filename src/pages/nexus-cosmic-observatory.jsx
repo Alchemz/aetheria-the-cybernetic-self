@@ -2,9 +2,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import * as THREE from 'three';
-import { ArrowLeft, Bell, Calendar, Sparkles, Zap } from 'lucide-react';
+import { ArrowLeft, Bell, Calendar, Sparkles, Zap, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { auth } from '@/api/supabaseClient';
+import { Capacitor } from '@capacitor/core';
 
 export default function CosmicObservatory() {
   const mountRef = useRef(null);
@@ -12,6 +13,7 @@ export default function CosmicObservatory() {
   const [cosmicBriefing, setCosmicBriefing] = useState(null);
   const [loadingBriefing, setLoadingBriefing] = useState(true);
   const [currentView, setCurrentView] = useState('calendar'); // Changed default to calendar
+  const [isNativeApp, setIsNativeApp] = useState(false);
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -105,7 +107,14 @@ export default function CosmicObservatory() {
   }, []);
 
   useEffect(() => {
-    loadCosmicBriefing();
+    const checkNative = Capacitor.isNativePlatform();
+    setIsNativeApp(checkNative);
+    
+    if (!checkNative) {
+      loadCosmicBriefing();
+    } else {
+      setLoadingBriefing(false);
+    }
   }, []);
 
   const loadCosmicBriefing = async () => {
@@ -511,6 +520,34 @@ export default function CosmicObservatory() {
           animation: pulse 2s ease-in-out infinite;
         }
 
+        .native-info-banner {
+          background: rgba(255, 140, 66, 0.1);
+          border: 2px solid rgba(255, 140, 66, 0.4);
+          padding: 30px;
+          text-align: center;
+          border-radius: 8px;
+        }
+
+        .native-info-icon {
+          margin-bottom: 15px;
+          animation: pulse 2s ease-in-out infinite;
+        }
+
+        .native-info-title {
+          font-family: 'Orbitron', monospace;
+          color: #FF8C42;
+          font-size: 1.2rem;
+          margin-bottom: 15px;
+          letter-spacing: 0.1em;
+        }
+
+        .native-info-text {
+          color: rgba(255, 255, 255, 0.8);
+          line-height: 1.8;
+          max-width: 600px;
+          margin: 0 auto;
+        }
+
         @media (max-width: 768px) {
           .observatory-content {
             padding: 60px 15px 30px;
@@ -625,7 +662,20 @@ export default function CosmicObservatory() {
         {/* Cosmic Briefing View Second */}
         {currentView === 'briefing' && (
           <div className="cosmic-briefing-section">
-            {loadingBriefing ? (
+            {isNativeApp ? (
+              <div className="native-info-banner">
+                <div className="native-info-icon">
+                  <AlertCircle size={48} color="#FF8C42" style={{display: 'inline-block'}} />
+                </div>
+                <div className="native-info-title">NATIVE APP MODE</div>
+                <div className="native-info-text">
+                  The Cosmic Briefing feature requires a backend server connection and is currently only available in the web version. 
+                  Please visit the web app to access your daily AI-generated cosmic insights and astrological guidance.
+                  <br /><br />
+                  The Cosmic Calendar below is fully functional in the native app!
+                </div>
+              </div>
+            ) : loadingBriefing ? (
               <div className="briefing-loading">
                 <Sparkles size={32} />
                 <div style={{marginTop: '15px'}}>Channeling today's cosmic intelligence...</div>
