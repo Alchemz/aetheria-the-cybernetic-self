@@ -404,6 +404,7 @@ export default function Synchrony() {
         .back-button {
           position: absolute;
           top: 1.5rem;
+          top: calc(1.5rem + env(safe-area-inset-top));
           left: 1.5rem;
           pointer-events: all;
           z-index: 100;

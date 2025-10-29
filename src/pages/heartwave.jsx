@@ -866,6 +866,7 @@ export default function TheTemple() {
               background: linear-gradient(to top, #0A0A0F, rgba(10, 10, 15, 0.95));
               backdrop-filter: blur(10px);
               padding: 1rem;
+              padding-bottom: calc(1rem + env(safe-area-inset-bottom));
               display: flex;
               justify-content: space-around;
               border-top: 1px solid rgba(0, 168, 107, 0.3);
