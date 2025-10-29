@@ -30,6 +30,7 @@ INNERSYNC is a meditation and wellness platform built with Vite and React, featu
 - **Today's Cosmic Briefing**: AI-powered daily astrological insights (300-400 words) with 3-4 extracted themes, cached in Supabase.
 - **Dream Assistant**: Provides dream interpretation and sleep guidance, leveraging user profile and dream journal context.
 - **Athena AI**: Offers bio-protocol optimization, science explanations, and habit adjustments, utilizing user profile and active bio-mods context.
+- **Resonator (Audio Library)**: Features 6 categories of healing frequencies (Deep Sleep, Lucid Dreaming, Chakra Alignment, Astral Projection, Theta Waves, Solfeggio) with downloadable MP3s and iOS-specific background playback support. Audio files hosted on Backblaze B2.
 
 ### System Design Choices
 - **Secure Client-Server Architecture**: Frontend (Vite/React) on Port 5000, Backend (Express.js) on Port 3000. Frontend proxies API requests to the backend to protect API keys.
@@ -61,6 +62,11 @@ INNERSYNC is a meditation and wellness platform built with Vite and React, featu
 - `npm run cap:build` - Build web app + sync to native
 - `npm run cap:sync` - Sync existing build to native
 - See `DEPLOYMENT.md` for App Store/Play Store submission
+
+**iOS Background Audio Configuration**:
+- **Info.plist**: Configured with `UIBackgroundModes` array containing `audio` for background playback support
+- **AppDelegate.swift**: Audio session configured with `AVAudioSessionCategoryPlayback` to enable background audio, lock screen playback, and audio continuation with silent switch ON
+- **Safe Area Support**: Added `viewport-fit=cover` and `env(safe-area-inset-*)` CSS for iPhone notch/Dynamic Island compatibility across Foundation, Portal, Temple, and Synchrony pages
 
 ## External Dependencies
 - **Supabase**: Used for authentication (`@supabase/supabase-js`) and as the primary PostgreSQL database.
