@@ -2,9 +2,7 @@
 // Calls secure backend API to protect API keys
 // Supports streaming responses with gpt-4o-mini
 
-// Backend API URL (proxied through Vite)
-// In production, this would be the actual backend URL
-const API_BASE_URL = '';
+import { API_BASE_URL } from './config';
 
 // Workflow IDs
 const WORKFLOWS = {
