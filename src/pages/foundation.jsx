@@ -2123,6 +2123,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
             width: 100%;
             display: block; /* Allows text-align to center h1/p */
             padding: 1rem 1.5rem;
+            padding-top: calc(1rem + env(safe-area-inset-top));
             background: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0.4), transparent);
             z-index: 100;
             text-align: center; /* Center title and subtitle */
@@ -2211,6 +2212,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
             display: flex;
             justify-content: space-around;
             padding: 1rem 0;
+            padding-bottom: calc(1rem + env(safe-area-inset-bottom));
             background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.6), transparent);
             z-index: 100;
           }
