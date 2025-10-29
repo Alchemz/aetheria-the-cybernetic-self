@@ -69,6 +69,14 @@ INNERSYNC is a meditation and wellness platform built with Vite and React, featu
 - **AppDelegate.swift**: Audio session configured with `AVAudioSessionCategoryPlayback` to enable background audio, lock screen playback, and audio continuation with silent switch ON
 - **Safe Area Support**: Added `viewport-fit=cover` and `env(safe-area-inset-*)` CSS for iPhone notch/Dynamic Island compatibility across Foundation, Portal, Temple, and Synchrony pages
 
+**Native App Limitations**:
+- **Backend-Dependent Features**: The following features require a live backend server and are disabled in native mode (detected via `Capacitor.isNativePlatform()`):
+  - **Cosmic Briefing (AI)**: Requires OpenAI API calls through the Express backend
+  - **Dream Assistant (AI)**: Requires OpenAI streaming API
+  - **Athena AI Assistant**: Requires OpenAI streaming API
+- **Fully Functional in Native**: All other features work offline including meditation audio, healing frequencies, Synchrony sessions, and the Cosmic Calendar
+- **Future Enhancement**: Could deploy backend to a cloud service (Vercel, Railway, Fly.io) and configure API endpoints to point to the deployed URL for native app support
+
 ## External Dependencies
 - **Supabase**: Used for authentication (`@supabase/supabase-js`) and as the primary PostgreSQL database.
 - **OpenAI API**: Integrated for AI capabilities, powering the Dream Assistant, Athena AI, and the Cosmic Briefing feature.
