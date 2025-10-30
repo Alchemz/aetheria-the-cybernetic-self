@@ -71,20 +71,31 @@ INNERSYNC is a meditation and wellness platform built with Vite and React, featu
 
 **Backend Deployment for Native App Support**:
 - **Replit Autoscale Deployment**: The Express backend (`server.js`) is configured for deployment to Replit's autoscale platform
-  - **Command**: `node server.js`
+  - **Run Command**: `node server.js` (automatically runs in production mode)
+  - **Build Command**: `npm run build` (builds the Vite frontend to `dist/` folder)
+  - **Port Configuration**: Server listens on port 5000 in production, serves both API and static files
   - **Pricing**: $1/month base + pay-per-use (typically $2-5/month, covered by Core plan credits)
   - **Features**: Auto-scaling, HTTPS by default, secrets management built-in
+- **Server Configuration**:
+  - **Development**: Runs on port 3000, works with Vite dev server on port 5000
+  - **Production**: Runs on port 5000, serves built static files from `dist/` folder
+  - **Environment Detection**: Uses `NODE_ENV=production` to switch modes automatically
+  - **SPA Support**: All non-API routes (`/portal`, `/foundation`, etc.) serve `index.html` in production
 - **API Configuration**: Environment-based endpoint switching (`src/api/config.js`)
   - Development (web): Uses Vite proxy to `localhost:3000`
   - Production (web): Uses deployed backend URL from `VITE_API_URL`
   - Native (iOS/Android): Uses deployed backend URL from `VITE_API_URL`
-- **Setup Instructions**:
-  1. Click "Deploy" in Replit workspace
-  2. Choose "Autoscale" deployment
-  3. After deployment, copy your deployment URL (e.g., `https://innersync-backend-username.replit.app`)
-  4. Add to Replit Secrets: `VITE_API_URL=<your-deployment-url>`
-  5. Rebuild native app: `npm run cap:build`
+- **Deployment Steps**:
+  1. Click "Publish" button at top of Replit workspace (or search "Publishing" in command bar)
+  2. Choose "Autoscale" deployment option
+  3. Configure: 1vCPU, 2 GiB RAM, max machines as needed
+  4. Verify run command is `node server.js` and build command is `npm run build`
+  5. Click "Publish" to deploy
+  6. Copy your deployment URL (e.g., `https://innersync-username.replit.app`)
+  7. Add to Replit Secrets: `VITE_API_URL=<your-deployment-url>`
+  8. For native app: Run `npm run cap:build` to rebuild with new API URL
 - **AI Features in Native App**: All AI features (Cosmic Briefing, Dream Assistant, Athena AI) work in native mode when backend is deployed
+- **Secrets Management**: All secrets (`OPENAI_API_KEY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`) automatically carry over from Replit development environment to deployment
 
 ## External Dependencies
 - **Supabase**: Used for authentication (`@supabase/supabase-js`) and as the primary PostgreSQL database.
