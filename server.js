@@ -3,9 +3,15 @@ import express from 'express';
 import cors from 'cors';
 import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 3000;
+// Use port 5000 in production (Replit deployment), port 3000 in development
+const PORT = process.env.NODE_ENV === 'production' ? 5000 : 3000;
 
 // Initialize OpenAI client (server-side only - API key never exposed to client)
 const openai = new OpenAI({
@@ -43,6 +49,13 @@ app.use((req, res, next) => {
   console.log(`📨 ${req.method} ${req.path}`);
   next();
 });
+
+// Serve static files from 'dist' folder in production
+if (process.env.NODE_ENV === 'production') {
+  const distPath = path.join(__dirname, 'dist');
+  console.log('📦 Serving static files from:', distPath);
+  app.use(express.static(distPath));
+}
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -269,8 +282,20 @@ Return a JSON object with a "themes" key containing an array of strings. Example
   }
 });
 
+// In production, serve index.html for all non-API routes (SPA support)
+if (process.env.NODE_ENV === 'production') {
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  });
+}
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Backend API server running on http://0.0.0.0:${PORT}`);
   console.log(`🔑 OpenAI API Key: ${process.env.OPENAI_API_KEY ? 'Configured ✅' : 'Missing ❌'}`);
-  console.log(`✅ Ready to accept requests from Vite proxy`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  if (process.env.NODE_ENV === 'production') {
+    console.log(`✅ Serving static files from dist/ folder`);
+  } else {
+    console.log(`✅ Ready to accept requests from Vite proxy`);
+  }
 });
