@@ -524,12 +524,11 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
       padding: '0',
       boxSizing: 'border-box'
     }}>
-      {/* HTML5 Audio Element - iOS ENHANCED NEXUS PATTERN */}
+      {/* HTML5 Audio Element - FIXED NEXUS PATTERN (NO crossOrigin!) */}
       <audio
         ref={audioRef}
         src={audioUrl || ''}
-        crossOrigin="anonymous"
-        preload="auto"
+        preload="metadata"
         playsInline
         onLoadedMetadata={handleLoadedMetadata}
         onDurationChange={handleDurationChange}

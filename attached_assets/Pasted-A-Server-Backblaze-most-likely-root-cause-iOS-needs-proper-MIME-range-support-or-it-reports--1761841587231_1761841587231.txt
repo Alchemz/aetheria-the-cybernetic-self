@@ -1,0 +1,141 @@
+A) Server / Backblaze (most likely root cause)
+
+iOS needs proper MIME + range support or it reports duration = Infinity and refuses to play.
+
+1) Check the headers for a real URL (use any file that fails)
+
+Run these on your Mac (replace with an actual audio URL):
+
+curl -I "https://f000.backblazeb2.com/file/YOUR_BUCKET/path/to/file.mp3"
+curl -I -H "Range: bytes=0-1" "https://f000.backblazeb2.com/file/YOUR_BUCKET/path/to/file.mp3"
+
+
+You want to see:
+
+Content-Type: audio/mpeg ✅
+
+Accept-Ranges: bytes ✅
+
+Content-Length: <number> ✅
+
+For the 2nd command: 206 Partial Content with Content-Range: bytes 0-1/<total> ✅
+
+If you get 200 OK to a Range request, bad MIME (e.g. application/octet-stream), or missing Accept-Ranges, iOS will give Infinity and stall.
+
+2) Set/force correct headers in Backblaze B2
+
+For each MP3 file’s Content-Type, set audio/mpeg (Backblaze can store per-file content-type).
+
+If you’re proxying or using signed URLs, make sure the proxy doesn’t strip range headers.
+
+3) CORS config on the bucket (very important for iOS)
+
+Allow your app origins and Range header, and expose length/range headers.
+
+Allowed Origins
+
+capacitor://localhost
+
+http://localhost:* (if you dev)
+
+https://innersync.replit.app (your base URL)
+
+Allowed Methods
+
+GET, HEAD
+
+Allowed Headers
+
+Range, Origin, Accept, Content-Type
+
+Expose Headers
+
+Accept-Ranges, Content-Range, Content-Length, Content-Type
+
+Max Age
+
+3600
+
+Without Range allowed/exposed, iOS often never resolves metadata → Infinity.
+
+B) App / iOS (make WebKit happy & robust)
+
+Even with perfect headers, let’s harden the player for iOS.
+
+1) Use a minimal, iOS-safe audio element
+<audio
+  id="player"
+  preload="metadata"
+  playsinline
+  webkit-playsinline
+  controls
+></audio>
+
+2) Only set src on user tap, then wait for readiness
+const audio = document.getElementById('player');
+
+function playUrl(url) {
+  audio.pause();
+  audio.removeAttribute('src');
+  audio.load();
+
+  audio.src = url;
+  audio.load();
+
+  const tryPlay = () => audio.play().catch(err => {
+    console.log('❌ play rejected', {
+      name: err?.name, message: err?.message,
+      readyState: audio.readyState, networkState: audio.networkState, duration: audio.duration
+    });
+  });
+
+  const onCanPlay = () => { audio.removeEventListener('canplay', onCanPlay); tryPlay(); };
+  audio.addEventListener('canplay', onCanPlay, { once: true });
+
+  // if already ready (e.g., after a retry)
+  if (audio.readyState >= 2) tryPlay();
+}
+
+audio.addEventListener('loadedmetadata', () => {
+  console.log('🔎 metadata', { duration: audio.duration, isFinite: isFinite(audio.duration), readyState: audio.readyState });
+});
+audio.addEventListener('durationchange', () => {
+  console.log('⏱️ durationchange', { duration: audio.duration, isFinite: isFinite(audio.duration) });
+});
+audio.addEventListener('stalled', () => console.log('⚠️ stalled'));
+audio.addEventListener('waiting', () => console.log('⏳ waiting'));
+audio.addEventListener('error', () => console.log('💥 audio.error', audio.error));
+
+3) Capacitor iOS: allow inline media + proper audio session
+
+AppDelegate.swift
+
+import AVFAudio  // or AVFoundation
+
+@UIApplicationMain
+class AppDelegate: UIResponder, UIApplicationDelegate {
+  var window: UIWindow?
+  // … your existing Capacitor setup …
+
+  func application(_ application: UIApplication,
+                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    do {
+      try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
+      try AVAudioSession.sharedInstance().setActive(true)
+    } catch {
+      print("AVAudioSession error: \(error)")
+    }
+    return true
+  }
+}
+
+
+Info.plist
+
+Add Required background modes → App plays audio or streams audio/video using AirPlay (optional if you want background)
+
+Ensure Allows Inline Media Playback is enabled in the WKWebView configuration (Capacitor uses it by default; if you customized, set allowsInlineMediaPlayback = true).
+
+4) Make sure the player element isn’t cross-origin-blocked
+
+If you use crossOrigin="anonymous", your bucket must return CORS headers as above. If not, remove crossOrigin for a quick test.
