@@ -284,7 +284,6 @@ export default function MeditationChamber() {
           align-items: center;
           justify-content: space-between;
           margin-bottom: 20px;
-          margin-top: calc(0px + env(safe-area-inset-top));
         }
 
         .chamber-back {
@@ -591,7 +590,7 @@ export default function MeditationChamber() {
 
         @media (max-width: 768px) {
           .chamber-content {
-            padding: 60px 15px 140px;
+            padding: calc(60px + env(safe-area-inset-top)) 15px calc(140px + env(safe-area-inset-bottom));
           }
 
           .chamber-title {

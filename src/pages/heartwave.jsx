@@ -638,7 +638,7 @@ export default function TheTemple() {
               min-height: 100vh;
               color: white;
               font-family: 'Rajdhani', sans-serif;
-              padding: 1rem 1rem 100px;
+              padding: calc(1rem + env(safe-area-inset-top)) 1rem 100px;
               background: transparent !important;
             }
 
