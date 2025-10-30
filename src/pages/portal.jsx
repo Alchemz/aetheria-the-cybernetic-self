@@ -26,12 +26,12 @@ export default function SovereignPortal() {
       path: "/foundation",
       logoUrl: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68d4574bc126933aed677cd7/50a012bb8_Photoroom_20251026_013106.png",
       colors: {
-        primary: '#FF4500',
-        secondary: '#FF6347',
-        tertiary: '#8B0000',
+        primary: '#CC5500',
+        secondary: '#D2691E',
+        tertiary: '#8B4513',
         background: 'radial-gradient(ellipse at center, #2d0a0a 0%, #1a0000 50%, #000000 100%)'
       },
-      particleColor: 0xFF4500,
+      particleColor: 0xCC5500,
       vibe: 'sanctuary'
     },
     {
@@ -441,25 +441,26 @@ export default function SovereignPortal() {
           background: rgba(0, 0, 0, 0.25);
           backdrop-filter: blur(40px) saturate(180%);
           -webkit-backdrop-filter: blur(40px) saturate(180%);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 32px;
+          border: 2px solid rgba(255, 255, 255, 0.12);
+          border-radius: 16px;
           padding: 4rem 3rem;
           max-width: 650px;
           width: 90%;
           text-align: center;
           box-shadow: 
             0 8px 32px rgba(0, 0, 0, 0.6),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15),
             0 0 60px rgba(0, 0, 0, 0.4);
           transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .realm.sanctuary .ui-panel {
-          border-color: rgba(255, 69, 0, 0.2);
+          border-color: rgba(204, 85, 0, 0.3);
           box-shadow: 
-            0 8px 32px rgba(255, 69, 0, 0.3),
-            inset 0 1px 0 rgba(255, 99, 71, 0.2),
-            0 0 80px rgba(255, 69, 0, 0.2);
+            0 8px 32px rgba(204, 85, 0, 0.3),
+            inset 0 1px 0 rgba(210, 105, 30, 0.2),
+            0 0 80px rgba(204, 85, 0, 0.25),
+            0 0 120px rgba(204, 85, 0, 0.15);
         }
 
         .realm.nexus .ui-panel {
@@ -505,8 +506,8 @@ export default function SovereignPortal() {
         }
 
         .realm.sanctuary .realm-title {
-          color: #FF6347;
-          text-shadow: 0 0 40px rgba(255, 69, 0, 0.8), 0 0 80px rgba(255, 69, 0, 0.4);
+          color: #D2691E;
+          text-shadow: 0 0 40px rgba(204, 85, 0, 0.8), 0 0 80px rgba(204, 85, 0, 0.4);
         }
 
         .realm.nexus .realm-title {
@@ -568,24 +569,24 @@ export default function SovereignPortal() {
         }
 
         .realm.sanctuary .realm-button {
-          border-color: rgba(255, 69, 0, 0.3);
-          background: rgba(255, 69, 0, 0.08);
-          color: #FFB3A3;
+          border-color: rgba(204, 85, 0, 0.3);
+          background: rgba(204, 85, 0, 0.08);
+          color: #FFB380;
           box-shadow: 
-            0 4px 20px rgba(255, 69, 0, 0.25),
-            inset 0 1px 0 rgba(255, 99, 71, 0.2),
-            0 0 30px rgba(255, 69, 0, 0.15);
+            0 4px 20px rgba(204, 85, 0, 0.25),
+            inset 0 1px 0 rgba(210, 105, 30, 0.2),
+            0 0 30px rgba(204, 85, 0, 0.15);
         }
 
         .realm.sanctuary .realm-button:hover {
-          background: rgba(255, 69, 0, 0.18);
-          border-color: rgba(255, 69, 0, 0.5);
+          background: rgba(204, 85, 0, 0.18);
+          border-color: rgba(204, 85, 0, 0.5);
           box-shadow: 
-            0 6px 30px rgba(255, 69, 0, 0.4),
-            inset 0 1px 0 rgba(255, 99, 71, 0.3),
-            0 0 50px rgba(255, 69, 0, 0.3);
+            0 6px 30px rgba(204, 85, 0, 0.4),
+            inset 0 1px 0 rgba(210, 105, 30, 0.3),
+            0 0 50px rgba(204, 85, 0, 0.3);
           transform: translateY(-2px);
-          color: #FF6347;
+          color: #D2691E;
         }
 
         .realm.nexus .realm-button {
@@ -671,7 +672,7 @@ export default function SovereignPortal() {
         @media (max-width: 768px) {
           .ui-panel {
             padding: 2.5rem 2rem;
-            border-radius: 24px;
+            border-radius: 12px;
           }
 
           .realm-title {
