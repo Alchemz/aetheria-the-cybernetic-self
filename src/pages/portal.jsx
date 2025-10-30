@@ -434,14 +434,14 @@ export default function SovereignPortal() {
           transition: opacity 0.8s ease;
         }
 
-        /* Clean Minimal Futuristic Panel - Square Button Style */
+        /* Borderless Glow Panel - Pure Glow Effect */
         .ui-panel {
           position: relative;
           z-index: 10;
           background: rgba(0, 0, 0, 0.25);
           backdrop-filter: blur(40px) saturate(180%);
           -webkit-backdrop-filter: blur(40px) saturate(180%);
-          border: 1px solid rgba(255, 255, 255, 0.15);
+          border: 1px solid transparent;
           border-radius: 4px;
           padding: 4rem 3rem;
           max-width: 650px;
@@ -449,37 +449,36 @@ export default function SovereignPortal() {
           text-align: center;
           box-shadow: 
             0 4px 20px rgba(0, 0, 0, 0.4),
-            inset 0 1px 0 rgba(255, 255, 255, 0.15),
-            0 0 30px rgba(255, 255, 255, 0.05);
+            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+            0 0 40px rgba(255, 255, 255, 0.05);
           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .realm.sanctuary .ui-panel {
-          border-color: rgba(204, 85, 0, 0.4);
           background: rgba(204, 85, 0, 0.05);
           box-shadow: 
             0 4px 20px rgba(204, 85, 0, 0.3),
-            inset 0 1px 0 rgba(210, 105, 30, 0.25),
-            0 0 30px rgba(204, 85, 0, 0.2),
-            0 0 60px rgba(204, 85, 0, 0.1);
+            inset 0 1px 0 rgba(210, 105, 30, 0.2),
+            0 0 40px rgba(204, 85, 0, 0.25),
+            0 0 80px rgba(204, 85, 0, 0.15);
         }
 
         .realm.nexus .ui-panel {
-          border-color: rgba(155, 89, 182, 0.4);
           background: rgba(155, 89, 182, 0.05);
           box-shadow: 
             0 4px 20px rgba(155, 89, 182, 0.3),
-            inset 0 1px 0 rgba(187, 143, 206, 0.25),
-            0 0 30px rgba(155, 89, 182, 0.2);
+            inset 0 1px 0 rgba(187, 143, 206, 0.2),
+            0 0 40px rgba(155, 89, 182, 0.25),
+            0 0 80px rgba(155, 89, 182, 0.15);
         }
 
         .realm.temple .ui-panel {
-          border-color: rgba(0, 168, 107, 0.4);
           background: rgba(0, 168, 107, 0.05);
           box-shadow: 
             0 4px 20px rgba(0, 168, 107, 0.3),
-            inset 0 1px 0 rgba(60, 179, 113, 0.25),
-            0 0 30px rgba(0, 168, 107, 0.2);
+            inset 0 1px 0 rgba(60, 179, 113, 0.2),
+            0 0 40px rgba(0, 168, 107, 0.25),
+            0 0 80px rgba(0, 168, 107, 0.15);
         }
 
         .logo-container {
