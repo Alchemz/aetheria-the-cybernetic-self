@@ -1,0 +1,30 @@
+framework-feb12df8fd4c4694.js:1 Unrecognized feature: 'ambient-light-sensor'.
+_ @ framework-feb12df8fd4c4694.js:1Understand this warning
+framework-feb12df8fd4c4694.js:1 Unrecognized feature: 'battery'.
+_ @ framework-feb12df8fd4c4694.js:1Understand this warning
+framework-feb12df8fd4c4694.js:1 Unrecognized feature: 'execution-while-not-rendered'.
+_ @ framework-feb12df8fd4c4694.js:1Understand this warning
+framework-feb12df8fd4c4694.js:1 Unrecognized feature: 'execution-while-out-of-viewport'.
+_ @ framework-feb12df8fd4c4694.js:1Understand this warning
+framework-feb12df8fd4c4694.js:1 Unrecognized feature: 'layout-animations'.
+_ @ framework-feb12df8fd4c4694.js:1Understand this warning
+framework-feb12df8fd4c4694.js:1 Unrecognized feature: 'legacy-image-formats'.
+_ @ framework-feb12df8fd4c4694.js:1Understand this warning
+framework-feb12df8fd4c4694.js:1 Unrecognized feature: 'navigation-override'.
+_ @ framework-feb12df8fd4c4694.js:1Understand this warning
+framework-feb12df8fd4c4694.js:1 Unrecognized feature: 'oversized-images'.
+_ @ framework-feb12df8fd4c4694.js:1Understand this warning
+framework-feb12df8fd4c4694.js:1 Unrecognized feature: 'publickey-credentials'.
+_ @ framework-feb12df8fd4c4694.js:1Understand this warning
+framework-feb12df8fd4c4694.js:1 Unrecognized feature: 'speaker-selection'.
+_ @ framework-feb12df8fd4c4694.js:1Understand this warning
+framework-feb12df8fd4c4694.js:1 Unrecognized feature: 'unoptimized-images'.
+_ @ framework-feb12df8fd4c4694.js:1Understand this warning
+framework-feb12df8fd4c4694.js:1 Unrecognized feature: 'unsized-media'.
+_ @ framework-feb12df8fd4c4694.js:1Understand this warning
+framework-feb12df8fd4c4694.js:1 Unrecognized feature: 'pointer-lock'.
+_ @ framework-feb12df8fd4c4694.js:1Understand this warning
+framework-feb12df8fd4c4694.js:1 Allow attribute will take precedence over 'allowfullscreen'.
+_ @ framework-feb12df8fd4c4694.js:1Understand this warning
+framework-feb12df8fd4c4694.js:1 Allow attribute will take precedence over 'allowpaymentrequest'.
+_ @ framework-feb12df8fd4c4694.js:1Understand this warning

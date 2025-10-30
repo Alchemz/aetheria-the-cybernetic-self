@@ -307,10 +307,7 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
 
   // Create/update audio element with BACKGROUND PLAYBACK enabled
   useEffect(() => {
-    console.log('🔍 AudioPlayer useEffect triggered, audioUrl:', audioUrl);
-    
     if (!audioUrl) {
-      console.log('⚠️ No audioUrl provided, clearing audio');
       setAudioData(null);
       setCurrentTime(0);
       setAudioError(null);
@@ -319,7 +316,6 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
     }
 
     if (currentAudioUrlRef.current === audioUrl && audioElementRef.current) {
-      console.log('Same URL, reusing existing audio element');
       return;
     }
 
@@ -460,7 +456,7 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
       audioElementRef.current = null;
       currentAudioUrlRef.current = null;
     };
-  }, [audioUrl, volume, onTogglePlay]);
+  }, [audioUrl, volume]);
 
   // Update volume
   useEffect(() => {
@@ -1875,9 +1871,6 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
 
   // Handle track selection - FIXED: Don't stop if same track
   const handleTrackSelect = (track) => {
-    console.log('🔍 handleTrackSelect called with:', track);
-    console.log('🔍 Track audioUrl:', track.audioUrl);
-    
     // Only change track if it's different
     if (currentPlayingTrack && track.id === currentPlayingTrack.id) {
       console.log('🎵 Same track selected, no change');
@@ -1885,7 +1878,6 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
     }
 
     console.log('🎵 Switching to new track:', track.name);
-    console.log('🎵 New track audioUrl:', track.audioUrl);
     
     // Find the category of the selected track to update the current playlist and index
     const categoryName = Object.keys(frequencyTracks).find(cat => 
