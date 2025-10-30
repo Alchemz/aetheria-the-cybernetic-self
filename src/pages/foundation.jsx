@@ -203,341 +203,191 @@ const MatrixVisualizer = ({ color = "#E25822", background = "#0A0A0A", audioData
   );
 };
 
-// Enhanced AudioPlayer with Playlist Navigation
+// Enhanced AudioPlayer with Playlist Navigation - REBUILT USING NEXUS PATTERN
 const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, onPrevious }) => {
   const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(70);
   const [audioData, setAudioData] = useState(null);
   const [audioError, setAudioError] = useState(null);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
   
+  const audioRef = useRef(null);
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
-  const audioElementRef = useRef(null);
   const sourceNodeRef = useRef(null);
-  const gainNodeRef = useRef(null);
-  const currentAudioUrlRef = useRef(null);
-  
-  const duration = 225;
+  const animationFrameRef = useRef(null);
 
-  // Initialize Web Audio API once
+  // Initialize Web Audio API ONCE for visualizer
   useEffect(() => {
-    if (!audioContextRef.current) {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      audioContextRef.current = new AudioContext();
-      
-      analyserRef.current = audioContextRef.current.createAnalyser();
-      analyserRef.current.fftSize = 256;
-      
-      gainNodeRef.current = audioContextRef.current.createGain();
-      
-      analyserRef.current.connect(gainNodeRef.current);
-      gainNodeRef.current.connect(audioContextRef.current.destination);
-      
-      console.log('✅ Web Audio API initialized for background playback');
+    if (!audioContextRef.current && audioRef.current) {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioContextRef.current = new AudioContext();
+        analyserRef.current = audioContextRef.current.createAnalyser();
+        analyserRef.current.fftSize = 256;
+        
+        const source = audioContextRef.current.createMediaElementSource(audioRef.current);
+        source.connect(analyserRef.current);
+        analyserRef.current.connect(audioContextRef.current.destination);
+        sourceNodeRef.current = source;
+        
+        console.log('✅ Web Audio API initialized for visualizer');
+      } catch (err) {
+        console.warn('Web Audio API unavailable:', err);
+      }
     }
-  }, []);
+  }, [audioUrl]); // Only when audio URL changes
 
-  // CRITICAL: Configure Media Session API for TRUE background audio
+  // Media Session API for background playback
   useEffect(() => {
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: currentTrack,
-        artist: 'INNERSYNC - The Dreamscape',
-        album: 'Sleep Frequencies',
-        artwork: [
-          { src: 'https://via.placeholder.com/96', sizes: '96x96', type: 'image/png' },
-          { src: 'https://via.placeholder.com/128', sizes: '128x128', type: 'image/png' },
-          { src: 'https://via.placeholder.com/192', sizes: '192x192', type: 'image/png' },
-          { src: 'https://via.placeholder.com/256', sizes: '256x256', type: 'image/png' },
-          { src: 'https://via.placeholder.com/384', sizes: '384x384', type: 'image/png' },
-          { src: 'https://via.placeholder.com/512', sizes: '512x512', type: 'image/png'}
-        ]
-      });
+    if (!currentTrack || !('mediaSession' in navigator)) return;
 
-      // Handle play/pause from lock screen or notification
-      navigator.mediaSession.setActionHandler('play', async () => {
-        if (audioElementRef.current) {
-          try {
-            await audioElementRef.current.play();
-            if (!isPlaying) onTogglePlay();
-          } catch (err) {
-            console.error('Play from media session failed:', err);
-          }
-        }
-      });
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: currentTrack,
+      artist: 'INNERSYNC - The Dreamscape',
+      album: 'Sleep Frequencies',
+      artwork: [
+        { src: 'https://via.placeholder.com/96', sizes: '96x96', type: 'image/png' },
+        { src: 'https://via.placeholder.com/128', sizes: '128x128', type: 'image/png' },
+        { src: 'https://via.placeholder.com/192', sizes: '192x192', type: 'image/png' },
+        { src: 'https://via.placeholder.com/256', sizes: '256x256', type: 'image/png' },
+        { src: 'https://via.placeholder.com/384', sizes: '384x384', type: 'image/png' },
+        { src: 'https://via.placeholder.com/512', sizes: '512x512', type: 'image/png'}
+      ]
+    });
 
-      navigator.mediaSession.setActionHandler('pause', () => {
-        if (audioElementRef.current) {
-          audioElementRef.current.pause();
-          if (isPlaying) onTogglePlay();
-        }
-      });
+    navigator.mediaSession.setActionHandler('play', () => {
+      if (audioRef.current && !isPlaying) {
+        audioRef.current.play().catch(console.error);
+        onTogglePlay();
+      }
+    });
 
-      // Handle seek controls from lock screen
-      navigator.mediaSession.setActionHandler('seekbackward', (details) => {
-        if (audioElementRef.current) {
-          audioElementRef.current.currentTime = Math.max(
-            audioElementRef.current.currentTime - (details.seekOffset || 10),
-            0
-          );
-        }
-      });
+    navigator.mediaSession.setActionHandler('pause', () => {
+      if (audioRef.current && isPlaying) {
+        audioRef.current.pause();
+        onTogglePlay();
+      }
+    });
 
-      navigator.mediaSession.setActionHandler('seekforward', (details) => {
-        if (audioElementRef.current) {
-          audioElementRef.current.currentTime = Math.min(
-            audioElementRef.current.currentTime + (details.seekOffset || 10),
-            audioElementRef.current.duration || 0
-          );
-        }
-      });
+    navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+      if (audioRef.current) {
+        audioRef.current.currentTime = Math.max(audioRef.current.currentTime - (details.seekOffset || 10), 0);
+      }
+    });
 
-      navigator.mediaSession.setActionHandler('nexttrack', () => {
-        if (onNext) onNext();
-      });
+    navigator.mediaSession.setActionHandler('seekforward', (details) => {
+      if (audioRef.current) {
+        audioRef.current.currentTime = Math.min(audioRef.current.currentTime + (details.seekOffset || 10), audioRef.current.duration || 0);
+      }
+    });
 
-      navigator.mediaSession.setActionHandler('previoustrack', () => {
-        if (onPrevious) onPrevious();
-      });
+    navigator.mediaSession.setActionHandler('nexttrack', () => onNext && onNext());
+    navigator.mediaSession.setActionHandler('previoustrack', () => onPrevious && onPrevious());
 
-      console.log('✅ Media Session API ready for background/lock screen controls');
-    }
+    console.log('✅ Media Session API configured');
   }, [currentTrack, isPlaying, onTogglePlay, onNext, onPrevious]);
 
-  // Create/update audio element with BACKGROUND PLAYBACK enabled
+  // Simple play/pause handler - NEXUS PATTERN
   useEffect(() => {
-    if (!audioUrl) {
-      setAudioData(null);
-      setCurrentTime(0);
-      setAudioError(null);
-      setIsLoadingAudio(false);
-      return;
-    }
+    const audio = audioRef.current;
+    if (!audio || !audioUrl) return;
 
-    if (currentAudioUrlRef.current === audioUrl && audioElementRef.current) {
-      return;
-    }
-
-    console.log('🎵 Loading audio for background playback:', audioUrl);
-    setIsLoadingAudio(true);
-    setAudioError(null);
-    currentAudioUrlRef.current = audioUrl;
-
-    // Cleanup old audio
-    if (sourceNodeRef.current) {
-      try {
-        sourceNodeRef.current.disconnect();
-      } catch (e) {}
-      sourceNodeRef.current = null;
-    }
-
-    if (audioElementRef.current) {
-      audioElementRef.current.pause();
-      audioElementRef.current.src = '';
-      audioElementRef.current.load();
-      audioElementRef.current = null;
-    }
-
-    // Create new audio element with background playback attributes
-    const audio = new Audio();
-    audio.crossOrigin = "anonymous";
-    audio.preload = "auto";
-    audio.volume = volume / 100;
-    audio.loop = false; // Set to true if you want looping
-    
-    // CRITICAL: These attributes help with background playback
-    audio.setAttribute('playsinline', 'true'); // iOS requirement
-    audio.setAttribute('webkit-playsinline', 'true'); // Older iOS
-    
-    const handleCanPlay = () => {
-      console.log('✅ Audio ready! Duration:', audio.duration);
-      setIsLoadingAudio(false);
-      setAudioError(null);
-    };
-
-    const handleError = () => {
-      console.error('❌ Audio load error');
-      let errorMsg = 'Failed to load audio';
-      if (audio.error) {
-        switch(audio.error.code) {
-          case 1: errorMsg = 'Loading aborted'; break;
-          case 2: errorMsg = 'Network error'; break;
-          case 3: errorMsg = 'Decode error'; break;
-          case 4: errorMsg = 'Format not supported'; break;
-          default: errorMsg = `Error code ${audio.error.code}`;
-        }
-      }
-      setAudioError(errorMsg);
-      setIsLoadingAudio(false);
-    };
-
-    const handleTimeUpdate = () => {
-      setCurrentTime(audio.currentTime);
+    if (isPlaying) {
+      console.log('▶️ Playing audio');
       
-      // Update lock screen position
-      if ('mediaSession' in navigator && 'setPositionState' in navigator.mediaSession) {
-        try {
-          navigator.mediaSession.setPositionState({
-            duration: audio.duration || 0,
-            playbackRate: audio.playbackRate,
-            position: audio.currentTime
-          });
-        } catch (e) {
-          // Ignore errors when duration not available yet
-        }
+      // Resume audio context if suspended
+      if (audioContextRef.current?.state === 'suspended') {
+        audioContextRef.current.resume();
       }
-    };
-
-    const handleEnded = () => {
-      console.log('🎵 Audio playback ended');
-      onTogglePlay(); // This will pause it, as per original logic.
-      // If auto-advancing on end is desired:
-      // if (onNext) onNext();
-      // else onTogglePlay();
-      setCurrentTime(0);
-    };
-
-    // CRITICAL: Handle when user backgrounds the app
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        console.log('📱 App backgrounded - audio continues playing');
-        // DO NOT pause audio here!
-        // Update media session state
-        if ('mediaSession' in navigator) {
-          navigator.mediaSession.playbackState = audio.paused ? 'paused' : 'playing';
-        }
-      } else {
-        console.log('📱 App foregrounded - audio still playing');
-        // Resume audio context if suspended
-        if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
-          audioContextRef.current.resume();
-        }
-      }
-    };
-
-    audio.addEventListener('canplay', handleCanPlay);
-    audio.addEventListener('error', handleError);
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('ended', handleEnded);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    audio.src = audioUrl;
-    audio.load();
-    audioElementRef.current = audio;
-
-    // Connect to Web Audio API for visualization
-    if (audioContextRef.current) {
-      try {
-        const source = audioContextRef.current.createMediaElementSource(audio);
-        source.connect(analyserRef.current);
-        sourceNodeRef.current = source;
-        console.log('✅ Audio connected to visualizer');
-      } catch (err) {
-        console.error('Web Audio connection error:', err);
-      }
-    }
-
-    return () => {
-      audio.removeEventListener('canplay', handleCanPlay);
-      audio.removeEventListener('error', handleError);
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('ended', handleEnded);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      
+      audio.play().catch(err => {
+        console.error('❌ Play error:', err);
+        setAudioError('Playback failed');
+        onTogglePlay(); // Stop playing on error
+      });
+    } else {
+      console.log('⏸️ Paused audio');
       audio.pause();
-      audio.src = '';
-      audio.load();
-      if (sourceNodeRef.current) {
-        try {
-          sourceNodeRef.current.disconnect();
-        } catch (e) {}
-        sourceNodeRef.current = null;
-      }
-      audioElementRef.current = null;
-      currentAudioUrlRef.current = null;
-    };
-  }, [audioUrl, volume]);
+    }
+  }, [isPlaying, audioUrl]);
 
   // Update volume
   useEffect(() => {
-    if (audioElementRef.current) {
-      audioElementRef.current.volume = volume / 100;
-    }
-    if (gainNodeRef.current && audioContextRef.current) {
-      gainNodeRef.current.gain.setValueAtTime(volume / 100, audioContextRef.current.currentTime);
+    if (audioRef.current) {
+      audioRef.current.volume = volume / 100;
     }
   }, [volume]);
 
-  // Handle play/pause - NEVER pause on background!
+  // Visualizer animation loop
   useEffect(() => {
-    const audio = audioElementRef.current;
-    if (!audio || !audioUrl) return;
+    if (!isPlaying || !analyserRef.current) {
+      setAudioData(null);
+      return;
+    }
 
-    let animationFrameId;
-
-    const updateVisualization = () => {
+    let frameId;
+    const updateVisualizer = () => {
       if (analyserRef.current && isPlaying && !document.hidden) {
         const bufferLength = analyserRef.current.frequencyBinCount;
         const dataArray = new Uint8Array(bufferLength);
         analyserRef.current.getByteFrequencyData(dataArray);
         setAudioData(Array.from(dataArray));
-      } else if (!isPlaying || document.hidden) {
-        setAudioData(null);
       }
-      animationFrameId = requestAnimationFrame(updateVisualization);
+      frameId = requestAnimationFrame(updateVisualizer);
     };
 
-    if (isPlaying) {
-      console.log('▶️ Starting playback');
-      
-      // Resume audio context if needed
-      if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
-        audioContextRef.current.resume().then(() => {
-          console.log('✅ Audio context resumed');
-        });
-      }
-      
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            console.log('✅ Playback started successfully');
-            
-            // Update Media Session state
-            if ('mediaSession' in navigator) {
-              navigator.mediaSession.playbackState = 'playing';
-            }
-            
-            updateVisualization();
-          })
-          .catch(err => {
-            if (err.name !== 'AbortError') {
-              console.error('❌ Play error:', err);
-              setAudioError('Cannot play: ' + err.message);
-            }
-          });
-      }
-    } else {
-      console.log('⏸️ Pausing playback');
-      audio.pause();
-      
-      // Update Media Session state
-      if ('mediaSession' in navigator) {
-        navigator.mediaSession.playbackState = 'paused';
-      }
-      
+    updateVisualizer();
+    return () => {
+      if (frameId) cancelAnimationFrame(frameId);
       setAudioData(null);
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
+    };
+  }, [isPlaying]);
+
+  // Event handlers for audio element
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration);
+      setIsLoadingAudio(false);
+      setAudioError(null);
+      console.log('✅ Audio loaded, duration:', audioRef.current.duration);
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+      
+      // Update Media Session position
+      if ('mediaSession' in navigator && 'setPositionState' in navigator.mediaSession) {
+        try {
+          navigator.mediaSession.setPositionState({
+            duration: audioRef.current.duration || 0,
+            playbackRate: audioRef.current.playbackRate,
+            position: audioRef.current.currentTime
+          });
+        } catch (e) {}
       }
     }
+  };
 
-    return () => {
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-      }
-    };
-  }, [isPlaying, audioUrl]);
+  const handleEnded = () => {
+    console.log('🎵 Track ended');
+    onTogglePlay(); // Stop playing
+    setCurrentTime(0);
+  };
+
+  const handleError = (e) => {
+    console.error('❌ Audio error:', e);
+    setAudioError('Failed to load audio');
+    setIsLoadingAudio(false);
+  };
+
+  const handleLoadStart = () => {
+    setIsLoadingAudio(true);
+    setAudioError(null);
+  };
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -550,9 +400,9 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
     const clickX = e.clientX - rect.left;
     const percentage = clickX / rect.width;
     
-    if (audioElementRef.current && audioElementRef.current.duration) {
-      const newTime = percentage * audioElementRef.current.duration;
-      audioElementRef.current.currentTime = newTime;
+    if (audioRef.current && duration) {
+      const newTime = percentage * duration;
+      audioRef.current.currentTime = newTime;
       setCurrentTime(newTime);
     }
   };
@@ -563,8 +413,6 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
     const newVolume = Math.round((clickX / rect.width) * 100);
     setVolume(Math.max(0, Math.min(100, newVolume)));
   };
-
-  const actualDuration = audioElementRef.current?.duration || duration;
 
   return (
     <div style={{
@@ -577,6 +425,21 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
       padding: '0',
       boxSizing: 'border-box'
     }}>
+      {/* HTML5 Audio Element - SIMPLE NEXUS PATTERN */}
+      <audio
+        ref={audioRef}
+        src={audioUrl || ''}
+        crossOrigin="anonymous"
+        preload="auto"
+        playsInline
+        onLoadedMetadata={handleLoadedMetadata}
+        onTimeUpdate={handleTimeUpdate}
+        onEnded={handleEnded}
+        onError={handleError}
+        onLoadStart={handleLoadStart}
+        style={{ display: 'none' }}
+      />
+
       {/* Track Info - Sleek Design */}
       <div style={{
         textAlign: 'center',
@@ -835,7 +698,7 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
             <div style={{
               height: '100%',
               background: 'linear-gradient(90deg, var(--color-primary), var(--color-secondary))',
-              width: `${(currentTime / actualDuration) * 100}%`,
+              width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
               boxShadow: '0 0 10px var(--color-primary)',
               position: 'relative',
               transition: 'width 0.1s linear'
@@ -863,7 +726,7 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
             fontFamily: "'Orbitron', monospace"
           }}>
             <span>{formatTime(currentTime)}</span>
-            <span>{formatTime(actualDuration)}</span>
+            <span>{formatTime(duration)}</span>
           </div>
         </div>
 
@@ -2165,6 +2028,15 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
             position: relative;
             animation: title-breath var(--breath-duration) ease-in-out infinite;
             margin-bottom: 0.5rem; /* Space between title and subtitle */
+            transition: opacity 0.3s ease, transform 0.3s ease;
+          }
+
+          .foundation-title.hidden,
+          .foundation-subtitle.hidden {
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+            position: absolute;
           }
 
           .foundation-subtitle {
@@ -2172,6 +2044,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
             color: rgba(255,255,255,0.7);
             margin-top: 0.5rem;
             margin-bottom: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
           }
 
           .swiper-container {
@@ -3477,14 +3350,12 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           <Link to="/account" className="foundation-account-btn">
             <User size={24} />
           </Link>
-          {activePanel === 1 && (
-            <>
-              <h1 className="foundation-title">THE DREAMSCAPE</h1>
-              <p className="foundation-subtitle">
-                Master your sleep. Reclaim your nights. Engineer your consciousness.
-              </p>
-            </>
-          )}
+          <h1 className={`foundation-title ${activePanel !== 1 ? 'hidden' : ''}`}>
+            THE DREAMSCAPE
+          </h1>
+          <p className={`foundation-subtitle ${activePanel !== 1 ? 'hidden' : ''}`}>
+            Master your sleep. Reclaim your nights. Engineer your consciousness.
+          </p>
         </div>
         
         {/* Course Modal */}
