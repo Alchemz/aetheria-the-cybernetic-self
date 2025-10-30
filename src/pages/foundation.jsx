@@ -205,50 +205,19 @@ const MatrixVisualizer = ({ color = "#E25822", background = "#0A0A0A", audioData
   );
 };
 
-// Enhanced AudioPlayer with Playlist Navigation - REBUILT USING NEXUS PATTERN
+// Enhanced AudioPlayer with Playlist Navigation - SIMPLE PATTERN (NO WEB AUDIO API)
 const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, onPrevious }) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(70);
-  const [audioData, setAudioData] = useState(null);
-  const [audioError, setAudioError] = useState(null);
-  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
-  const [canPlay, setCanPlay] = useState(false);
   
   const audioRef = useRef(null);
-  const audioContextRef = useRef(null);
-  const analyserRef = useRef(null);
-  const sourceNodeRef = useRef(null);
-  const animationFrameRef = useRef(null);
 
-  // Reset canPlay state when audio URL changes
+  // Reset state when audio URL changes
   useEffect(() => {
-    setCanPlay(false);
-    setIsLoadingAudio(true);
     setCurrentTime(0);
     setDuration(0);
   }, [audioUrl]);
-
-  // Initialize Web Audio API ONCE for visualizer
-  useEffect(() => {
-    if (!audioContextRef.current && audioRef.current) {
-      try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        audioContextRef.current = new AudioContext();
-        analyserRef.current = audioContextRef.current.createAnalyser();
-        analyserRef.current.fftSize = 256;
-        
-        const source = audioContextRef.current.createMediaElementSource(audioRef.current);
-        source.connect(analyserRef.current);
-        analyserRef.current.connect(audioContextRef.current.destination);
-        sourceNodeRef.current = source;
-        
-        console.log('✅ Web Audio API initialized for visualizer');
-      } catch (err) {
-        console.warn('Web Audio API unavailable:', err);
-      }
-    }
-  }, [audioUrl]); // Only when audio URL changes
 
   // Media Session API for background playback
   useEffect(() => {
@@ -305,39 +274,12 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
     }
   }, [volume]);
 
-  // Visualizer animation loop
-  useEffect(() => {
-    if (!isPlaying || !analyserRef.current) {
-      setAudioData(null);
-      return;
-    }
-
-    let frameId;
-    const updateVisualizer = () => {
-      if (analyserRef.current && isPlaying && !document.hidden) {
-        const bufferLength = analyserRef.current.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
-        analyserRef.current.getByteFrequencyData(dataArray);
-        setAudioData(Array.from(dataArray));
-      }
-      frameId = requestAnimationFrame(updateVisualizer);
-    };
-
-    updateVisualizer();
-    return () => {
-      if (frameId) cancelAnimationFrame(frameId);
-      setAudioData(null);
-    };
-  }, [isPlaying]);
-
-  // Event handlers for audio element - iOS ENHANCED
+  // Event handlers - SIMPLE
   const handleLoadedMetadata = () => {
     if (audioRef.current) {
       const dur = audioRef.current.duration;
-      setAudioError(null);
       console.log('✅ Metadata loaded, duration:', dur, 'isFinite:', isFinite(dur), 'readyState:', audioRef.current.readyState);
       
-      // Only set duration if it's valid
       if (isFinite(dur) && dur > 0) {
         setDuration(dur);
       }
@@ -349,56 +291,10 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
       const dur = audioRef.current.duration;
       console.log('⏱️ Duration changed:', dur, 'isFinite:', isFinite(dur));
       
-      // Update duration when it becomes valid (iOS fix)
       if (isFinite(dur) && dur > 0) {
         setDuration(dur);
       }
     }
-  };
-
-  const handleCanPlay = () => {
-    console.log('✅ Audio can start playing (readyState:', audioRef.current?.readyState, ')');
-    setCanPlay(true);
-    setIsLoadingAudio(false);
-    
-    // Update duration if it's now valid (iOS sometimes reports Infinity at first)
-    if (audioRef.current) {
-      const dur = audioRef.current.duration;
-      if (isFinite(dur) && dur > 0) {
-        setDuration(dur);
-      }
-    }
-    
-    // If user already clicked play, try playing now
-    if (isPlaying && audioRef.current && audioRef.current.paused) {
-      audioRef.current.play().catch(err => {
-        console.error('❌ Delayed play error:', err.message);
-      });
-    }
-  };
-
-  const handleCanPlayThrough = () => {
-    console.log('✅ Audio can play through without buffering (readyState:', audioRef.current?.readyState, ')');
-    setCanPlay(true);
-    setIsLoadingAudio(false);
-    
-    // Final duration check (iOS fix)
-    if (audioRef.current) {
-      const dur = audioRef.current.duration;
-      if (isFinite(dur) && dur > 0) {
-        setDuration(dur);
-      }
-    }
-  };
-
-  const handleWaiting = () => {
-    console.log('⏳ Audio waiting for more data...');
-    setIsLoadingAudio(true);
-  };
-
-  const handleStalled = () => {
-    console.log('⚠️ Audio stalled while loading');
-    setIsLoadingAudio(true);
   };
 
   const handleTimeUpdate = () => {
@@ -421,45 +317,13 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
   const handleEnded = () => {
     console.log('🎵 Track ended');
     setCurrentTime(0);
-    // State updates handled by onPause event
   };
 
-  const handleError = (e) => {
-    console.error('❌ Audio error event:', {
-      error: e.target?.error,
-      code: e.target?.error?.code,
-      message: e.target?.error?.message,
-      networkState: audioRef.current?.networkState,
-      readyState: audioRef.current?.readyState,
-      src: audioRef.current?.src
-    });
-    setAudioError('Failed to load audio: ' + (e.target?.error?.message || 'Network error'));
-    setIsLoadingAudio(false);
-    setCanPlay(false);
-  };
-
-  const handleLoadStart = () => {
-    console.log('🔄 Started loading audio');
-    setIsLoadingAudio(true);
-    setAudioError(null);
-    setCanPlay(false);
-  };
-
-  // Direct play/pause control - NEXUS PATTERN
-  const handlePlayPause = async () => {
+  // Direct play/pause control - SIMPLE
+  const handlePlayPause = () => {
     if (!audioRef.current || !audioUrl) return;
     
     if (audioRef.current.paused) {
-      // Resume AudioContext for Web Audio API (required for Safari/iOS)
-      if (audioContextRef.current) {
-        try {
-          await audioContextRef.current.resume();
-          console.log('🔊 AudioContext resumed, state:', audioContextRef.current.state);
-        } catch (err) {
-          console.error('❌ Failed to resume AudioContext:', err);
-        }
-      }
-      
       audioRef.current.play().catch(err => {
         console.error('❌ Playback error:', err);
       });
@@ -559,35 +423,7 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
         }}>
           4.5 Hz Delta | 432 Hz Base | Δ: 0.03
         </div>
-        {isLoadingAudio && (
-          <div style={{
-            fontSize: '10px',
-            color: 'var(--color-primary)',
-            marginTop: '12px',
-            padding: '6px 12px',
-            background: 'rgba(226, 88, 34, 0.1)',
-            border: '1px solid rgba(226, 88, 34, 0.3)',
-            borderRadius: '20px',
-            display: 'inline-block'
-          }}>
-            ⟳ Loading Frequency...
-          </div>
-        )}
-        {audioError && (
-          <div style={{
-            fontSize: '10px',
-            color: '#FF6B6B',
-            marginTop: '12px',
-            padding: '6px 12px',
-            background: 'rgba(255, 107, 107, 0.1)',
-            border: '1px solid rgba(255, 107, 107, 0.3)',
-            borderRadius: '20px',
-            display: 'inline-block'
-          }}>
-            {audioError}
-          </div>
-        )}
-        {!audioUrl && !isLoadingAudio && (
+        {!audioUrl && (
           <div style={{
             fontSize: '10px',
             color: 'rgba(255, 255, 255, 0.4)',
@@ -623,7 +459,7 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
       </div>
 
       {/* Matrix Visualizer */}
-      <MatrixVisualizer audioData={audioData} />
+      <MatrixVisualizer />
 
       {/* Control Panel with Playlist Navigation */}
       <div style={{
