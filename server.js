@@ -284,7 +284,7 @@ Return a JSON object with a "themes" key containing an array of strings. Example
 
 // In production, serve index.html for all non-API routes (SPA support)
 if (process.env.NODE_ENV === 'production') {
-  app.get('/(.*)', (req, res) => {
+  app.get('/*path', (req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
   });
 }
