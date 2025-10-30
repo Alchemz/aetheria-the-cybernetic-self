@@ -179,17 +179,21 @@ export default function MeditationChamber() {
   }, []);
 
   const handlePlayTrack = (track) => {
+    console.log('🎵 Loading track:', track.name, track.url);
+    
     if (currentTrack?.id === track.id) {
       // Toggle play/pause for same track
       if (isPlaying) {
         audioRef.current?.pause();
         setIsPlaying(false);
+        console.log('⏸️ Paused:', track.name);
       } else {
         audioRef.current?.play().catch(err => {
-          console.error('Playback error on play:', err);
+          console.error('❌ Playback error on play:', err);
           setIsPlaying(false);
         });
         setIsPlaying(true);
+        console.log('▶️ Playing:', track.name);
       }
     } else {
       // Load and play new track
@@ -203,9 +207,11 @@ export default function MeditationChamber() {
         if (audioRef.current) {
           audioRef.current.load(); // Reload the audio element to apply new src
           audioRef.current.play().catch(err => {
-            console.error('Playback error on new track:', err);
+            console.error('❌ Playback error on new track:', err);
+            console.error('Failed URL:', track.url);
             setIsPlaying(false);
           });
+          console.log('✅ Track loaded and playing:', track.name);
         }
       }, 50); // A small delay to ensure DOM update
     }
@@ -291,6 +297,9 @@ export default function MeditationChamber() {
           font-weight: 600;
           transition: all 0.3s ease;
           text-transform: uppercase;
+          touch-action: manipulation;
+          user-select: none;
+          -webkit-tap-highlight-color: transparent;
         }
 
         .chamber-back:hover {
@@ -337,6 +346,9 @@ export default function MeditationChamber() {
           letter-spacing: 0.08em;
           position: relative;
           overflow: hidden;
+          touch-action: manipulation;
+          user-select: none;
+          -webkit-tap-highlight-color: transparent;
         }
 
         .category-btn::before {
@@ -422,6 +434,9 @@ export default function MeditationChamber() {
           justify-content: space-between;
           align-items: center;
           transition: all 0.3s ease;
+          touch-action: manipulation;
+          user-select: none;
+          -webkit-tap-highlight-color: transparent;
         }
 
         .track-item:hover {
@@ -468,6 +483,9 @@ export default function MeditationChamber() {
           display: flex;
           align-items: center;
           justify-content: center;
+          touch-action: manipulation;
+          user-select: none;
+          -webkit-tap-highlight-color: transparent;
         }
 
         .track-button:hover {
@@ -495,6 +513,9 @@ export default function MeditationChamber() {
           transition: all 0.3s ease;
           text-transform: uppercase;
           letter-spacing: 0.05em;
+          touch-action: manipulation;
+          user-select: none;
+          -webkit-tap-highlight-color: transparent;
         }
 
         .track-download-button:hover {
@@ -503,48 +524,6 @@ export default function MeditationChamber() {
           box-shadow: 0 0 15px rgba(255, 107, 157, 0.5);
         }
 
-        .track-background-play-button {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          background: rgba(226, 88, 34, 0.2);
-          border: 2px solid #E25822;
-          color: #FF8C42;
-          padding: 8px 12px;
-          font-family: 'Orbitron', monospace;
-          font-size: 0.7rem;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          font-weight: 600;
-        }
-
-        .track-background-play-button:hover {
-          background: #E25822;
-          color: black;
-          box-shadow: 0 0 15px rgba(226, 88, 34, 0.5);
-          transform: translateY(-1px);
-        }
-
-        .ios-background-tip {
-          background: rgba(255, 140, 66, 0.1);
-          border: 1px solid rgba(255, 140, 66, 0.3);
-          padding: 1rem;
-          margin-bottom: 1.5rem;
-          font-size: 0.75rem;
-          color: rgba(255, 255, 255, 0.8);
-          line-height: 1.5;
-          text-align: center;
-        }
-
-        .ios-background-tip-title {
-          font-family: 'Orbitron', monospace;
-          color: #FF8C42;
-          font-size: 0.8rem;
-          margin-bottom: 0.5rem;
-          letter-spacing: 0.05em;
-        }
 
         .player-bar {
           position: fixed;
@@ -598,6 +577,9 @@ export default function MeditationChamber() {
           align-items: center;
           justify-content: center;
           border-radius: 50%;
+          touch-action: manipulation;
+          user-select: none;
+          -webkit-tap-highlight-color: transparent;
         }
 
         .player-button:hover {
