@@ -1,0 +1,49 @@
+CLIENT OF UIKIT REQUIRES UPDATE: This process does not adopt UIScene lifecycle. This will become an assert in a future version.
+✅ Audio session configured for background playback
+Could not create a sandbox extension for '/var/containers/Bundle/Application/7BA03519-E75A-42C7-B14C-B2E94A028AD0/App.app'
+⚡️  Loading app at capacitor://localhost...
+App is being debugged, do not track this hang
+Hang detected: 0.38s (debugger attached, not reporting)
+App is being debugged, do not track this hang
+Hang detected: 0.27s (debugger attached, not reporting)
+App is being debugged, do not track this hang
+Hang detected: 0.45s (debugger attached, not reporting)
+⚡️  WebView loaded
+⚡️  [log] - 🔧 API Config: {"isNative":true,"isProduction":true,"baseUrl":"https://innersync.replit.app"}
+⚡️  [log] - ✅ Speech recognition initialized
+⚡️  [log] - ✅ Web Audio API initialized for visualizer
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ⏸️ Paused audio
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Audio loaded, duration: Infinity
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ▶️ Playing audio
+⚡️  [log] - ✅ Audio playing
+⚡️  [log] - ✅ Media Session API configured
+⚡️  [log] - ⏸️ Paused audio
+⚡️  [log] - ⏸️ Audio paused
+⚡️  [error] - ❌ Play error: {}

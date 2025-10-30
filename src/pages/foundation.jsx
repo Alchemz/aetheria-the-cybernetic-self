@@ -213,12 +213,21 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
   const [audioData, setAudioData] = useState(null);
   const [audioError, setAudioError] = useState(null);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  const [canPlay, setCanPlay] = useState(false);
   
   const audioRef = useRef(null);
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
   const sourceNodeRef = useRef(null);
   const animationFrameRef = useRef(null);
+
+  // Reset canPlay state when audio URL changes
+  useEffect(() => {
+    setCanPlay(false);
+    setIsLoadingAudio(true);
+    setCurrentTime(0);
+    setDuration(0);
+  }, [audioUrl]);
 
   // Initialize Web Audio API ONCE for visualizer
   useEffect(() => {
@@ -291,29 +300,43 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
     console.log('✅ Media Session API configured');
   }, [currentTrack, isPlaying, onTogglePlay, onNext, onPrevious]);
 
-  // Simple play/pause handler - NEXUS PATTERN
+  // Simple play/pause handler - NEXUS PATTERN WITH iOS FIX
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !audioUrl) return;
 
     if (isPlaying) {
-      console.log('▶️ Playing audio');
+      console.log('▶️ Attempting to play audio, canPlay:', canPlay, 'readyState:', audio.readyState);
       
       // Resume audio context if suspended
       if (audioContextRef.current?.state === 'suspended') {
         audioContextRef.current.resume();
       }
       
-      audio.play().catch(err => {
-        console.error('❌ Play error:', err);
-        setAudioError('Playback failed');
-        onTogglePlay(); // Stop playing on error
-      });
+      // iOS FIX: Wait for audio to be ready before playing
+      if (audio.readyState >= 2) { // HAVE_CURRENT_DATA or better
+        audio.play().catch(err => {
+          console.error('❌ Play error:', {
+            message: err.message,
+            name: err.name,
+            code: err.code,
+            readyState: audio.readyState,
+            networkState: audio.networkState,
+            duration: audio.duration,
+            src: audio.src
+          });
+          setAudioError('Playback failed: ' + (err.message || 'Unknown error'));
+          onTogglePlay(); // Stop playing on error
+        });
+      } else {
+        console.log('⏳ Audio not ready, waiting for canplay event (readyState:', audio.readyState, ')');
+        setIsLoadingAudio(true);
+      }
     } else {
       console.log('⏸️ Paused audio');
       audio.pause();
     }
-  }, [isPlaying, audioUrl]);
+  }, [isPlaying, audioUrl, canPlay]);
 
   // Update volume
   useEffect(() => {
@@ -347,14 +370,75 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
     };
   }, [isPlaying]);
 
-  // Event handlers for audio element
+  // Event handlers for audio element - iOS ENHANCED
   const handleLoadedMetadata = () => {
     if (audioRef.current) {
-      setDuration(audioRef.current.duration);
-      setIsLoadingAudio(false);
+      const dur = audioRef.current.duration;
       setAudioError(null);
-      console.log('✅ Audio loaded, duration:', audioRef.current.duration);
+      console.log('✅ Metadata loaded, duration:', dur, 'isFinite:', isFinite(dur), 'readyState:', audioRef.current.readyState);
+      
+      // Only set duration if it's valid
+      if (isFinite(dur) && dur > 0) {
+        setDuration(dur);
+      }
     }
+  };
+
+  const handleDurationChange = () => {
+    if (audioRef.current) {
+      const dur = audioRef.current.duration;
+      console.log('⏱️ Duration changed:', dur, 'isFinite:', isFinite(dur));
+      
+      // Update duration when it becomes valid (iOS fix)
+      if (isFinite(dur) && dur > 0) {
+        setDuration(dur);
+      }
+    }
+  };
+
+  const handleCanPlay = () => {
+    console.log('✅ Audio can start playing (readyState:', audioRef.current?.readyState, ')');
+    setCanPlay(true);
+    setIsLoadingAudio(false);
+    
+    // Update duration if it's now valid (iOS sometimes reports Infinity at first)
+    if (audioRef.current) {
+      const dur = audioRef.current.duration;
+      if (isFinite(dur) && dur > 0) {
+        setDuration(dur);
+      }
+    }
+    
+    // If user already clicked play, try playing now
+    if (isPlaying && audioRef.current && audioRef.current.paused) {
+      audioRef.current.play().catch(err => {
+        console.error('❌ Delayed play error:', err.message);
+      });
+    }
+  };
+
+  const handleCanPlayThrough = () => {
+    console.log('✅ Audio can play through without buffering (readyState:', audioRef.current?.readyState, ')');
+    setCanPlay(true);
+    setIsLoadingAudio(false);
+    
+    // Final duration check (iOS fix)
+    if (audioRef.current) {
+      const dur = audioRef.current.duration;
+      if (isFinite(dur) && dur > 0) {
+        setDuration(dur);
+      }
+    }
+  };
+
+  const handleWaiting = () => {
+    console.log('⏳ Audio waiting for more data...');
+    setIsLoadingAudio(true);
+  };
+
+  const handleStalled = () => {
+    console.log('⚠️ Audio stalled while loading');
+    setIsLoadingAudio(true);
   };
 
   const handleTimeUpdate = () => {
@@ -381,14 +465,24 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
   };
 
   const handleError = (e) => {
-    console.error('❌ Audio error:', e);
-    setAudioError('Failed to load audio');
+    console.error('❌ Audio error event:', {
+      error: e.target?.error,
+      code: e.target?.error?.code,
+      message: e.target?.error?.message,
+      networkState: audioRef.current?.networkState,
+      readyState: audioRef.current?.readyState,
+      src: audioRef.current?.src
+    });
+    setAudioError('Failed to load audio: ' + (e.target?.error?.message || 'Network error'));
     setIsLoadingAudio(false);
+    setCanPlay(false);
   };
 
   const handleLoadStart = () => {
+    console.log('🔄 Started loading audio');
     setIsLoadingAudio(true);
     setAudioError(null);
+    setCanPlay(false);
   };
 
   const formatTime = (seconds) => {
@@ -430,7 +524,7 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
       padding: '0',
       boxSizing: 'border-box'
     }}>
-      {/* HTML5 Audio Element - SIMPLE NEXUS PATTERN */}
+      {/* HTML5 Audio Element - iOS ENHANCED NEXUS PATTERN */}
       <audio
         ref={audioRef}
         src={audioUrl || ''}
@@ -438,10 +532,15 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
         preload="auto"
         playsInline
         onLoadedMetadata={handleLoadedMetadata}
+        onDurationChange={handleDurationChange}
+        onCanPlay={handleCanPlay}
+        onCanPlayThrough={handleCanPlayThrough}
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleEnded}
         onError={handleError}
         onLoadStart={handleLoadStart}
+        onWaiting={handleWaiting}
+        onStalled={handleStalled}
         onPlay={() => console.log('✅ Audio playing')}
         onPause={() => console.log('⏸️ Audio paused')}
         style={{ display: 'none' }}
