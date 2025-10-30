@@ -2586,6 +2586,9 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
             font-family: 'Orbitron', monospace;
             font-size: 0.8rem;
             letter-spacing: 0.05em;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
           }
 
           .category-tab.active {
@@ -2617,6 +2620,9 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
             display: flex;
             flex-direction: column; /* Changed to column to allow download button beneath */
             align-items: flex-start; /* Align text left */
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
           }
 
           .track-item:hover, .track-item.active {
@@ -3319,6 +3325,9 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
             letter-spacing: 0.05em;
             margin-top: 0.5rem;
             align-self: flex-start; /* Ensure it aligns nicely if not full width */
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
           }
 
           .track-download-button:hover {
@@ -3327,57 +3336,12 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
             box-shadow: 0 0 10px var(--color-primary);
           }
 
-          .track-background-play-button {
-            display: flex;
-            align-items: center;
-            background: rgba(226, 88, 34, 0.2);
-            border: 2px solid var(--color-secondary);
-            color: var(--color-secondary);
-            padding: 0.5rem 1rem;
-            font-family: 'Orbitron', monospace;
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-top: 0.5rem;
-            align-self: flex-start;
-            font-weight: 600;
-            animation: gentle-breath var(--breath-duration) ease-in-out infinite;
-          }
-
-          .track-background-play-button:hover {
-            background: var(--color-secondary);
-            color: black;
-            box-shadow: 0 0 15px var(--color-secondary);
-            transform: translateY(-1px);
-          }
-
           .track-button-group {
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
             margin-top: 0.5rem;
             width: 100%;
-          }
-
-          .ios-background-tip {
-            background: rgba(255, 140, 66, 0.1);
-            border: 1px solid rgba(255, 140, 66, 0.3);
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.8);
-            line-height: 1.5;
-            text-align: center;
-          }
-
-          .ios-background-tip-title {
-            font-family: 'Orbitron', monospace;
-            color: var(--color-secondary);
-            font-size: 0.8rem;
-            margin-bottom: 0.5rem;
-            letter-spacing: 0.05em;
           }
 
           .track-coming-soon {
@@ -3708,26 +3672,6 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
               onPrevious={handlePreviousTrack}
             />
 
-            {/* iOS Background Playback & Download Tip */}
-            {isIOS && (
-              <div className="ios-background-tip">
-                <div className="ios-background-tip-title">🌙 iOS PLAYBACK GUIDE</div>
-                <div style={{marginBottom: '0.5rem'}}>
-                  <strong>For Background Audio:</strong> Tap "Play in Background" to open the track in Safari. 
-                  It will continue playing with your screen locked.
-                </div>
-                <div>
-                  <strong>To Download:</strong> After opening, tap the Share button (
-                  <span style={{display: 'inline-block', transform: 'translateY(2px)'}}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{display: 'inline'}}>
-                      <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
-                    </svg>
-                  </span>
-                  ), then "Save to Files"
-                </div>
-              </div>
-            )}
-
             {/* Category Selector */}
             <div className="category-selector">
               <div className="category-tabs">
@@ -3759,17 +3703,6 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
                   <div className="track-frequency">{track.frequency}</div>
                   {track.audioUrl ? (
                     <div className="track-button-group">
-                      {isIOS && (
-                        <button 
-                          className="track-background-play-button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleBackgroundPlay(track);
-                          }}
-                        >
-                          🌙 Play in Background
-                        </button>
-                      )}
                       <button 
                         className="track-download-button"
                         onClick={(e) => {
@@ -3778,7 +3711,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
                         }}
                       >
                         <Download size={14} style={{marginRight: '4px'}} />
-                        {isIOS ? 'Download/Share' : 'Download MP3'}
+                        Download
                       </button>
                     </div>
                   ) : (
