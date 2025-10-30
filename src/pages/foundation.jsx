@@ -2136,7 +2136,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           
           .foundation-home-btn, .foundation-account-btn {
             position: absolute;
-            top: 1rem;
+            top: calc(1rem + env(safe-area-inset-top));
             color: rgba(255,255,255,0.7);
             transition: color 0.3s;
             display: flex;

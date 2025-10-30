@@ -2,26 +2,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import * as THREE from 'three';
-import { ArrowLeft, Play, Pause, Volume2, Download, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Play, Pause, Volume2, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function MeditationChamber() {
   const mountRef = useRef(null);
-  const audioRef = useRef(null); // Added audioRef
+  const audioRef = useRef(null);
   const [currentCategory, setCurrentCategory] = useState('guided');
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(null);
-  const [isIOS, setIsIOS] = useState(false);
-
-  useEffect(() => {
-    const checkIOS = () => {
-      const ua = navigator.userAgent;
-      const isIOSUA = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
-      const isIPadOS = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-      return isIOSUA || isIPadOS;
-    };
-    setIsIOS(checkIOS());
-  }, []);
 
   const categories = {
     guided: {
@@ -252,9 +241,6 @@ export default function MeditationChamber() {
     }
   };
 
-  const handleBackgroundPlay = (track) => {
-    window.open(track.url, '_blank');
-  };
 
   return (
     <div className="meditation-chamber">
@@ -699,12 +685,6 @@ export default function MeditationChamber() {
             <p className="category-desc">{categories[currentCategory].description}</p>
           </div>
 
-          {isIOS && (
-            <div className="ios-background-tip">
-              <div className="ios-background-tip-title">iOS BACKGROUND AUDIO</div>
-              Tap "Play in Background" to open in Safari for native background playback with lock screen controls. Perfect for meditation sessions.
-            </div>
-          )}
 
           <div className="tracks-list">
             {categories[currentCategory].tracks.map(track => (
@@ -735,16 +715,6 @@ export default function MeditationChamber() {
                     <Download size={16} />
                     <span>Download</span>
                   </button>
-                  {isIOS && (
-                    <button 
-                      className="track-background-play-button"
-                      onClick={() => handleBackgroundPlay(track)}
-                      title="Play in Background (iOS)"
-                    >
-                      <ExternalLink size={16} />
-                      <span>Play in Background</span>
-                    </button>
-                  )}
                 </div>
               </div>
             ))}

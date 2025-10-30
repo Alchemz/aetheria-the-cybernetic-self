@@ -432,6 +432,9 @@ export default function SovereignPortal() {
           align-items: center;
           justify-content: center;
           transition: opacity 0.8s ease;
+          touch-action: manipulation;
+          -webkit-user-select: none;
+          user-select: none;
         }
 
         /* Borderless Glow Panel - Pure Glow Effect */
@@ -452,6 +455,7 @@ export default function SovereignPortal() {
             inset 0 1px 0 rgba(255, 255, 255, 0.1),
             0 0 40px rgba(255, 255, 255, 0.05);
           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          touch-action: manipulation;
         }
 
         .realm.sanctuary .ui-panel {
