@@ -1023,28 +1023,30 @@ export default function SleepSanctuary() { // Renamed from Foundation to SleepSa
             errorMessage = 'No speech detected. Please try again and speak clearly.';
             break;
           case 'audio-capture':
-            errorMessage = 'No microphone found or microphone access denied.';
+            errorMessage = 'No microphone found. Please check if your microphone is connected.';
             break;
           case 'not-allowed':
-            errorMessage = 'Microphone permission denied. Please enable it in your browser settings.';
+            errorMessage = 'Please allow microphone access when your browser prompts you. Click the microphone icon to try again.';
             break;
           case 'network':
             errorMessage = 'Network error occurred. Please check your connection.';
             break;
           case 'aborted':
-            errorMessage = 'Recording was aborted.';
-            break;
-            case 'bad-grammar':
+            // Don't show error for aborted (user stopped it intentionally)
+            return;
+          case 'bad-grammar':
             errorMessage = 'Could not understand speech. Please try again.';
             break;
           default:
             errorMessage = `Speech recognition error: ${event.error}`;
         }
         
-        setChatMessages(prev => [...prev, { 
-          role: 'assistant', 
-          content: errorMessage
-        }]);
+        if (errorMessage) {
+          setChatMessages(prev => [...prev, { 
+            role: 'assistant', 
+            content: errorMessage
+          }]);
+        }
       };
 
       console.log('✅ Speech recognition initialized');
@@ -1066,25 +1068,28 @@ export default function SleepSanctuary() { // Renamed from Foundation to SleepSa
     if (isRecording) {
       console.log('⏹️ Stopping recording...');
       recognitionRef.current.stop();
-      // setIsRecording(false); // This will be handled by onend
     } else {
       console.log('▶️ Starting recording...');
       try {
-        // Clear any previous recognition state
-        recognitionRef.current.abort();
-        
-        // Small delay to ensure clean state (iOS quirk)
-        setTimeout(() => {
-          recognitionRef.current.start();
-          console.log('🎤 Recognition start() called');
-        }, 100);
+        recognitionRef.current.start();
+        setIsRecording(true);
+        console.log('🎤 Recognition started');
       } catch (error) {
         console.error('❌ Error starting speech recognition:', error);
         setIsRecording(false);
-        setChatMessages(prev => [...prev, { 
-          role: 'assistant', 
-          content: 'Could not start recording. Please try again.' 
-        }]);
+        
+        // Provide more helpful error message
+        if (error.name === 'NotAllowedError') {
+          setChatMessages(prev => [...prev, { 
+            role: 'assistant', 
+            content: 'Please allow microphone access when prompted by your browser. Click the microphone icon again to retry.' 
+          }]);
+        } else {
+          setChatMessages(prev => [...prev, { 
+            role: 'assistant', 
+            content: 'Could not start recording. Please try again.' 
+          }]);
+        }
       }
     }
   };
