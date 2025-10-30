@@ -269,16 +269,14 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
     });
 
     navigator.mediaSession.setActionHandler('play', () => {
-      if (audioRef.current && !isPlaying) {
+      if (audioRef.current) {
         audioRef.current.play().catch(console.error);
-        onTogglePlay();
       }
     });
 
     navigator.mediaSession.setActionHandler('pause', () => {
-      if (audioRef.current && isPlaying) {
+      if (audioRef.current) {
         audioRef.current.pause();
-        onTogglePlay();
       }
     });
 
@@ -298,45 +296,7 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
     navigator.mediaSession.setActionHandler('previoustrack', () => onPrevious && onPrevious());
 
     console.log('✅ Media Session API configured');
-  }, [currentTrack, isPlaying, onTogglePlay, onNext, onPrevious]);
-
-  // Simple play/pause handler - NEXUS PATTERN WITH iOS FIX
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !audioUrl) return;
-
-    if (isPlaying) {
-      console.log('▶️ Attempting to play audio, canPlay:', canPlay, 'readyState:', audio.readyState);
-      
-      // Resume audio context if suspended
-      if (audioContextRef.current?.state === 'suspended') {
-        audioContextRef.current.resume();
-      }
-      
-      // iOS FIX: Wait for audio to be ready before playing
-      if (audio.readyState >= 2) { // HAVE_CURRENT_DATA or better
-        audio.play().catch(err => {
-          console.error('❌ Play error:', {
-            message: err.message,
-            name: err.name,
-            code: err.code,
-            readyState: audio.readyState,
-            networkState: audio.networkState,
-            duration: audio.duration,
-            src: audio.src
-          });
-          setAudioError('Playback failed: ' + (err.message || 'Unknown error'));
-          onTogglePlay(); // Stop playing on error
-        });
-      } else {
-        console.log('⏳ Audio not ready, waiting for canplay event (readyState:', audio.readyState, ')');
-        setIsLoadingAudio(true);
-      }
-    } else {
-      console.log('⏸️ Paused audio');
-      audio.pause();
-    }
-  }, [isPlaying, audioUrl, canPlay]);
+  }, [currentTrack]);
 
   // Update volume
   useEffect(() => {
@@ -460,8 +420,8 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
 
   const handleEnded = () => {
     console.log('🎵 Track ended');
-    onTogglePlay(); // Stop playing
     setCurrentTime(0);
+    // State updates handled by onPause event
   };
 
   const handleError = (e) => {
@@ -483,6 +443,19 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
     setIsLoadingAudio(true);
     setAudioError(null);
     setCanPlay(false);
+  };
+
+  // Direct play/pause control - NEXUS PATTERN
+  const handlePlayPause = () => {
+    if (!audioRef.current || !audioUrl) return;
+    
+    if (audioRef.current.paused) {
+      audioRef.current.play().catch(err => {
+        console.error('❌ Playback error:', err);
+      });
+    } else {
+      audioRef.current.pause();
+    }
   };
 
   const formatTime = (seconds) => {
@@ -524,24 +497,16 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
       padding: '0',
       boxSizing: 'border-box'
     }}>
-      {/* HTML5 Audio Element - FIXED NEXUS PATTERN (NO crossOrigin!) */}
+      {/* HTML5 Audio Element - SIMPLE NEXUS PATTERN */}
       <audio
         ref={audioRef}
         src={audioUrl || ''}
-        preload="metadata"
-        playsInline
         onLoadedMetadata={handleLoadedMetadata}
         onDurationChange={handleDurationChange}
-        onCanPlay={handleCanPlay}
-        onCanPlayThrough={handleCanPlayThrough}
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleEnded}
-        onError={handleError}
-        onLoadStart={handleLoadStart}
-        onWaiting={handleWaiting}
-        onStalled={handleStalled}
-        onPlay={() => console.log('✅ Audio playing')}
-        onPause={() => console.log('⏸️ Audio paused')}
+        onPlay={() => { console.log('✅ Audio playing'); if (!isPlaying) onTogglePlay(); }}
+        onPause={() => { console.log('⏸️ Audio paused'); if (isPlaying) onTogglePlay(); }}
         style={{ display: 'none' }}
       />
 
@@ -679,7 +644,7 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
         }}>
           <button 
             onClick={onPrevious}
-            disabled={isLoadingAudio || !!audioError || !audioUrl}
+            disabled={!audioUrl}
             style={{
               width: '45px',
               height: '45px',
@@ -690,14 +655,14 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: (isLoadingAudio || !!audioError || !audioUrl) ? 'not-allowed' : 'pointer',
+              cursor: !audioUrl ? 'not-allowed' : 'pointer',
               transition: 'all 0.3s ease',
               fontSize: '14px',
               fontFamily: "'Orbitron', monospace",
-              opacity: (isLoadingAudio || !!audioError || !audioUrl) ? 0.5 : 1,
+              opacity: !audioUrl ? 0.5 : 1,
             }}
             onMouseEnter={(e) => {
-              if (!(isLoadingAudio || !!audioError || !audioUrl)) {
+              if (audioUrl) {
                 e.target.style.background = 'rgba(226, 88, 34, 0.2)';
                 e.target.style.borderColor = 'var(--color-primary)';
                 e.target.style.boxShadow = '0 0 15px rgba(226, 88, 34, 0.4)';
@@ -713,8 +678,8 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
           </button>
           
           <button 
-            onClick={onTogglePlay}
-            disabled={isLoadingAudio || !!audioError || !audioUrl}
+            onClick={handlePlayPause}
+            disabled={!audioUrl}
             style={{
               width: '70px',
               height: '70px',
@@ -727,17 +692,17 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: (isLoadingAudio || !!audioError || !audioUrl) ? 'not-allowed' : 'pointer',
+              cursor: !audioUrl ? 'not-allowed' : 'pointer',
               transition: 'all 0.3s ease',
               fontSize: '16px',
               fontFamily: "'Orbitron', monospace",
               fontWeight: 'bold',
-              opacity: (isLoadingAudio || !!audioError || !audioUrl) ? 0.5 : 1,
+              opacity: !audioUrl ? 0.5 : 1,
               boxShadow: isPlaying ? '0 0 25px rgba(226, 88, 34, 0.6)' : '0 0 10px rgba(226, 88, 34, 0.3)',
               animation: isPlaying ? 'gentle-breath 7s ease-in-out infinite' : 'none'
             }}
             onMouseEnter={(e) => {
-              if (!(isLoadingAudio || !!audioError || !audioUrl)) {
+              if (audioUrl) {
                 e.target.style.transform = 'scale(1.1)';
                 e.target.style.boxShadow = '0 0 35px rgba(226, 88, 34, 0.8)';
               }
@@ -752,7 +717,7 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
           
           <button 
             onClick={onNext}
-            disabled={isLoadingAudio || !!audioError || !audioUrl}
+            disabled={!audioUrl}
             style={{
               width: '45px',
               height: '45px',
@@ -763,14 +728,14 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: (isLoadingAudio || !!audioError || !audioUrl) ? 'not-allowed' : 'pointer',
+              cursor: !audioUrl ? 'not-allowed' : 'pointer',
               transition: 'all 0.3s ease',
               fontSize: '14px',
               fontFamily: "'Orbitron', monospace",
-              opacity: (isLoadingAudio || !!audioError || !audioUrl) ? 0.5 : 1,
+              opacity: !audioUrl ? 0.5 : 1,
             }}
             onMouseEnter={(e) => {
-              if (!(isLoadingAudio || !!audioError || !audioUrl)) {
+              if (audioUrl) {
                 e.target.style.background = 'rgba(226, 88, 34, 0.2)';
                 e.target.style.borderColor = 'var(--color-primary)';
                 e.target.style.boxShadow = '0 0 15px rgba(226, 88, 34, 0.4)';
