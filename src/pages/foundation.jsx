@@ -10,7 +10,9 @@ import {
   Mic,
   MicOff,
   Download,
-  Home
+  Home,
+  Play,
+  Pause
 } from 'lucide-react';
 
 import { auth } from '@/api/supabaseClient';
@@ -390,6 +392,9 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
   };
 
   const formatTime = (seconds) => {
+    if (!seconds || !isFinite(seconds) || isNaN(seconds)) {
+      return '0:00';
+    }
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
@@ -437,6 +442,8 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
         onEnded={handleEnded}
         onError={handleError}
         onLoadStart={handleLoadStart}
+        onPlay={() => console.log('✅ Audio playing')}
+        onPause={() => console.log('⏸️ Audio paused')}
         style={{ display: 'none' }}
       />
 
@@ -642,7 +649,7 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
               e.target.style.boxShadow = isPlaying ? '0 0 25px rgba(226, 88, 34, 0.6)' : '0 0 10px rgba(226, 88, 34, 0.3)';
             }}
           >
-            {isPlaying ? '⏸' : '▶'}
+            {isPlaying ? <Pause size={20} /> : <Play size={20} />}
           </button>
           
           <button 
