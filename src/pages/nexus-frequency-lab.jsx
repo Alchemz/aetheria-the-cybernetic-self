@@ -284,6 +284,7 @@ export default function MeditationChamber() {
           align-items: center;
           justify-content: space-between;
           margin-bottom: 20px;
+          margin-top: calc(0px + env(safe-area-inset-top));
         }
 
         .chamber-back {

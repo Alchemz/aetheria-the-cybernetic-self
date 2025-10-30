@@ -730,6 +730,7 @@ export default function PinealAtrium() {
           border-left: 2px solid #BA55D3;
           z-index: 20;
           padding: 30px;
+          padding-top: calc(30px + env(safe-area-inset-top));
           overflow-y: auto;
           transform: translateX(${selectedRegion ? '0' : '100%'});
           transition: transform 0.4s ease;

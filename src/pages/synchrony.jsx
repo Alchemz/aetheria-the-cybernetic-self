@@ -443,6 +443,7 @@ export default function Synchrony() {
           color: #00FFFF;
           text-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
           text-align: center;
+          margin-top: calc(1rem + env(safe-area-inset-top));
           margin-bottom: 0;
         }
 
