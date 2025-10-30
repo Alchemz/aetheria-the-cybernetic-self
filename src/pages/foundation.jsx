@@ -2724,6 +2724,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
             font-family: 'Orbitron', monospace;
             font-size: 1.1rem;
             color: var(--color-secondary);
+            margin-top: 0.75rem;
             margin-bottom: 0.5rem;
           }
 
@@ -3476,10 +3477,14 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           <Link to="/account" className="foundation-account-btn">
             <User size={24} />
           </Link>
-          <h1 className="foundation-title">THE DREAMSCAPE</h1>
-          <p className="foundation-subtitle">
-            Master your sleep. Reclaim your nights. Engineer your consciousness.
-          </p>
+          {activePanel === 1 && (
+            <>
+              <h1 className="foundation-title">THE DREAMSCAPE</h1>
+              <p className="foundation-subtitle">
+                Master your sleep. Reclaim your nights. Engineer your consciousness.
+              </p>
+            </>
+          )}
         </div>
         
         {/* Course Modal */}
