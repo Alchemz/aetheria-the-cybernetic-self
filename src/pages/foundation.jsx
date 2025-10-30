@@ -446,10 +446,20 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
   };
 
   // Direct play/pause control - NEXUS PATTERN
-  const handlePlayPause = () => {
+  const handlePlayPause = async () => {
     if (!audioRef.current || !audioUrl) return;
     
     if (audioRef.current.paused) {
+      // Resume AudioContext for Web Audio API (required for Safari/iOS)
+      if (audioContextRef.current) {
+        try {
+          await audioContextRef.current.resume();
+          console.log('🔊 AudioContext resumed, state:', audioContextRef.current.state);
+        } catch (err) {
+          console.error('❌ Failed to resume AudioContext:', err);
+        }
+      }
+      
       audioRef.current.play().catch(err => {
         console.error('❌ Playback error:', err);
       });
