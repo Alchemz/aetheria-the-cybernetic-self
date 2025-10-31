@@ -27,6 +27,7 @@ INNERSYNC is a meditation and wellness platform built with Vite and React, featu
 
 ### Feature Specifications
 - **Synchrony Global Meditation**: Guided box breathing (4-4-4-4 rhythm) for 2 minutes, followed by Aum toning (10s inhale, 15s exhale), with auto-progression and synchronized 3D particle effects. Sessions are daily at 11 PM Japan time for 15 minutes.
+- **Wisdom Well**: Spiritual knowledge library featuring 10 expandable wisdom threads from various traditions (Hermetic Principles, Christ Consciousness, Buddha's Path, Yoga Sutras, Bhagavad Gita, Emerald Tablet, Tao Te Ching, Krishna Stories, Gnostic Gospels, Jungian Archetypes). Accessed via left-side portal button with Ankh symbol (☥). Matches Synchrony's cyan aesthetic (#4A9EFF, #00FFFF) with animated glow effects. Each thread expands to reveal full formatted teachings in a clean, scrollable card interface.
 - **Today's Cosmic Briefing**: AI-powered daily astrological insights (300-400 words) with 3-4 extracted themes, cached in Supabase.
 - **Dream Assistant**: Provides dream interpretation and sleep guidance, leveraging user profile and dream journal context.
 - **Athena AI**: Offers bio-protocol optimization, science explanations, and habit adjustments, utilizing user profile and active bio-mods context.
