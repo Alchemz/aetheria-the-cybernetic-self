@@ -70,6 +70,13 @@ INNERSYNC is a meditation and wellness platform built with Vite and React, featu
 - **AppDelegate.swift**: Audio session configured with `AVAudioSessionCategoryPlayback` to enable background audio, lock screen playback, and audio continuation with silent switch ON
 - **Safe Area Support**: Added `viewport-fit=cover` and `env(safe-area-inset-*)` CSS for iPhone notch/Dynamic Island compatibility across Foundation, Portal, Temple, and Synchrony pages
 
+**App Icon & Branding**:
+- **Custom Icon**: Chakra-themed icon with vertically stacked glowing spheres (purple, blue, green, yellow, orange, red) on dark background
+- **Icon Generation**: Uses `@capacitor/assets` to automatically generate all required sizes for iOS and Android from source image in `/resources/icon.png`
+- **Asset Locations**: iOS icons in `/ios/App/App/Assets.xcassets/AppIcon.appiconset/`, Android adaptive icons in `/android/app/src/main/res/mipmap-*/`
+- **Web Favicon**: Updated `index.html` to use custom icon at `/public/icon.png` with apple-touch-icon support
+- **Regeneration Command**: `npx capacitor-assets generate --iconBackgroundColor '#000000' --iconBackgroundColorDark '#000000' --ios --android`
+
 **Backend Deployment for Native App Support**:
 - **Replit Autoscale Deployment**: The Express backend (`server.js`) is configured for deployment to Replit's autoscale platform
   - **Run Command**: `node server.js` (automatically runs in production mode)
