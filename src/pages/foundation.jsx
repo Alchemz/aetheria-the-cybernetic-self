@@ -1942,30 +1942,23 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
 
           .foundation-title {
             font-family: 'Orbitron', monospace;
-            font-size: 1.5rem;
+            font-size: 1.1rem;
             font-weight: 900;
             color: var(--color-primary);
-            letter-spacing: 0.15em;
+            letter-spacing: 0.12em;
             position: relative;
             animation: title-breath var(--breath-duration) ease-in-out infinite;
-            margin-bottom: 0.5rem; /* Space between title and subtitle */
-            transition: opacity 0.3s ease, transform 0.3s ease;
-          }
-
-          .foundation-title.hidden,
-          .foundation-subtitle.hidden {
-            opacity: 0;
-            transform: translateY(-10px);
-            pointer-events: none;
-            position: absolute;
+            margin: 0;
+            line-height: 1.2;
+            text-shadow: 0 0 12px rgba(226, 88, 34, 0.5);
           }
 
           .foundation-subtitle {
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.7);
-            margin-top: 0.5rem;
-            margin-bottom: 0;
-            transition: opacity 0.3s ease, transform 0.3s ease;
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.65);
+            margin: 0.25rem auto 0;
+            line-height: 1.3;
+            max-width: 85%;
           }
 
           .swiper-container {
@@ -1978,7 +1971,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
             z-index: 10;
-            padding-top: 100px; /* Adjust for fixed header height */
+            padding-top: 85px; /* Adjust for fixed header height (reduced from 100px) */
             opacity: ${!showDailyQuote && swiperReady ? '1' : '0'};
             transition: opacity 0.3s ease;
           }
@@ -3170,11 +3163,13 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
             }
             
             .foundation-title {
-              font-size: 1.2rem;
+              font-size: 0.95rem;
+              letter-spacing: 0.1em;
             }
 
             .foundation-subtitle {
-              font-size: 0.7rem;
+              font-size: 0.6rem;
+              max-width: 90%;
             }
 
             .category-tabs {
@@ -3271,10 +3266,10 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           <Link to="/account" className="foundation-account-btn">
             <User size={24} />
           </Link>
-          <h1 className={`foundation-title ${activePanel !== 1 ? 'hidden' : ''}`}>
+          <h1 className="foundation-title">
             THE DREAMSCAPE
           </h1>
-          <p className={`foundation-subtitle ${activePanel !== 1 ? 'hidden' : ''}`}>
+          <p className="foundation-subtitle">
             Master your sleep. Reclaim your nights. Engineer your consciousness.
           </p>
         </div>
