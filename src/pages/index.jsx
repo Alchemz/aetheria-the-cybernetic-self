@@ -105,6 +105,8 @@ function PagesContent() {
                 
                 <Route path="/wisdomwell" element={<Wisdomwell />} />
                 
+                <Route path="/wisdom-well" element={<Wisdomwell />} />
+                
                 <Route path="/nexus" element={<Nexus />} />
                 
                 <Route path="/nexus-frequency-lab" element={<NexusFrequencyLab />} />

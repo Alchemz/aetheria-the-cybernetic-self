@@ -9,7 +9,8 @@ export default function SovereignPortal() {
   const [currentRealm, setCurrentRealm] = useState(0);
   const [isAuthenticating, setIsAuthenticating] = useState(!APP_CONFIG.BYPASS_AUTH);
   const [isAuthenticated, setIsAuthenticated] = useState(APP_CONFIG.BYPASS_AUTH);
-  const [synchronyOpen, setSynchronyOpen] = useState(false); // Added synchronyOpen state
+  const [synchronyOpen, setSynchronyOpen] = useState(false);
+  const [wisdomOpen, setWisdomOpen] = useState(false);
   const scrollContainerRef = useRef(null);
   const canvasRef = useRef(null);
   const sceneRef = useRef(null);
@@ -303,6 +304,23 @@ export default function SovereignPortal() {
   const handleSynchronyToggle = (e) => {
     e.stopPropagation();
     setSynchronyOpen(!synchronyOpen);
+  };
+
+  const handleWisdomClick = () => {
+    navigate('/wisdom-well');
+  };
+
+  const handleWisdomHover = () => {
+    setWisdomOpen(true);
+  };
+
+  const handleWisdomLeave = () => {
+    setWisdomOpen(false);
+  };
+
+  const handleWisdomToggle = (e) => {
+    e.stopPropagation();
+    setWisdomOpen(!wisdomOpen);
   };
 
   if (isAuthenticating) {
@@ -900,6 +918,75 @@ export default function SovereignPortal() {
           transition: all 0.3s ease;
         }
 
+        /* Wisdom Well Portal Widget (Left Side) */
+        .floating-wisdom-widget {
+          position: fixed;
+          bottom: 2rem;
+          bottom: calc(2rem + env(safe-area-inset-bottom));
+          left: 2rem;
+          z-index: 1000;
+          cursor: pointer;
+          --portal-size: 80px;
+        }
+
+        .floating-wisdom-widget .portal-container:hover {
+          transform: scale(1.15);
+        }
+
+        /* Wisdom Well Floating Text */
+        .wisdom-button-overlay {
+          position: fixed;
+          bottom: 2rem;
+          bottom: calc(2rem + env(safe-area-inset-bottom));
+          left: 9.5rem;
+          z-index: 999;
+          opacity: 0;
+          transform: translateX(-20px) scale(0.8);
+          transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+          pointer-events: none;
+        }
+
+        .wisdom-button-overlay.visible {
+          opacity: 1;
+          transform: translateX(0) scale(1);
+          pointer-events: all;
+        }
+
+        .wisdom-glass-button {
+          text-align: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .wisdom-glass-button:hover .wisdom-title {
+          text-shadow: 0 0 25px #4A9EFF, 0 0 35px #4A9EFF;
+          transform: scale(1.05);
+        }
+
+        .wisdom-glass-button:hover .wisdom-subtitle {
+          color: rgba(74, 158, 255, 0.9);
+        }
+
+        .wisdom-title {
+          font-family: 'Orbitron', monospace;
+          font-size: 1rem;
+          font-weight: 700;
+          color: #4A9EFF;
+          letter-spacing: 0.12em;
+          margin-bottom: 0.2rem;
+          text-shadow: 0 0 15px rgba(74, 158, 255, 0.6);
+          transition: all 0.3s ease;
+        }
+
+        .wisdom-subtitle {
+          font-family: 'Inter', sans-serif;
+          font-size: 0.6rem;
+          color: rgba(74, 158, 255, 0.6);
+          letter-spacing: 0.08em;
+          text-transform: lowercase;
+          transition: all 0.3s ease;
+        }
+
         @media (max-width: 768px) {
           .floating-portal-widget {
             bottom: 1.5rem;
@@ -922,6 +1009,26 @@ export default function SovereignPortal() {
           }
 
           .synchrony-subtitle {
+            font-size: 0.55rem;
+          }
+
+          .floating-wisdom-widget {
+            bottom: 1.5rem;
+            bottom: calc(1.5rem + env(safe-area-inset-bottom));
+            left: 1.5rem;
+            --portal-size: 60px;
+          }
+
+          .wisdom-button-overlay {
+            bottom: 1.5rem;
+            left: 5.5rem;
+          }
+
+          .wisdom-title {
+            font-size: 0.9rem;
+          }
+
+          .wisdom-subtitle {
             font-size: 0.55rem;
           }
         }
@@ -997,6 +1104,30 @@ export default function SovereignPortal() {
         <div className="synchrony-glass-button" onClick={handleSynchronyClick}>
           <div className="synchrony-title">SYNCHRONY</div>
           <div className="synchrony-subtitle">save the world</div>
+        </div>
+      </div>
+
+      {/* Wisdom Well Portal Widget */}
+      <div 
+        className="floating-wisdom-widget"
+        onClick={handleWisdomClick}
+        onMouseEnter={handleWisdomHover}
+        onMouseLeave={handleWisdomLeave}
+        onTouchStart={handleWisdomToggle}
+      >
+        <div className="portal-container">
+          <div className="portal-ring"></div>
+          <div className="portal-vortex"></div>
+          <div className="portal-particles"></div>
+          <div className="portal-center-symbol">☥</div>
+        </div>
+      </div>
+
+      {/* Wisdom Well Floating Text Labels */}
+      <div className={`wisdom-button-overlay ${wisdomOpen ? 'visible' : ''}`}>
+        <div className="wisdom-glass-button" onClick={handleWisdomClick}>
+          <div className="wisdom-title">WISDOM WELL</div>
+          <div className="wisdom-subtitle">learn about faith</div>
         </div>
       </div>
     </div>

@@ -383,23 +383,23 @@ export default function WisdomWell() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap');
 
-        @keyframes golden-glow {
+        @keyframes cyan-glow {
           0%, 100% {
-            text-shadow: 0 0 20px #E8943A, 0 0 30px #F5A857;
-            box-shadow: 0 0 20px rgba(232, 148, 58, 0.4);
+            text-shadow: 0 0 20px #4A9EFF, 0 0 30px #00FFFF;
+            box-shadow: 0 0 20px rgba(74, 158, 255, 0.4);
           }
           50% {
-            text-shadow: 0 0 30px #E8943A, 0 0 50px #F5A857, 0 0 60px #FFD4A3;
-            box-shadow: 0 0 40px rgba(232, 148, 58, 0.6);
+            text-shadow: 0 0 30px #4A9EFF, 0 0 50px #00FFFF, 0 0 60px #A0D8FF;
+            box-shadow: 0 0 40px rgba(74, 158, 255, 0.6);
           }
         }
 
         @keyframes icon-shine {
           0%, 100% {
-            filter: drop-shadow(0 0 10px #E8943A);
+            filter: drop-shadow(0 0 10px #4A9EFF);
           }
           50% {
-            filter: drop-shadow(0 0 20px #F5A857) drop-shadow(0 0 30px #FFD4A3);
+            filter: drop-shadow(0 0 20px #00FFFF) drop-shadow(0 0 30px #A0D8FF);
           }
         }
 
@@ -430,8 +430,8 @@ export default function WisdomWell() {
           right: 0;
           bottom: 0;
           background: 
-            radial-gradient(circle at 20% 50%, rgba(232, 148, 58, 0.03) 0%, transparent 50%),
-            radial-gradient(circle at 80% 50%, rgba(245, 168, 87, 0.03) 0%, transparent 50%);
+            radial-gradient(circle at 20% 50%, rgba(74, 158, 255, 0.03) 0%, transparent 50%),
+            radial-gradient(circle at 80% 50%, rgba(0, 255, 255, 0.03) 0%, transparent 50%);
           pointer-events: none;
           z-index: 0;
         }
@@ -454,7 +454,7 @@ export default function WisdomWell() {
           align-items: center;
           gap: 8px;
           text-decoration: none;
-          color: #E8943A;
+          color: #4A9EFF;
           font-family: 'Orbitron', monospace;
           font-size: 14px;
           font-weight: 600;
@@ -464,34 +464,34 @@ export default function WisdomWell() {
         }
 
         .wisdom-back-button:hover {
-          color: #F5A857;
+          color: #00FFFF;
           transform: translateX(-3px);
-          text-shadow: 0 0 15px #E8943A;
+          text-shadow: 0 0 15px #4A9EFF;
         }
 
         .wisdom-title {
           font-family: 'Orbitron', monospace;
           font-size: 3rem;
           font-weight: 900;
-          color: #E8943A;
+          color: #4A9EFF;
           margin-bottom: 20px;
           letter-spacing: 0.15em;
-          animation: golden-glow 4s ease-in-out infinite;
-          background: linear-gradient(90deg, #E8943A, #F5A857, #FFD4A3, #F5A857, #E8943A);
+          animation: cyan-glow 4s ease-in-out infinite;
+          background: linear-gradient(90deg, #4A9EFF, #00FFFF, #A0D8FF, #00FFFF, #4A9EFF);
           background-size: 200% auto;
           -webkit-background-clip: text;
           background-clip: text;
           -webkit-text-fill-color: transparent;
-          animation: golden-glow 4s ease-in-out infinite, shimmer 3s linear infinite;
+          animation: cyan-glow 4s ease-in-out infinite, shimmer 3s linear infinite;
         }
 
         .wisdom-subtitle {
           font-size: 1.1rem;
-          color: rgba(232, 148, 58, 0.8);
+          color: rgba(74, 158, 255, 0.8);
           line-height: 1.6;
           max-width: 700px;
           margin: 0 auto;
-          text-shadow: 0 0 10px rgba(245, 168, 87, 0.3);
+          text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
         }
 
         .wisdom-grid {
@@ -505,8 +505,8 @@ export default function WisdomWell() {
         }
 
         .wisdom-card {
-          background: linear-gradient(135deg, rgba(232, 148, 58, 0.08), rgba(232, 148, 58, 0.03));
-          border: 2px solid rgba(232, 148, 58, 0.4);
+          background: linear-gradient(135deg, rgba(74, 158, 255, 0.08), rgba(74, 158, 255, 0.03));
+          border: 2px solid rgba(74, 158, 255, 0.4);
           transition: all 0.4s ease;
           cursor: pointer;
           overflow: hidden;
@@ -521,7 +521,7 @@ export default function WisdomWell() {
           left: -100%;
           width: 100%;
           height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(245, 168, 87, 0.1), transparent);
+          background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.1), transparent);
           transition: left 0.5s ease;
         }
 
@@ -530,9 +530,9 @@ export default function WisdomWell() {
         }
 
         .wisdom-card:hover {
-          background: linear-gradient(135deg, rgba(232, 148, 58, 0.15), rgba(232, 148, 58, 0.08));
-          border-color: #E8943A;
-          box-shadow: 0 0 30px rgba(232, 148, 58, 0.3), inset 0 0 20px rgba(245, 168, 87, 0.1);
+          background: linear-gradient(135deg, rgba(74, 158, 255, 0.15), rgba(74, 158, 255, 0.08));
+          border-color: #4A9EFF;
+          box-shadow: 0 0 30px rgba(74, 158, 255, 0.3), inset 0 0 20px rgba(0, 255, 255, 0.1);
           transform: translateY(-2px);
         }
 
@@ -553,7 +553,7 @@ export default function WisdomWell() {
 
         .card-icon-wrapper {
           flex-shrink: 0;
-          color: #E8943A;
+          color: #4A9EFF;
           animation: icon-shine 4s ease-in-out infinite;
         }
 
@@ -565,20 +565,20 @@ export default function WisdomWell() {
           font-family: 'Orbitron', monospace;
           font-size: 1.4rem;
           font-weight: 700;
-          color: #E8943A;
+          color: #4A9EFF;
           margin-bottom: 8px;
           letter-spacing: 0.05em;
-          text-shadow: 0 0 15px rgba(232, 148, 58, 0.5);
+          text-shadow: 0 0 15px rgba(74, 158, 255, 0.5);
         }
 
         .card-description {
           font-size: 0.95rem;
-          color: rgba(232, 148, 58, 0.7);
+          color: rgba(74, 158, 255, 0.7);
           line-height: 1.5;
         }
 
         .card-expand-icon {
-          color: #E8943A;
+          color: #4A9EFF;
           flex-shrink: 0;
           transition: transform 0.3s ease;
         }
@@ -598,27 +598,27 @@ export default function WisdomWell() {
         .card-content.expanded {
           max-height: 5000px;
           padding: 30px 25px;
-          border-top: 1px solid rgba(232, 148, 58, 0.3);
+          border-top: 1px solid rgba(74, 158, 255, 0.3);
         }
 
         .card-content h3 {
           font-family: 'Orbitron', monospace;
           font-size: 1.3rem;
-          color: #F5A857;
+          color: #00FFFF;
           margin-bottom: 20px;
           letter-spacing: 0.08em;
           text-align: center;
-          text-shadow: 0 0 20px rgba(245, 168, 87, 0.5);
+          text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
         }
 
         .card-content h4 {
           font-family: 'Orbitron', monospace;
           font-size: 1.1rem;
-          color: #E8943A;
+          color: #4A9EFF;
           margin-top: 25px;
           margin-bottom: 12px;
           letter-spacing: 0.05em;
-          text-shadow: 0 0 10px rgba(232, 148, 58, 0.3);
+          text-shadow: 0 0 10px rgba(74, 158, 255, 0.3);
         }
 
         .card-content p {
@@ -629,13 +629,13 @@ export default function WisdomWell() {
         }
 
         .card-content strong {
-          color: #F5A857;
+          color: #00FFFF;
           font-weight: 600;
-          text-shadow: 0 0 8px rgba(245, 168, 87, 0.3);
+          text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
         }
 
         .card-content em {
-          color: rgba(232, 148, 58, 0.8);
+          color: rgba(74, 158, 255, 0.8);
           font-style: italic;
         }
 
