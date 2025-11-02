@@ -13,6 +13,7 @@ INNERSYNC is a meditation and wellness platform built with Vite and React, featu
 ### UI/UX Decisions
 - **The Synchrony Redesign**: Features a cyan aesthetic (`#00FFFF`) with a compact card-based pre-session lobby. Incorporates animated pulsing circles for box breathing and a breath visualizer bar for Aum toning, with radiating wave effects. A 3D particle field ("Sovereign Galaxy") visualizes connected users.
 - **Portal as Landing Page**: The default landing page is now Portal, featuring 3D graphics as the initial user experience.
+- **Foundation (Dreamscape) Design**: Minimalist header with floating circular icons (Home, Account) that have glassmorphic backgrounds. No title bar to maximize background image visibility. Icons feature hover effects with orange glow matching the sanctuary aesthetic.
 
 ### Technical Implementations
 - **Frontend**: Vite + React (JavaScript/JSX) with Tailwind CSS and Radix UI components for styling.

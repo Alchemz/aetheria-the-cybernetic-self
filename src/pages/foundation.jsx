@@ -1922,35 +1922,40 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
             top: 0;
             left: 0;
             width: 100%;
-            display: block; /* Allows text-align to center h1/p */
-            padding: 1rem 1.5rem;
-            padding-top: calc(1rem + env(safe-area-inset-top));
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0.4), transparent);
+            height: 0; /* No height, just container for icons */
             z-index: 100;
-            text-align: center; /* Center title and subtitle */
+            pointer-events: none; /* Allow clicks through header */
           }
           
           .foundation-home-btn, .foundation-account-btn {
-            position: absolute;
+            position: fixed;
             top: calc(1rem + env(safe-area-inset-top));
-            color: rgba(255,255,255,0.7);
-            transition: color 0.3s;
+            color: rgba(255,255,255,0.9);
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0.5rem; /* Make clickable area larger */
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            pointer-events: auto; /* Re-enable clicks on buttons */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
           }
 
           .foundation-home-btn {
-            left: 0.5rem;
+            left: 1rem;
           }
 
           .foundation-account-btn {
-            right: 0.5rem;
+            right: 1rem;
           }
           
           .foundation-home-btn:hover, .foundation-account-btn:hover {
             color: var(--color-primary);
+            background: rgba(226, 88, 34, 0.2);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(226, 88, 34, 0.4);
           }
 
           .foundation-title {
@@ -1984,7 +1989,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
             z-index: 10;
-            padding-top: 85px; /* Adjust for fixed header height (reduced from 100px) */
+            padding-top: calc(60px + env(safe-area-inset-top)); /* Minimal space for floating icons */
             opacity: ${!showDailyQuote && swiperReady ? '1' : '0'};
             transition: opacity 0.3s ease;
           }
