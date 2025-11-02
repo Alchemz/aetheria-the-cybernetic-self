@@ -1918,13 +1918,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
 
           .foundation-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 0; /* No height, just container for icons */
-            z-index: 100;
-            pointer-events: none; /* Allow clicks through header */
+            display: none; /* Completely hidden container */
           }
           
           .foundation-home-btn, .foundation-account-btn {
@@ -1936,10 +1930,10 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
             align-items: center;
             justify-content: center;
             padding: 0.75rem;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(10px);
             border-radius: 50%;
-            pointer-events: auto; /* Re-enable clicks on buttons */
+            z-index: 100;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
           }
 
@@ -1953,9 +1947,9 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           
           .foundation-home-btn:hover, .foundation-account-btn:hover {
             color: var(--color-primary);
-            background: rgba(226, 88, 34, 0.2);
+            background: rgba(226, 88, 34, 0.3);
             transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(226, 88, 34, 0.4);
+            box-shadow: 0 0 20px rgba(226, 88, 34, 0.5);
           }
 
           .foundation-title {
@@ -3249,23 +3243,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
         `}</style>
 
-        {/* Floating Particles */}
-        <div className="particle-container">
-          {Array.from({ length: 30 }).map((_, i) => (
-            <div
-              key={i}
-              className="particle"
-              style={{
-                left: `${Math.random() * 100}%`,
-                width: `${Math.random() * 2 + 1}px`,
-                height: `${Math.random() * 2 + 1}px`,
-                animationDelay: `${Math.random() * 20}s`,
-                animationDuration: `${Math.random() * 15 + 10}s`,
-                opacity: `${Math.random() * 0.5 + 0.1}`
-              }}
-            />
-          ))}
-        </div>
+        {/* Floating Particles - REMOVED */}
         
         {/* Daily Quote Overlay */}
         {showDailyQuote && (
