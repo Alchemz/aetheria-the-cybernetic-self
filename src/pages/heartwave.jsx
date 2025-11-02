@@ -154,9 +154,9 @@ export default function TheTemple() {
       habits: [
         {
           name: 'Switch Hands Protocol',
-          duration: 60,
+          duration: 45,
           difficulty: 'Medium',
-          why: 'Using non-dominant hand for routine actions forces new neural pathways, breaking habitual patterns and enhancing neuroplasticity throughout the day.'
+          why: 'Using non-dominant hand for routine morning tasks (first 30-60 min of day) forces new neural pathways, breaking habitual patterns and enhancing neuroplasticity.'
         },
         {
           name: 'Mirror Work Affirmation',

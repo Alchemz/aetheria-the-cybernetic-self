@@ -62,10 +62,10 @@ export default function HeartWaveConsole() {
         {
           name: 'Switch Hands Protocol',
           category: 'Neuroplasticity',
-          duration: 60,
+          duration: 45,
           difficulty: 'Medium',
-          why: 'Using non-dominant hand for routine actions forces new neural pathways, breaking habitual patterns and enhancing neuroplasticity throughout the day.',
-          howTo: 'Brush teeth, eat, open doors, and write using your non-dominant hand for the entire day.'
+          why: 'Using non-dominant hand for routine morning tasks (first 30-60 min of day) forces new neural pathways, breaking habitual patterns and enhancing neuroplasticity.',
+          howTo: 'Brush teeth, eat, open doors, and perform routine tasks using your non-dominant hand for the first 30-60 minutes of your morning.'
         },
         {
           name: 'Mirror Work Affirmation',
