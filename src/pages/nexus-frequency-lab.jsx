@@ -85,18 +85,6 @@ export default function MeditationChamber() {
         }
       ]
     },
-    synchrony: {
-      name: 'Synchrony',
-      description: 'Sacred alignment meditation for the global synchrony practice',
-      tracks: [
-        { 
-          id: '963-synchrony', 
-          name: '963 Hz Alignment Meditation', 
-          duration: '30:00', 
-          url: 'https://Innersync-media.s3.us-east-005.backblazeb2.com/963+Hz+to+Connect++healing+Meditation+and+Healing+.mp3'
-        }
-      ]
-    },
     focus: {
       name: 'Focus',
       description: 'Binaural beats and gamma waves for peak concentration and cognitive performance',
