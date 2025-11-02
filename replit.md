@@ -38,8 +38,28 @@ INNERSYNC is a meditation and wellness platform built with Vite and React, featu
 ### System Design Choices
 - **Secure Client-Server Architecture**: Frontend (Vite/React) on Port 5000, Backend (Express.js) on Port 3000. Frontend proxies API requests to the backend to protect API keys.
 - **Supabase Integration**: Used for authentication and database (PostgreSQL). Includes `profiles` and `cosmic_briefings` tables with Row Level Security and a trigger for automatic profile creation on user signup.
-- **Environment Variables**: Managed via Replit Secrets for `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `OPENAI_API_KEY`.
+- **Environment Variables**: Managed via Replit Secrets for `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `OPENAI_API_KEY`, and `VITE_REVENUECAT_API_KEY`.
 - **Workflow Configuration**: `npm run dev:all` script to run both frontend and backend concurrently.
+
+### Monetization & Payment System
+- **RevenueCat Integration**: Integrated `@revenuecat/purchases-capacitor` for cross-platform in-app purchases on iOS and Android
+  - **Payment Model**: Subscription-based access through App Store and Google Play
+  - **Subscription Service** (`src/services/subscriptionService.js`): Handles RevenueCat SDK initialization, purchase flow, subscription status checks, and syncing with Supabase
+  - **Supabase Sync**: Subscription status stored in `profiles` table (`subscription_status`, `subscribed_products`, `subscription_type`) and synced automatically
+  - **Protected Routes**: `ProtectedRoute` component wraps paid features and redirects to upgrade page if no active subscription
+- **Free vs Paid Features**:
+  - **Free** (No subscription required): Portal, Synchrony (global meditation), Wisdom Well (spiritual library)
+  - **Paid** (Requires subscription): Foundation (sleep/dreams), Temple (bio-protocols), Nexus (cognitive enhancement), Meditation Chamber (healing frequencies), all AI features
+- **Upgrade/Paywall Page** (`/upgrade`): Beautiful gradient design with feature cards, pricing display, and native purchase flow
+  - Shows RevenueCat offerings on native platforms (iOS/Android)
+  - Displays "Download Native App" message on web
+  - Supports purchase restoration for existing subscribers
+- **Portal UX**: Lock icons displayed on paid realm buttons (Sanctuary, Nexus, Temple) to indicate premium features
+- **Access Control Flow**:
+  1. User clicks paid feature → ProtectedRoute checks subscription status
+  2. If no subscription → Redirect to `/upgrade` page with return URL
+  3. User purchases subscription → RevenueCat processes payment
+  4. Status synced to Supabase → User granted access → Redirected to original destination
 
 ### Capacitor Native Mobile Setup
 **Configuration**: `capacitor.config.ts` defines App ID (`com.innersync.app`), App Name (`INNERSYNC`), and web directory (`dist`).
@@ -111,6 +131,7 @@ INNERSYNC is a meditation and wellness platform built with Vite and React, featu
 - **OpenAI API**: Integrated for AI capabilities, powering the Dream Assistant, Athena AI, and the Cosmic Briefing feature.
 - **Three.js**: Utilized for 3D graphics rendering and immersive visualizations.
 - **Capacitor**: Used for wrapping the web application into native iOS and Android applications (`@capacitor/core`, `@capacitor/cli`, `@capacitor/ios`, `@capacitor/android`).
+- **RevenueCat**: Cross-platform subscription management (`@revenuecat/purchases-capacitor`) for iOS App Store and Google Play in-app purchases.
 - **Tailwind CSS**: A utility-first CSS framework for styling.
 - **Radix UI**: A collection of unstyled, accessible UI components.
 - **@tanstack/react-query**: For server state management and caching.
