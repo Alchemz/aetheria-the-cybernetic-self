@@ -12,6 +12,7 @@ export default function Synchrony() {
   const sceneRef = useRef(null);
   const particlesRef = useRef([]);
   const centralLightRef = useRef(null);
+  const audioRef = useRef(null);
   
   const [participantCount, setParticipantCount] = useState(8421); // Simulated count
   const [timeUntilNext, setTimeUntilNext] = useState({ hours: 0, minutes: 0, seconds: 0 });
@@ -314,6 +315,24 @@ export default function Synchrony() {
       return () => clearInterval(interval);
     }
   }, [meditationPhase]);
+
+  // Autoplay 963 Hz meditation audio when joining
+  useEffect(() => {
+    if (hasJoined && audioRef.current) {
+      audioRef.current.play().catch(err => {
+        console.log('Audio autoplay prevented, will play on user interaction:', err);
+      });
+
+      // Setup Media Session API for background playback
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: '963 Hz Alignment Meditation',
+          artist: 'INNERSYNC Synchrony',
+          album: 'Global Meditation',
+        });
+      }
+    }
+  }, [hasJoined]);
 
   const handleJoinSession = async () => {
     try {
@@ -847,6 +866,14 @@ export default function Synchrony() {
           </>
         )}
       </div>
+
+      {/* Hidden audio element for 963 Hz meditation */}
+      <audio 
+        ref={audioRef}
+        src="https://Innersync-media.s3.us-east-005.backblazeb2.com/963+Hz+to+Connect++healing+Meditation+and+Healing+.mp3"
+        loop
+        preload="auto"
+      />
     </div>
   );
 }
