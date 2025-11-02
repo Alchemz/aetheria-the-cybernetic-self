@@ -3258,15 +3258,13 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           </div>
         )}
 
-        {/* Header */}
-        <div className="foundation-header">
-          <Link to="/portal" className="foundation-home-btn">
-            <Home size={24} />
-          </Link>
-          <Link to="/account" className="foundation-account-btn">
-            <User size={24} />
-          </Link>
-        </div>
+        {/* Floating Navigation Buttons */}
+        <Link to="/portal" className="foundation-home-btn">
+          <Home size={24} />
+        </Link>
+        <Link to="/account" className="foundation-account-btn">
+          <User size={24} />
+        </Link>
         
         {/* Course Modal */}
         {selectedCourse && (
