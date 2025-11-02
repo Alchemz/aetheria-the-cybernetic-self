@@ -219,6 +219,19 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
     setDuration(0);
   }, [audioUrl]);
 
+  // Auto-play/pause when isPlaying prop changes
+  useEffect(() => {
+    if (!audioRef.current || !audioUrl) return;
+    
+    if (isPlaying && audioRef.current.paused) {
+      audioRef.current.play().catch(err => {
+        console.error('❌ Auto-play error:', err);
+      });
+    } else if (!isPlaying && !audioRef.current.paused) {
+      audioRef.current.pause();
+    }
+  }, [isPlaying, audioUrl]);
+
   // Media Session API for background playback
   useEffect(() => {
     if (!currentTrack || !('mediaSession' in navigator)) return;
@@ -1026,7 +1039,7 @@ export default function SleepSanctuary() { // Renamed from Foundation to SleepSa
             errorMessage = 'No microphone found. Please check if your microphone is connected.';
             break;
           case 'not-allowed':
-            errorMessage = 'Please allow microphone access when your browser prompts you. Click the microphone icon to try again.';
+            errorMessage = 'Microphone access is required. Please enable microphone permissions in your device settings and try again.';
             break;
           case 'network':
             errorMessage = 'Network error occurred. Please check your connection.';
@@ -1082,7 +1095,7 @@ export default function SleepSanctuary() { // Renamed from Foundation to SleepSa
         if (error.name === 'NotAllowedError') {
           setChatMessages(prev => [...prev, { 
             role: 'assistant', 
-            content: 'Please allow microphone access when prompted by your browser. Click the microphone icon again to retry.' 
+            content: 'Microphone access is required. Please enable microphone permissions in your device settings and try again.' 
           }]);
         } else {
           setChatMessages(prev => [...prev, { 
@@ -2575,10 +2588,11 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
 
           .course-modal-close {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: transparent;
+            position: sticky;
+            top: 0;
+            right: 0;
+            float: right;
+            background: rgba(10, 10, 10, 0.95);
             border: 1px solid var(--color-primary);
             color: var(--color-primary);
             padding: 0.5rem 1rem;
@@ -2586,6 +2600,9 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
             font-family: 'Orbitron', monospace;
             font-size: 0.8rem;
             transition: all 0.3s ease;
+            z-index: 10;
+            margin-bottom: 1rem;
+            box-shadow: 0 0 15px rgba(226, 88, 34, 0.5);
           }
 
           .course-modal-close:hover {
@@ -3266,12 +3283,6 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           <Link to="/account" className="foundation-account-btn">
             <User size={24} />
           </Link>
-          <h1 className="foundation-title">
-            THE DREAMSCAPE
-          </h1>
-          <p className="foundation-subtitle">
-            Master your sleep. Reclaim your nights. Engineer your consciousness.
-          </p>
         </div>
         
         {/* Course Modal */}
@@ -3601,7 +3612,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
                           onClick={handleSaveDream}
                           disabled={!dreamJournalEntry.trim()}
                         >
-                          Save & Interpret
+                          Save
                         </button>
                       </div>
                     ) : (
