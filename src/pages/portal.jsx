@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '@/api/supabaseClient';
 import { APP_CONFIG } from '@/config';
+import { Lock } from 'lucide-react';
 import * as THREE from 'three';
 
 export default function SovereignPortal() {
@@ -25,6 +26,7 @@ export default function SovereignPortal() {
       caption: "Reclaim Your Night. Master Sleep & Subconscious Power.",
       buttonText: "Enter the Sanctuary",
       path: "/foundation",
+      requiresSubscription: true, // PAID FEATURE
       logoUrl: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68d4574bc126933aed677cd7/50a012bb8_Photoroom_20251026_013106.png",
       colors: {
         primary: '#CC5500',
@@ -40,6 +42,7 @@ export default function SovereignPortal() {
       caption: "Augment Your Mind. Master Your Inner Frequency.",
       buttonText: "Activate Neuro-Sync",
       path: "/nexus",
+      requiresSubscription: true, // PAID FEATURE
       logoUrl: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68d4574bc126933aed677cd7/209999ac2_20251025_0942_CelestialBrainLogo_simple_compose_01k8e3xrb6fs6rrdxvh20ppw2y.png",
       colors: {
         primary: '#9B59B6',
@@ -55,6 +58,7 @@ export default function SovereignPortal() {
       caption: "Embody Your Spirit. Align Breath, Movement, Energy.",
       buttonText: "Begin Embodiment",
       path: "/heartwave",
+      requiresSubscription: true, // PAID FEATURE
       logoUrl: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68d4574bc126933aed677cd7/d4dc55d83_20251025_1106_MeditativeGeometricHeart_simple_compose_01k8e8pzp2eeyvqyv030kvy8ts.png",
       colors: {
         primary: '#00A86B',
@@ -280,13 +284,30 @@ export default function SovereignPortal() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentRealm]);
 
-  const handleEnterRealm = (path) => {
+  const handleEnterRealm = async (realm) => {
     if (!isAuthenticated) {
       alert('Please login to access this feature');
-      base44.auth.redirectToLogin(path);
+      auth.redirectToLogin(realm.path);
       return;
     }
-    navigate(path);
+
+    // Check if realm requires subscription
+    if (realm.requiresSubscription) {
+      try {
+        const user = await auth.me();
+        const hasActiveSubscription = user.subscription_status === 'active';
+        
+        if (!hasActiveSubscription) {
+          // Redirect to upgrade page
+          navigate('/upgrade', { state: { from: realm.path } });
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking subscription:', error);
+      }
+    }
+
+    navigate(realm.path);
   };
 
   const handleSynchronyClick = () => {
@@ -1062,8 +1083,9 @@ export default function SovereignPortal() {
               <p className="realm-caption">{realm.caption}</p>
               <button 
                 className="realm-button"
-                onClick={() => handleEnterRealm(realm.path)}
+                onClick={() => handleEnterRealm(realm)}
               >
+                {realm.requiresSubscription && <Lock size={20} style={{ marginRight: '8px' }} />}
                 {realm.buttonText}
               </button>
             </div>

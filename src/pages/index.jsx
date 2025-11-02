@@ -34,6 +34,10 @@ import HeartwaveConsole from "./heartwave-console";
 
 import Synchrony from "./synchrony";
 
+import Upgrade from "./upgrade";
+
+import ProtectedRoute from "@/components/ProtectedRoute";
+
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 
 const PAGES = {
@@ -72,6 +76,8 @@ const PAGES = {
     
     synchrony: Synchrony,
     
+    upgrade: Upgrade,
+    
 }
 
 function _getCurrentPage(url) {
@@ -95,46 +101,29 @@ function PagesContent() {
     return (
         <Layout currentPageName={currentPage}>
             <Routes>            
-                
-                    <Route path="/" element={<Portal />} />
-                
-                
-                <Route path="/foundation" element={<Foundation />} />
-                
+                {/* Free Pages - No Protection */}
+                <Route path="/" element={<Portal />} />
                 <Route path="/portal" element={<Portal />} />
-                
                 <Route path="/wisdomwell" element={<Wisdomwell />} />
-                
                 <Route path="/wisdom-well" element={<Wisdomwell />} />
-                
-                <Route path="/nexus" element={<Nexus />} />
-                
-                <Route path="/nexus-frequency-lab" element={<NexusFrequencyLab />} />
-                
-                <Route path="/nexus-cosmic-library" element={<NexusCosmicLibrary />} />
-                
+                <Route path="/synchrony" element={<Synchrony />} />
+                <Route path="/upgrade" element={<Upgrade />} />
                 <Route path="/account" element={<Account />} />
-                
-                <Route path="/nexus-pineal-atrium" element={<NexusPinealAtrium />} />
-                
-                <Route path="/nexus-biohacking-lab" element={<NexusBiohackingLab />} />
-                
-                <Route path="/nexus-cosmic-observatory" element={<NexusCosmicObservatory />} />
-                
-                <Route path="/subscribe" element={<Subscribe />} />
-                
-                <Route path="/heartwave" element={<Heartwave />} />
-                
                 <Route path="/admin-setup" element={<AdminSetup />} />
                 
-                <Route path="/heartwave-protocols" element={<HeartwaveProtocols />} />
-                
-                <Route path="/heartwave-athena" element={<HeartwaveAthena />} />
-                
-                <Route path="/heartwave-console" element={<HeartwaveConsole />} />
-                
-                <Route path="/synchrony" element={<Synchrony />} />
-                
+                {/* Paid Pages - Protected */}
+                <Route path="/foundation" element={<ProtectedRoute><Foundation /></ProtectedRoute>} />
+                <Route path="/nexus" element={<ProtectedRoute><Nexus /></ProtectedRoute>} />
+                <Route path="/nexus-frequency-lab" element={<ProtectedRoute><NexusFrequencyLab /></ProtectedRoute>} />
+                <Route path="/nexus-cosmic-library" element={<ProtectedRoute><NexusCosmicLibrary /></ProtectedRoute>} />
+                <Route path="/nexus-pineal-atrium" element={<ProtectedRoute><NexusPinealAtrium /></ProtectedRoute>} />
+                <Route path="/nexus-biohacking-lab" element={<ProtectedRoute><NexusBiohackingLab /></ProtectedRoute>} />
+                <Route path="/nexus-cosmic-observatory" element={<ProtectedRoute><NexusCosmicObservatory /></ProtectedRoute>} />
+                <Route path="/heartwave" element={<ProtectedRoute><Heartwave /></ProtectedRoute>} />
+                <Route path="/heartwave-protocols" element={<ProtectedRoute><HeartwaveProtocols /></ProtectedRoute>} />
+                <Route path="/heartwave-athena" element={<ProtectedRoute><HeartwaveAthena /></ProtectedRoute>} />
+                <Route path="/heartwave-console" element={<ProtectedRoute><HeartwaveConsole /></ProtectedRoute>} />
+                <Route path="/subscribe" element={<ProtectedRoute><Subscribe /></ProtectedRoute>} />
             </Routes>
         </Layout>
     );
