@@ -205,19 +205,13 @@ const MatrixVisualizer = ({ color = "#E25822", background = "#0A0A0A", audioData
   );
 };
 
-// Enhanced AudioPlayer with Playlist Navigation + Audio Visualization
+// Enhanced AudioPlayer with Playlist Navigation - SIMPLE PATTERN (NO WEB AUDIO API)
 const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, onPrevious }) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(70);
-  const [audioData, setAudioData] = useState(null);
   
   const audioRef = useRef(null);
-  const audioContextRef = useRef(null);
-  const analyserRef = useRef(null);
-  const dataArrayRef = useRef(null);
-  const sourceRef = useRef(null);
-  const animationFrameRef = useRef(null);
 
   // Reset state when audio URL changes
   useEffect(() => {
@@ -292,57 +286,6 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
       audioRef.current.volume = volume / 100;
     }
   }, [volume]);
-
-  // Web Audio API for Visualization
-  useEffect(() => {
-    if (!audioRef.current || !audioUrl) return;
-
-    // Create audio context and analyzer
-    if (!audioContextRef.current) {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      audioContextRef.current = new AudioContext();
-      analyserRef.current = audioContextRef.current.createAnalyser();
-      analyserRef.current.fftSize = 256;
-      
-      const bufferLength = analyserRef.current.frequencyBinCount;
-      dataArrayRef.current = new Uint8Array(bufferLength);
-    }
-
-    // Connect audio element to analyzer (only once per element)
-    if (!sourceRef.current && audioRef.current) {
-      sourceRef.current = audioContextRef.current.createMediaElementSource(audioRef.current);
-      sourceRef.current.connect(analyserRef.current);
-      analyserRef.current.connect(audioContextRef.current.destination);
-    }
-
-    // Animation loop to update frequency data
-    const updateAudioData = () => {
-      if (analyserRef.current && dataArrayRef.current) {
-        analyserRef.current.getByteFrequencyData(dataArrayRef.current);
-        setAudioData([...dataArrayRef.current]);
-      }
-      animationFrameRef.current = requestAnimationFrame(updateAudioData);
-    };
-
-    if (isPlaying) {
-      // Resume audio context if suspended (required by browsers)
-      if (audioContextRef.current.state === 'suspended') {
-        audioContextRef.current.resume();
-      }
-      updateAudioData();
-    } else {
-      // Stop animation when paused to save battery
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-    }
-
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-    };
-  }, [audioUrl, isPlaying]);
 
   // Event handlers - SIMPLE
   const handleLoadedMetadata = () => {
@@ -529,7 +472,7 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
       </div>
 
       {/* Matrix Visualizer */}
-      <MatrixVisualizer audioData={audioData} />
+      <MatrixVisualizer />
 
       {/* Control Panel with Playlist Navigation */}
       <div style={{
