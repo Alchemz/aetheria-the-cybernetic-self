@@ -25,6 +25,23 @@ export default function Synchrony() {
   const [breathPhase, setBreathPhase] = useState('inhale'); // 'inhale', 'hold1', 'exhale', 'hold2'
   const [breathProgress, setBreathProgress] = useState(0); // 0-100
   const [phaseTimer, setPhaseTimer] = useState(0); // Seconds in current phase
+  
+  // Voice guidance audio refs
+  const voiceAudioRefs = useRef({
+    inhale: null,
+    holdYourBreath: null,
+    exhale: null,
+    andHold: null,
+    aum: null,
+    nowRelaxed: null
+  });
+  
+  // Track which voice cues have been played to play them only once
+  const [voiceCuesPlayed, setVoiceCuesPlayed] = useState({
+    boxBreathingCycle: false,
+    transitionToAum: false,
+    aumExample: false
+  });
 
   // Helper to create a Date object representing a specific time in Asia/Tokyo
   const getJapanDateTime = useCallback((date, hour, minute, second, addDays = 0) => {
@@ -242,26 +259,64 @@ export default function Synchrony() {
 
     const breathCycleDuration = 16000; // 16 seconds total (4s each phase)
     const phaseDuration = 4000; // 4 seconds per phase
+    const startTime = Date.now();
+    let lastPhase = null;
     
     const interval = setInterval(() => {
       const now = Date.now();
-      const cyclePosition = now % breathCycleDuration;
+      const elapsedTime = now - startTime;
+      const cyclePosition = elapsedTime % breathCycleDuration;
+      const isFirstCycle = elapsedTime < breathCycleDuration;
       
       if (cyclePosition < phaseDuration) {
         // Phase 1: Inhale (0-4s)
-        setBreathPhase('inhale');
+        if (lastPhase !== 'inhale') {
+          setBreathPhase('inhale');
+          lastPhase = 'inhale';
+          
+          // Play "Inhale" voice cue only once at the very start
+          if (isFirstCycle && !voiceCuesPlayed.boxBreathingCycle) {
+            playVoiceGuidance('inhale');
+          }
+        }
         setBreathProgress((cyclePosition / phaseDuration) * 100);
       } else if (cyclePosition < phaseDuration * 2) {
         // Phase 2: Hold (4-8s)
-        setBreathPhase('hold1');
+        if (lastPhase !== 'hold1') {
+          setBreathPhase('hold1');
+          lastPhase = 'hold1';
+          
+          // Play "Hold your breath" voice cue only in first cycle
+          if (isFirstCycle && !voiceCuesPlayed.boxBreathingCycle) {
+            playVoiceGuidance('holdYourBreath');
+          }
+        }
         setBreathProgress(100);
       } else if (cyclePosition < phaseDuration * 3) {
         // Phase 3: Exhale (8-12s)
-        setBreathPhase('exhale');
+        if (lastPhase !== 'exhale') {
+          setBreathPhase('exhale');
+          lastPhase = 'exhale';
+          
+          // Play "Exhale" voice cue only in first cycle
+          if (isFirstCycle && !voiceCuesPlayed.boxBreathingCycle) {
+            playVoiceGuidance('exhale');
+          }
+        }
         setBreathProgress(100 - ((cyclePosition - phaseDuration * 2) / phaseDuration) * 100);
       } else {
         // Phase 4: Hold (12-16s)
-        setBreathPhase('hold2');
+        if (lastPhase !== 'hold2') {
+          setBreathPhase('hold2');
+          lastPhase = 'hold2';
+          
+          // Play "And hold" voice cue only in first cycle
+          if (isFirstCycle && !voiceCuesPlayed.boxBreathingCycle) {
+            playVoiceGuidance('andHold');
+            // Mark that we've played the complete first cycle
+            setVoiceCuesPlayed(prev => ({ ...prev, boxBreathingCycle: true }));
+          }
+        }
         setBreathProgress(0);
       }
     }, 50);
@@ -276,18 +331,34 @@ export default function Synchrony() {
     const breathCycleDuration = 25000; // 25 seconds total (10s inhale, 15s exhale)
     const inhaleDuration = 10000; // 10 seconds inhale
     const exhaleDuration = 15000; // 15 seconds exhale with Aum
+    const startTime = Date.now();
+    let lastPhase = null;
     
     const interval = setInterval(() => {
       const now = Date.now();
-      const cyclePosition = now % breathCycleDuration;
+      const elapsedTime = now - startTime;
+      const cyclePosition = elapsedTime % breathCycleDuration;
+      const isFirstCycle = elapsedTime < breathCycleDuration;
       
       if (cyclePosition < inhaleDuration) {
         // Inhale phase (0-10s)
-        setBreathPhase('inhale');
+        if (lastPhase !== 'inhale') {
+          setBreathPhase('inhale');
+          lastPhase = 'inhale';
+        }
         setBreathProgress((cyclePosition / inhaleDuration) * 100);
       } else {
         // Exhale with AUM (10-25s)
-        setBreathPhase('exhale');
+        if (lastPhase !== 'exhale') {
+          setBreathPhase('exhale');
+          lastPhase = 'exhale';
+          
+          // Play AUM example audio only in first cycle
+          if (isFirstCycle && !voiceCuesPlayed.aumExample) {
+            playVoiceGuidance('aum');
+            setVoiceCuesPlayed(prev => ({ ...prev, aumExample: true }));
+          }
+        }
         setBreathProgress(100 - ((cyclePosition - inhaleDuration) / exhaleDuration) * 100);
       }
     }, 50);
@@ -305,6 +376,15 @@ export default function Synchrony() {
           // After 2 minutes of box breathing, switch to Aum toning
           if (meditationPhase === 'boxBreathing' && newTime >= 120) {
             setMeditationPhase('aumToning');
+            
+            // Play transition voice cue
+            if (!voiceCuesPlayed.transitionToAum) {
+              setTimeout(() => {
+                playVoiceGuidance('nowRelaxed');
+                setVoiceCuesPlayed(prev => ({ ...prev, transitionToAum: true }));
+              }, 500);
+            }
+            
             return 0;
           }
           
@@ -315,6 +395,24 @@ export default function Synchrony() {
       return () => clearInterval(interval);
     }
   }, [meditationPhase]);
+
+  // Preload voice guidance audio files
+  useEffect(() => {
+    const voiceFiles = {
+      inhale: 'https://f005.backblazeb2.com/file/Innersync-media/Inhale.mp3',
+      holdYourBreath: 'https://f005.backblazeb2.com/file/Innersync-media/Holdurbreath.mp3',
+      exhale: 'https://f005.backblazeb2.com/file/Innersync-media/Exhale.mp3',
+      andHold: 'https://f005.backblazeb2.com/file/Innersync-media/AndHold.mp3',
+      aum: 'https://f005.backblazeb2.com/file/Innersync-media/AUM.mp3',
+      nowRelaxed: 'https://f005.backblazeb2.com/file/Innersync-media/Nowthatweverelaxed.mp3'
+    };
+
+    Object.keys(voiceFiles).forEach(key => {
+      const audio = new Audio(voiceFiles[key]);
+      audio.preload = 'auto';
+      voiceAudioRefs.current[key] = audio;
+    });
+  }, []);
 
   // Autoplay 963 Hz meditation audio when joining
   useEffect(() => {
@@ -334,6 +432,17 @@ export default function Synchrony() {
     }
   }, [hasJoined]);
 
+  // Play voice guidance cue
+  const playVoiceGuidance = (audioKey) => {
+    const audio = voiceAudioRefs.current[audioKey];
+    if (audio) {
+      audio.currentTime = 0;
+      audio.play().catch(err => {
+        console.log(`Voice guidance ${audioKey} autoplay prevented:`, err);
+      });
+    }
+  };
+
   const handleJoinSession = async () => {
     try {
       // In demo mode, skip auth check
@@ -349,6 +458,13 @@ export default function Synchrony() {
       setMeditationPhase('boxBreathing');
       setPhaseTimer(0);
       setParticipantCount(prev => prev + 1);
+      
+      // Reset voice cues tracking for new session
+      setVoiceCuesPlayed({
+        boxBreathingCycle: false,
+        transitionToAum: false,
+        aumExample: false
+      });
     } catch (error) {
       console.error('Error joining session:', error);
       // Even if auth fails, allow joining in demo mode
@@ -357,6 +473,13 @@ export default function Synchrony() {
         setMeditationPhase('boxBreathing');
         setPhaseTimer(0);
         setParticipantCount(prev => prev + 1);
+        
+        // Reset voice cues tracking for new session
+        setVoiceCuesPlayed({
+          boxBreathingCycle: false,
+          transitionToAum: false,
+          aumExample: false
+        });
       }
     }
   };
