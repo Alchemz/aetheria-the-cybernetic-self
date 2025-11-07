@@ -49,5 +49,9 @@
         <array>
                 <string>audio</string>
         </array>
+        <key>NSMicrophoneUsageDescription</key>
+        <string>INNERSYNC uses your microphone to enable voice interactions with your AI wellness assistants.</string>
+        <key>NSSpeechRecognitionUsageDescription</key>
+        <string>INNERSYNC uses speech recognition to understand and respond to your voice commands during meditation and journaling.</string>
 </dict>
 </plist>
