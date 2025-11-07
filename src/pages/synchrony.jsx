@@ -21,27 +21,40 @@ export default function Synchrony() {
   const [sessionTime, setSessionTime] = useState(900); // 15 minutes in seconds
   
   // New states for guided meditation
-  const [meditationPhase, setMeditationPhase] = useState('lobby'); // 'lobby', 'boxBreathing', 'aumToning'
+  const [meditationPhase, setMeditationPhase] = useState('lobby'); // 'lobby', 'preMeditation', 'boxBreathing', 'aumToning'
   const [breathPhase, setBreathPhase] = useState('inhale'); // 'inhale', 'hold1', 'exhale', 'hold2'
   const [breathProgress, setBreathProgress] = useState(0); // 0-100
   const [phaseTimer, setPhaseTimer] = useState(0); // Seconds in current phase
   
-  // Voice guidance audio refs
+  // Voice guidance audio refs - NEW 12-file system
   const voiceAudioRefs = useRef({
-    inhale: null,
-    holdYourBreath: null,
-    exhale: null,
+    // Pre-meditation (2 files)
+    letsBegin: null,
+    forTwoMinutes: null,
+    // Box breathing first cycle (4 files)
+    breatheIn: null,
+    hold4Seconds: null,
+    andBreatheOut: null,
     andHold: null,
-    aum: null,
-    nowRelaxed: null
+    // AUM transition (6 files)
+    nowRelaxed: null,
+    itIsTime: null,
+    theGoal: null,
+    imagineVibration: null,
+    asMorePeople: null,
+    thisNet: null
   });
   
-  // Track which voice cues have been played to play them only once
+  // Track which voice cues have been played
   const [voiceCuesPlayed, setVoiceCuesPlayed] = useState({
+    preMeditationComplete: false,
     boxBreathingCycle: false,
-    transitionToAum: false,
-    aumExample: false
+    aumTransitionComplete: false
   });
+  
+  // Audio sequencer state
+  const [currentAudioSequence, setCurrentAudioSequence] = useState([]);
+  const [sequenceIndex, setSequenceIndex] = useState(0);
 
   // Helper to create a Date object representing a specific time in Asia/Tokyo
   const getJapanDateTime = useCallback((date, hour, minute, second, addDays = 0) => {
@@ -253,6 +266,19 @@ export default function Synchrony() {
     return () => clearInterval(interval);
   }, [checkSessionActive, getJapanDateTime, getNextSessionTime]);
 
+  // Pre-meditation phase - plays intro audios before any animation
+  useEffect(() => {
+    if (meditationPhase !== 'preMeditation' || voiceCuesPlayed.preMeditationComplete) return;
+
+    // Play the 2 intro audios in sequence
+    playAudioSequence(['letsBegin', 'forTwoMinutes'], () => {
+      // After both audios complete, transition to box breathing
+      setVoiceCuesPlayed(prev => ({ ...prev, preMeditationComplete: true }));
+      setMeditationPhase('boxBreathing');
+      setPhaseTimer(0);
+    });
+  }, [meditationPhase, voiceCuesPlayed.preMeditationComplete, playAudioSequence]);
+
   // Breathing animation for box breathing (4-4-4-4)
   useEffect(() => {
     if (meditationPhase !== 'boxBreathing') return;
@@ -396,15 +422,24 @@ export default function Synchrony() {
     }
   }, [meditationPhase]);
 
-  // Preload voice guidance audio files
+  // Preload voice guidance audio files - NEW 12-file premium system
   useEffect(() => {
     const voiceFiles = {
-      inhale: 'https://f005.backblazeb2.com/file/Innersync-media/Inhale.mp3',
-      holdYourBreath: 'https://f005.backblazeb2.com/file/Innersync-media/Holdurbreath.mp3',
-      exhale: 'https://f005.backblazeb2.com/file/Innersync-media/Exhale.mp3',
-      andHold: 'https://f005.backblazeb2.com/file/Innersync-media/AndHold.mp3',
-      aum: 'https://f005.backblazeb2.com/file/Innersync-media/AUM.mp3',
-      nowRelaxed: 'https://f005.backblazeb2.com/file/Innersync-media/Nowthatweverelaxed.mp3'
+      // Pre-meditation phase (2 files)
+      letsBegin: 'https://f005.backblazeb2.com/file/Innersync-media/Lets+begin+the+worldwide.mp3',
+      forTwoMinutes: 'https://f005.backblazeb2.com/file/Innersync-media/For+2+minutes+close.mp3',
+      // Box breathing first cycle (4 files)
+      breatheIn: 'https://f005.backblazeb2.com/file/Innersync-media/Breathe+in+for+.mp3',
+      hold4Seconds: 'https://f005.backblazeb2.com/file/Innersync-media/Hold+4+seconds.mp3',
+      andBreatheOut: 'https://f005.backblazeb2.com/file/Innersync-media/And+breathe+out.mp3',
+      andHold: 'https://f005.backblazeb2.com/file/Innersync-media/And+hold.mp3',
+      // AUM transition phase (6 files)
+      nowRelaxed: 'https://f005.backblazeb2.com/file/Innersync-media/Now+that+weve+relaxed.mp3',
+      itIsTime: 'https://f005.backblazeb2.com/file/Innersync-media/It+is+time+to+join.mp3',
+      theGoal: 'https://f005.backblazeb2.com/file/Innersync-media/The+goal+is+to+.mp3',
+      imagineVibration: 'https://f005.backblazeb2.com/file/Innersync-media/Imagine+your+vibration.mp3',
+      asMorePeople: 'https://f005.backblazeb2.com/file/Innersync-media/As+more+people+connect+.mp3',
+      thisNet: 'https://f005.backblazeb2.com/file/Innersync-media/This+net+will+help.mp3'
     };
 
     Object.keys(voiceFiles).forEach(key => {
@@ -432,7 +467,49 @@ export default function Synchrony() {
     }
   }, [hasJoined]);
 
-  // Play voice guidance cue
+  // Audio sequencer - plays audio files consecutively
+  const playAudioSequence = useCallback((audioKeys, onComplete) => {
+    if (!audioKeys || audioKeys.length === 0) {
+      if (onComplete) onComplete();
+      return;
+    }
+
+    let currentIndex = 0;
+
+    const playNext = () => {
+      if (currentIndex >= audioKeys.length) {
+        if (onComplete) onComplete();
+        return;
+      }
+
+      const audioKey = audioKeys[currentIndex];
+      const audio = voiceAudioRefs.current[audioKey];
+      
+      if (audio) {
+        audio.currentTime = 0;
+        
+        const handleEnded = () => {
+          audio.removeEventListener('ended', handleEnded);
+          currentIndex++;
+          playNext();
+        };
+        
+        audio.addEventListener('ended', handleEnded);
+        audio.play().catch(err => {
+          console.log(`Audio ${audioKey} autoplay prevented:`, err);
+          // Still continue sequence even if one fails
+          handleEnded();
+        });
+      } else {
+        currentIndex++;
+        playNext();
+      }
+    };
+
+    playNext();
+  }, []);
+
+  // Play single voice guidance cue
   const playVoiceGuidance = (audioKey) => {
     const audio = voiceAudioRefs.current[audioKey];
     if (audio) {
@@ -455,30 +532,30 @@ export default function Synchrony() {
       }
 
       setHasJoined(true);
-      setMeditationPhase('boxBreathing');
+      setMeditationPhase('preMeditation'); // Start with pre-meditation phase
       setPhaseTimer(0);
       setParticipantCount(prev => prev + 1);
       
       // Reset voice cues tracking for new session
       setVoiceCuesPlayed({
+        preMeditationComplete: false,
         boxBreathingCycle: false,
-        transitionToAum: false,
-        aumExample: false
+        aumTransitionComplete: false
       });
     } catch (error) {
       console.error('Error joining session:', error);
       // Even if auth fails, allow joining in demo mode
       if (APP_CONFIG.BYPASS_AUTH) {
         setHasJoined(true);
-        setMeditationPhase('boxBreathing');
+        setMeditationPhase('preMeditation'); // Start with pre-meditation phase
         setPhaseTimer(0);
         setParticipantCount(prev => prev + 1);
         
         // Reset voice cues tracking for new session
         setVoiceCuesPlayed({
+          preMeditationComplete: false,
           boxBreathingCycle: false,
-          transitionToAum: false,
-          aumExample: false
+          aumTransitionComplete: false
         });
       }
     }
