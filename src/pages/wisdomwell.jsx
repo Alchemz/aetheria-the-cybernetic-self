@@ -389,11 +389,9 @@ export default function WisdomWell() {
         @keyframes cyan-glow {
           0%, 100% {
             text-shadow: 0 0 20px #4A9EFF, 0 0 30px #00FFFF;
-            box-shadow: 0 0 20px rgba(74, 158, 255, 0.4);
           }
           50% {
             text-shadow: 0 0 30px #4A9EFF, 0 0 50px #00FFFF, 0 0 60px #A0D8FF;
-            box-shadow: 0 0 40px rgba(74, 158, 255, 0.6);
           }
         }
 
