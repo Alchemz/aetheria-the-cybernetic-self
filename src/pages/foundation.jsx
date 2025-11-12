@@ -12,13 +12,15 @@ import {
   Download,
   Home,
   Play,
-  Pause
+  Pause,
+  Sparkles
 } from 'lucide-react';
 
 import { auth } from '@/api/supabaseClient';
 import { InvokeLLMStream } from '@/api/integrations';
 import { buildDreamContext } from '@/api/openaiService';
 import SubscriptionGuard from '../components/SubscriptionGuard';
+import BrainVisualization from '../components/BrainVisualization';
 
 // Mark body as loaded when component mounts
 if (typeof document !== 'undefined') {
@@ -3675,9 +3677,14 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
               </div>
             ))}
           </div>
+
+          {/* PANEL 4: PINEAL ATRIUM - Brain Anatomy Visualization */}
+          <div className="panel" style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
+            <BrainVisualization active={activePanel === 3} />
+          </div>
         </main>
 
-        {/* Bottom Navigation - Only 3 Items */}
+        {/* Bottom Navigation - 4 Items */}
         <nav className="bottom-nav">
           <button className={`nav-item ${activePanel === 0 ? 'active' : ''}`} onClick={() => handleNavClick(0)}>
             <Music size={24} />
@@ -3690,6 +3697,10 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           <button className={`nav-item ${activePanel === 2 ? 'active' : ''}`} onClick={() => handleNavClick(2)}>
             <Library size={24} />
             <span>Library</span>
+          </button>
+          <button className={`nav-item ${activePanel === 3 ? 'active' : ''}`} onClick={() => handleNavClick(3)}>
+            <Sparkles size={24} />
+            <span>Pineal Atrium</span>
           </button>
         </nav>
       </div>

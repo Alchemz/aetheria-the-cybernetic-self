@@ -18,11 +18,14 @@ const BrainVisualization = ({ active = true }) => {
   
   const [selectedRegion, setSelectedRegion] = useState(null);
   const [hoveredRegion, setHoveredRegion] = useState(null);
+  const [webGLError, setWebGLError] = useState(null);
   
   const cameraControlsRef = useRef({
     isDragging: false,
     previousMousePosition: { x: 0, y: 0 },
     previousTouchDistance: 0,
+    touchStartTime: 0,
+    touchStartPos: { x: 0, y: 0 },
     rotation: { x: 0, y: 0 },
     targetRotation: { x: 0, y: 0 },
     zoom: 5,
@@ -97,11 +100,23 @@ const BrainVisualization = ({ active = true }) => {
     camera.position.z = 5;
     cameraRef.current = camera;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    containerRef.current.appendChild(renderer.domElement);
-    rendererRef.current = renderer;
+    let renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      
+      if (!renderer.getContext()) {
+        throw new Error('WebGL context not available');
+      }
+      
+      renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      containerRef.current.appendChild(renderer.domElement);
+      rendererRef.current = renderer;
+    } catch (error) {
+      console.warn('WebGL not available:', error);
+      setWebGLError('WebGL is not supported in this environment. Please view in a modern browser with WebGL enabled.');
+      return;
+    }
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
     scene.add(ambientLight);
@@ -351,6 +366,140 @@ const BrainVisualization = ({ active = true }) => {
     }
   };
 
+  const handleTouchStart = (e) => {
+    e.preventDefault();
+    const controls = cameraControlsRef.current;
+    
+    if (e.touches.length === 1) {
+      controls.isDragging = true;
+      controls.touchStartTime = Date.now();
+      controls.touchStartPos = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY
+      };
+      controls.previousMousePosition = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY
+      };
+    } else if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      controls.previousTouchDistance = Math.sqrt(dx * dx + dy * dy);
+      controls.isDragging = false;
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    e.preventDefault();
+    const controls = cameraControlsRef.current;
+    
+    if (e.touches.length === 1 && controls.isDragging) {
+      const deltaX = e.touches[0].clientX - controls.previousMousePosition.x;
+      const deltaY = e.touches[0].clientY - controls.previousMousePosition.y;
+      
+      controls.targetRotation.y += deltaX * 0.005;
+      controls.targetRotation.x += deltaY * 0.005;
+      controls.targetRotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, controls.targetRotation.x));
+      
+      controls.previousMousePosition = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY
+      };
+    } else if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      if (controls.previousTouchDistance > 0) {
+        const delta = distance - controls.previousTouchDistance;
+        controls.targetZoom -= delta * 0.01;
+        controls.targetZoom = Math.max(3, Math.min(10, controls.targetZoom));
+      }
+      
+      controls.previousTouchDistance = distance;
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    e.preventDefault();
+    const controls = cameraControlsRef.current;
+    
+    const tapDuration = Date.now() - controls.touchStartTime;
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - controls.touchStartPos.x;
+    const dy = touch.clientY - controls.touchStartPos.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    if (tapDuration < 300 && distance < 10 && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
+      const y = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
+      
+      mouseRef.current.set(x, y);
+      
+      if (cameraRef.current && sceneRef.current) {
+        raycasterRef.current.setFromCamera(mouseRef.current, cameraRef.current);
+        const intersects = raycasterRef.current.intersectObjects(orbsRef.current);
+        
+        if (intersects.length > 0) {
+          setSelectedRegion(intersects[0].object.userData);
+          setHoveredRegion(null);
+        }
+      }
+    }
+    
+    controls.isDragging = false;
+    controls.previousTouchDistance = 0;
+  };
+
+  if (webGLError) {
+    return (
+      <div style={{
+        position: 'relative',
+        width: '100%',
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #0A0A0A, #1A0A0A)',
+        padding: '2rem'
+      }}>
+        <div style={{
+          textAlign: 'center',
+          color: '#FF5533',
+          fontFamily: 'Exo 2, sans-serif',
+          maxWidth: '600px'
+        }}>
+          <div style={{
+            fontSize: '3rem',
+            marginBottom: '1rem',
+            textShadow: '0 0 20px rgba(255, 85, 51, 0.5)'
+          }}>⚠️</div>
+          <h2 style={{
+            fontSize: '1.5rem',
+            marginBottom: '1rem',
+            color: '#FF2200',
+            textShadow: '0 0 10px rgba(255, 34, 0, 0.5)'
+          }}>WebGL Not Available</h2>
+          <p style={{
+            fontSize: '1rem',
+            lineHeight: '1.6',
+            color: 'rgba(255, 255, 255, 0.8)',
+            marginBottom: '1rem'
+          }}>
+            {webGLError}
+          </p>
+          <p style={{
+            fontSize: '0.9rem',
+            color: 'rgba(255, 255, 255, 0.6)'
+          }}>
+            This 3D visualization requires WebGL support. Try opening in Chrome, Firefox, or Safari.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden' }}>
       <div
@@ -361,7 +510,10 @@ const BrainVisualization = ({ active = true }) => {
         onMouseLeave={handleMouseUp}
         onWheel={handleWheel}
         onClick={handleClick}
-        style={{ width: '100%', height: '100%', cursor: 'grab' }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        style={{ width: '100%', height: '100%', cursor: 'grab', touchAction: 'none' }}
       />
 
       <div style={{
