@@ -74,7 +74,7 @@ const SigilIcon = ({ className, type = "default" }) => {
 };
 
 // Matrix Wave Visualizer - ONLY pauses animations, NOT audio
-const MatrixVisualizer = ({ color = "#E25822", background = "#0A0A0A", audioData = null }) => {
+const MatrixVisualizer = ({ color = "#FF2200", background = "#0A0A0A", audioData = null }) => {
   const canvasRef = React.useRef(null);
   const animationFrameRef = React.useRef(null);
   const isVisibleRef = React.useRef(true);
@@ -402,7 +402,7 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
         textAlign: 'center',
         marginBottom: '20px',
         padding: '25px 20px',
-        background: 'linear-gradient(135deg, rgba(226, 88, 34, 0.08), rgba(255, 140, 66, 0.04))',
+        background: 'linear-gradient(135deg, rgba(255, 34, 0, 0.08), rgba(255, 85, 51, 0.04))',
         borderLeft: '3px solid var(--color-primary)',
         borderRight: '3px solid var(--color-secondary)',
         position: 'relative',
@@ -423,14 +423,14 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
           marginBottom: '12px',
           letterSpacing: '2px',
           color: 'var(--color-secondary)',
-          textShadow: '0 0 20px rgba(255, 140, 66, 0.6)',
+          textShadow: '0 0 20px rgba(255, 85, 51, 0.6)',
           wordWrap: 'break-word'
         }}>
           {currentTrack}
         </div>
         <div style={{
           fontSize: '11px',
-          color: 'rgba(255, 140, 66, 0.7)',
+          color: 'rgba(255, 85, 51, 0.7)',
           letterSpacing: '1px',
           textTransform: 'uppercase'
         }}>
@@ -452,8 +452,8 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
             color: 'var(--color-secondary)',
             marginTop: '12px',
             padding: '6px 12px',
-            background: 'rgba(255, 140, 66, 0.15)',
-            border: '1px solid rgba(255, 140, 66, 0.4)',
+            background: 'rgba(255, 85, 51, 0.15)',
+            border: '1px solid rgba(255, 85, 51, 0.4)',
             borderRadius: '20px',
             display: 'inline-block',
             animation: 'gentle-breath 7s ease-in-out infinite'
@@ -478,7 +478,7 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
       <div style={{
         marginTop: '25px',
         padding: '25px 20px',
-        background: 'linear-gradient(135deg, rgba(226, 88, 34, 0.08), rgba(255, 140, 66, 0.04))',
+        background: 'linear-gradient(135deg, rgba(255, 34, 0, 0.08), rgba(255, 85, 51, 0.04))',
         borderLeft: '3px solid var(--color-secondary)',
         borderRight: '3px solid var(--color-primary)',
         position: 'relative',
@@ -508,8 +508,8 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
               width: '45px',
               height: '45px',
               borderRadius: '50%',
-              background: 'rgba(226, 88, 34, 0.1)',
-              border: '2px solid rgba(226, 88, 34, 0.4)',
+              background: 'rgba(255, 34, 0, 0.1)',
+              border: '2px solid rgba(255, 34, 0, 0.4)',
               color: 'var(--color-primary)',
               display: 'flex',
               alignItems: 'center',
@@ -522,14 +522,14 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
             }}
             onMouseEnter={(e) => {
               if (audioUrl) {
-                e.target.style.background = 'rgba(226, 88, 34, 0.2)';
+                e.target.style.background = 'rgba(255, 34, 0, 0.2)';
                 e.target.style.borderColor = 'var(--color-primary)';
-                e.target.style.boxShadow = '0 0 15px rgba(226, 88, 34, 0.4)';
+                e.target.style.boxShadow = '0 0 15px rgba(255, 34, 0, 0.4)';
               }
             }}
             onMouseLeave={(e) => {
-              e.target.style.background = 'rgba(226, 88, 34, 0.1)';
-              e.target.style.borderColor = 'rgba(226, 88, 34, 0.4)';
+              e.target.style.background = 'rgba(255, 34, 0, 0.1)';
+              e.target.style.borderColor = 'rgba(255, 34, 0, 0.4)';
               e.target.style.boxShadow = 'none';
             }}
           >
@@ -544,8 +544,8 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
               height: '70px',
               borderRadius: '50%',
               background: isPlaying 
-                ? 'linear-gradient(135deg, rgba(255, 140, 66, 0.3), rgba(226, 88, 34, 0.2))'
-                : 'linear-gradient(135deg, rgba(226, 88, 34, 0.2), rgba(255, 140, 66, 0.1))',
+                ? 'linear-gradient(135deg, rgba(255, 85, 51, 0.3), rgba(255, 34, 0, 0.2))'
+                : 'linear-gradient(135deg, rgba(255, 34, 0, 0.2), rgba(255, 85, 51, 0.1))',
               border: '3px solid var(--color-primary)',
               color: 'var(--color-secondary)',
               display: 'flex',
@@ -557,18 +557,18 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
               fontFamily: "'Orbitron', monospace",
               fontWeight: 'bold',
               opacity: !audioUrl ? 0.5 : 1,
-              boxShadow: isPlaying ? '0 0 25px rgba(226, 88, 34, 0.6)' : '0 0 10px rgba(226, 88, 34, 0.3)',
+              boxShadow: isPlaying ? '0 0 25px rgba(255, 34, 0, 0.6)' : '0 0 10px rgba(255, 34, 0, 0.3)',
               animation: isPlaying ? 'gentle-breath 7s ease-in-out infinite' : 'none'
             }}
             onMouseEnter={(e) => {
               if (audioUrl) {
                 e.target.style.transform = 'scale(1.1)';
-                e.target.style.boxShadow = '0 0 35px rgba(226, 88, 34, 0.8)';
+                e.target.style.boxShadow = '0 0 35px rgba(255, 34, 0, 0.8)';
               }
             }}
             onMouseLeave={(e) => {
               e.target.style.transform = 'scale(1)';
-              e.target.style.boxShadow = isPlaying ? '0 0 25px rgba(226, 88, 34, 0.6)' : '0 0 10px rgba(226, 88, 34, 0.3)';
+              e.target.style.boxShadow = isPlaying ? '0 0 25px rgba(255, 34, 0, 0.6)' : '0 0 10px rgba(255, 34, 0, 0.3)';
             }}
           >
             {isPlaying ? <Pause size={20} /> : <Play size={20} />}
@@ -581,8 +581,8 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
               width: '45px',
               height: '45px',
               borderRadius: '50%',
-              background: 'rgba(226, 88, 34, 0.1)',
-              border: '2px solid rgba(226, 88, 34, 0.4)',
+              background: 'rgba(255, 34, 0, 0.1)',
+              border: '2px solid rgba(255, 34, 0, 0.4)',
               color: 'var(--color-primary)',
               display: 'flex',
               alignItems: 'center',
@@ -595,14 +595,14 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
             }}
             onMouseEnter={(e) => {
               if (audioUrl) {
-                e.target.style.background = 'rgba(226, 88, 34, 0.2)';
+                e.target.style.background = 'rgba(255, 34, 0, 0.2)';
                 e.target.style.borderColor = 'var(--color-primary)';
-                e.target.style.boxShadow = '0 0 15px rgba(226, 88, 34, 0.4)';
+                e.target.style.boxShadow = '0 0 15px rgba(255, 34, 0, 0.4)';
               }
             }}
             onMouseLeave={(e) => {
-              e.target.style.background = 'rgba(226, 88, 34, 0.1)';
-              e.target.style.borderColor = 'rgba(226, 88, 34, 0.4)';
+              e.target.style.background = 'rgba(255, 34, 0, 0.1)';
+              e.target.style.borderColor = 'rgba(255, 34, 0, 0.4)';
               e.target.style.boxShadow = 'none';
             }}
           >
@@ -617,7 +617,7 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
             style={{
               width: '100%',
               height: '4px',
-              background: 'linear-gradient(90deg, rgba(226, 88, 34, 0.2), rgba(255, 140, 66, 0.2))',
+              background: 'linear-gradient(90deg, rgba(255, 34, 0, 0.2), rgba(255, 85, 51, 0.2))',
               position: 'relative',
               cursor: 'pointer',
               borderRadius: '2px',
@@ -651,7 +651,7 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
             justifyContent: 'space-between',
             fontSize: '11px',
             marginTop: '8px',
-            color: 'rgba(255, 140, 66, 0.8)',
+            color: 'rgba(255, 85, 51, 0.8)',
             fontFamily: "'Orbitron', monospace"
           }}>
             <span>{formatTime(currentTime)}</span>
@@ -665,13 +665,13 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
           alignItems: 'center',
           gap: '15px'
         }}>
-          <Music size={18} style={{ color: 'var(--color-primary)', filter: 'drop-shadow(0 0 8px rgba(226, 88, 34, 0.5))' }} />
+          <Music size={18} style={{ color: 'var(--color-primary)', filter: 'drop-shadow(0 0 8px rgba(255, 34, 0, 0.5))' }} />
           <div 
             onClick={handleVolumeChange}
             style={{
               flex: 1,
               height: '4px',
-              background: 'linear-gradient(90deg, rgba(226, 88, 34, 0.2), rgba(255, 140, 66, 0.2))',
+              background: 'linear-gradient(90deg, rgba(255, 34, 0, 0.2), rgba(255, 85, 51, 0.2))',
               position: 'relative',
               cursor: 'pointer',
               borderRadius: '2px',
@@ -705,7 +705,7 @@ const AudioPlayer = ({ isPlaying, onTogglePlay, currentTrack, audioUrl, onNext, 
             fontSize: '12px',
             minWidth: '40px',
             textAlign: 'right',
-            textShadow: '0 0 8px rgba(255, 140, 66, 0.5)'
+            textShadow: '0 0 8px rgba(255, 85, 51, 0.5)'
           }}>
             {volume}%
           </span>
@@ -1750,8 +1750,8 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           
           :root {
             --color-bg: #0A0A0A;
-            --color-primary: #FF5900;
-            --color-secondary: #FF8C42;
+            --color-primary: #FF2200;
+            --color-secondary: #FF5533;
             --bg-primary: rgba(10, 10, 10, 0.85);
             --bg-secondary: rgba(10, 10, 10, 0.6);
             --glow-strength: 12px;
@@ -1761,15 +1761,15 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           @keyframes gentle-breath {
             0% { 
               text-shadow: 0 0 8px var(--color-secondary), 0 0 10px var(--color-primary);
-              box-shadow: 0 0 10px 0 rgba(226, 88, 34, 0.3);
+              box-shadow: 0 0 10px 0 rgba(255, 34, 0, 0.3);
             }
             50% { 
               text-shadow: 0 0 14px var(--color-secondary), 0 0 18px var(--color-primary);
-              box-shadow: 0 0 20px 0 rgba(226, 88, 34, 0.6);
+              box-shadow: 0 0 20px 0 rgba(255, 34, 0, 0.6);
             }
             100% { 
               text-shadow: 0 0 8px var(--color-secondary), 0 0 10px var(--color-primary);
-              box-shadow: 0 0 10px 0 rgba(226, 88, 34, 0.3);
+              box-shadow: 0 0 10px 0 rgba(255, 34, 0, 0.3);
             }
           }
 
@@ -1809,9 +1809,9 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
           
           @keyframes breathing-glow {
-            0% { box-shadow: 0 0 15px rgba(226, 88, 34, 0.4); }
-            50% { box-shadow: 0 0 30px rgba(226, 88, 34, 0.8); }
-            100% { box-shadow: 0 0 15px rgba(226, 88, 34, 0.4); }
+            0% { box-shadow: 0 0 15px rgba(255, 34, 0, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(255, 34, 0, 0.8); }
+            100% { box-shadow: 0 0 15px rgba(255, 34, 0, 0.4); }
           }
 
           @keyframes fadeIn {
@@ -1947,9 +1947,9 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           
           .foundation-home-btn:hover, .foundation-account-btn:hover {
             color: var(--color-primary);
-            background: rgba(226, 88, 34, 0.3);
+            background: rgba(255, 34, 0, 0.3);
             transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(226, 88, 34, 0.5);
+            box-shadow: 0 0 20px rgba(255, 34, 0, 0.5);
           }
 
           .foundation-title {
@@ -1962,7 +1962,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
             animation: title-breath var(--breath-duration) ease-in-out infinite;
             margin: 0;
             line-height: 1.2;
-            text-shadow: 0 0 12px rgba(226, 88, 34, 0.5);
+            text-shadow: 0 0 12px rgba(255, 34, 0, 0.5);
           }
 
           .foundation-subtitle {
@@ -2132,8 +2132,8 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
           
           .hud-chip {
-            background: rgba(226, 88, 34, 0.1);
-            border: 1px solid rgba(226, 88, 34, 0.4);
+            background: rgba(255, 34, 0, 0.1);
+            border: 1px solid rgba(255, 34, 0, 0.4);
             padding: 1rem;
             text-align: center;
             position: relative;
@@ -2141,7 +2141,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
 
           .hud-chip:hover {
-            background: rgba(226, 88, 34, 0.15);
+            background: rgba(255, 34, 0, 0.15);
             border-color: var(--color-primary);
           }
 
@@ -2179,20 +2179,20 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
           
           .chat-widget {
-            background: rgba(226, 88, 34, 0.1);
-            border: 2px solid rgba(226, 88, 34, 0.6);
+            background: rgba(255, 34, 0, 0.1);
+            border: 2px solid rgba(255, 34, 0, 0.6);
             height: 450px;
             display: flex;
             flex-direction: column;
             position: relative;
             transition: all 0.3s ease;
-            box-shadow: 0 0 25px rgba(226, 88, 34, 0.5);
+            box-shadow: 0 0 25px rgba(255, 34, 0, 0.5);
           }
 
           .chat-widget:hover {
-            background: rgba(226, 88, 34, 0.15);
+            background: rgba(255, 34, 0, 0.15);
             border-color: var(--color-primary);
-            box-shadow: 0 0 35px rgba(226, 88, 34, 0.7);
+            box-shadow: 0 0 35px rgba(255, 34, 0, 0.7);
           }
 
           .chat-widget::before {
@@ -2209,7 +2209,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
 
           .chat-header {
             padding: 1.2rem;
-            border-bottom: 2px solid rgba(226, 88, 34, 0.4);
+            border-bottom: 2px solid rgba(255, 34, 0, 0.4);
             background: rgba(0, 0, 0, 0.4);
           }
 
@@ -2261,7 +2261,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
 
           .chat-message.user {
-            background: rgba(226, 88, 34, 0.15);
+            background: rgba(255, 34, 0, 0.15);
             border-left: 3px solid var(--color-primary);
             margin-left: 2rem;
           }
@@ -2279,7 +2279,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           
           .chat-input {
             display: flex;
-            border-top: 2px solid rgba(226, 88, 34, 0.4);
+            border-top: 2px solid rgba(255, 34, 0, 0.4);
             background: rgba(0, 0, 0, 0.3);
             align-items: center;
           }
@@ -2312,11 +2312,11 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
             display: flex;
             align-items: center;
             justify-content: center;
-            border-left: 1px solid rgba(226, 88, 34, 0.3);
+            border-left: 1px solid rgba(255, 34, 0, 0.3);
           }
 
           .chat-mic-button:hover:not(:disabled) {
-            background: rgba(226, 88, 34, 0.1);
+            background: rgba(255, 34, 0, 0.1);
             color: var(--color-secondary);
           }
 
@@ -2326,12 +2326,12 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
 
           .chat-mic-button.recording {
-            background: rgba(226, 88, 34, 0.2);
+            background: rgba(255, 34, 0, 0.2);
             animation: pulse-glow 1.5s ease-in-out infinite;
           }
 
           .chat-input button:last-child {
-            background: rgba(226, 88, 34, 0.8);
+            background: rgba(255, 34, 0, 0.8);
             border: none;
             padding: 1rem 1.5rem;
             color: white;
@@ -2345,7 +2345,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
 
           .chat-input button:last-child:hover:not(:disabled) {
             background: var(--color-primary);
-            box-shadow: 0 0 15px rgba(226, 88, 34, 0.5);
+            box-shadow: 0 0 15px rgba(255, 34, 0, 0.5);
           }
 
           .chat-input button:last-child:disabled {
@@ -2375,8 +2375,8 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
 
           .category-tab {
-            background: rgba(226, 88, 34, 0.1);
-            border: 1px solid rgba(226, 88, 34, 0.4);
+            background: rgba(255, 34, 0, 0.1);
+            border: 1px solid rgba(255, 34, 0, 0.4);
             color: rgba(255,255,255,0.8);
             padding: 0.5rem 1rem;
             cursor: pointer;
@@ -2390,14 +2390,14 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
 
           .category-tab.active {
-            background: rgba(226, 88, 34, 0.2);
+            background: rgba(255, 34, 0, 0.2);
             border-color: var(--color-primary);
             color: var(--color-secondary);
             animation: gentle-breath var(--breath-duration) ease-in-out infinite;
           }
 
           .category-tab:hover {
-            background: rgba(226, 88, 34, 0.15);
+            background: rgba(255, 34, 0, 0.15);
             border-color: var(--color-primary);
           }
 
@@ -2408,8 +2408,8 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
 
           .track-item {
-            background: rgba(226, 88, 34, 0.1);
-            border: 1px solid rgba(226, 88, 34, 0.4);
+            background: rgba(255, 34, 0, 0.1);
+            border: 1px solid rgba(255, 34, 0, 0.4);
             margin-bottom: 0.5rem;
             padding: 1rem;
             cursor: pointer;
@@ -2424,7 +2424,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
 
           .track-item:hover, .track-item.active {
-            background: rgba(226, 88, 34, 0.15);
+            background: rgba(255, 34, 0, 0.15);
             border-color: var(--color-primary);
           }
 
@@ -2489,8 +2489,8 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
           
           .course-card {
-            background: rgba(226, 88, 34, 0.1);
-            border: 1px solid rgba(226, 88, 34, 0.4);
+            background: rgba(255, 34, 0, 0.1);
+            border: 1px solid rgba(255, 34, 0, 0.4);
             padding: 1.5rem;
             width: 100%;
             max-width: 600px;
@@ -2500,7 +2500,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
           
           .course-card:hover {
-            background: rgba(226, 88, 34, 0.15);
+            background: rgba(255, 34, 0, 0.15);
             border-color: var(--color-primary);
             animation: gentle-breath var(--breath-duration) ease-in-out infinite;
           }
@@ -2601,7 +2601,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
             transition: all 0.3s ease;
             z-index: 10;
             margin-bottom: 1rem;
-            box-shadow: 0 0 15px rgba(226, 88, 34, 0.5);
+            box-shadow: 0 0 15px rgba(255, 34, 0, 0.5);
           }
 
           .course-modal-close:hover {
@@ -2625,8 +2625,8 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
 
           .sleep-stage {
-            background: rgba(226, 88, 34, 0.05);
-            border: 1px solid rgba(226, 88, 34, 0.3);
+            background: rgba(255, 34, 0, 0.05);
+            border: 1px solid rgba(255, 34, 0, 0.3);
             padding: 1.5rem;
             margin-bottom: 1rem;
             position: relative;
@@ -2674,8 +2674,8 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           .info-section {
             margin-top: 2rem;
             padding: 1.5rem;
-            background: rgba(226, 88, 34, 0.05);
-            border: 1px solid rgba(226, 88, 34, 0.3);
+            background: rgba(255, 34, 0, 0.05);
+            border: 1px solid rgba(255, 34, 0, 0.3);
           }
 
           .info-section-title {
@@ -2736,7 +2736,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
 
           .technique-checkbox:hover {
-            background: rgba(226, 88, 34, 0.2);
+            background: rgba(255, 34, 0, 0.2);
             box-shadow: 0 0 8px var(--color-primary);
           }
 
@@ -2761,8 +2761,8 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
 
           .system-box {
-            background: rgba(226, 88, 34, 0.05);
-            border: 1px solid rgba(226, 88, 34, 0.3);
+            background: rgba(255, 34, 0, 0.05);
+            border: 1px solid rgba(255, 34, 0, 0.3);
             padding: 1.5rem;
             margin-bottom: 1rem;
             position: relative;
@@ -2807,8 +2807,8 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
 
           .phase-box {
-            background: rgba(226, 88, 34, 0.05);
-            border: 1px solid rgba(226, 88, 34, 0.3);
+            background: rgba(255, 34, 0, 0.05);
+            border: 1px solid rgba(255, 34, 0, 0.3);
             padding: 1.5rem;
             margin-bottom: 1rem;
             position: relative;
@@ -2858,19 +2858,19 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
 
           .dream-journal-widget {
-            background: rgba(226, 88, 34, 0.1);
-            border: 2px solid rgba(226, 88, 34, 0.6);
+            background: rgba(255, 34, 0, 0.1);
+            border: 2px solid rgba(255, 34, 0, 0.6);
             display: flex;
             flex-direction: column;
             position: relative;
             transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(226, 88, 34, 0.4);
+            box-shadow: 0 0 20px rgba(255, 34, 0, 0.4);
           }
 
           .dream-journal-widget:hover {
-            background: rgba(226, 88, 34, 0.15);
+            background: rgba(255, 34, 0, 0.15);
             border-color: var(--color-primary);
-            box-shadow: 0 0 30px rgba(226, 88, 34, 0.6);
+            box-shadow: 0 0 30px rgba(255, 34, 0, 0.6);
           }
 
           .dream-journal-widget::before {
@@ -2887,7 +2887,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
 
           .dream-journal-header {
             padding: 1rem;
-            border-bottom: 1px solid rgba(226, 88, 34, 0.4);
+            border-bottom: 1px solid rgba(255, 34, 0, 0.4);
             background: rgba(0, 0, 0, 0.3);
             display: flex;
             justify-content: space-between;
@@ -2930,7 +2930,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
 
           .dream-journal-textarea {
             background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(226, 88, 34, 0.3);
+            border: 1px solid rgba(255, 34, 0, 0.3);
             color: white;
             padding: 1rem;
             font-family: 'Exo 2', sans-serif;
@@ -2949,11 +2949,11 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           .dream-journal-textarea:focus {
             outline: none;
             border-color: var(--color-primary);
-            box-shadow: 0 0 10px rgba(226, 88, 34, 0.3);
+            box-shadow: 0 0 10px rgba(255, 34, 0, 0.3);
           }
 
           .dream-journal-button {
-            background: rgba(226, 88, 34, 0.8);
+            background: rgba(255, 34, 0, 0.8);
             border: none;
             padding: 0.8rem 1.5rem;
             color: white;
@@ -2969,7 +2969,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
 
           .dream-journal-button:hover:not(:disabled) {
             background: var(--color-primary);
-            box-shadow: 0 0 15px rgba(226, 88, 34, 0.6);
+            box-shadow: 0 0 15px rgba(255, 34, 0, 0.6);
             transform: translateY(-1px);
           }
 
@@ -2999,7 +2999,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           }
 
           .dream-entry {
-            background: rgba(226, 88, 34, 0.05);
+            background: rgba(255, 34, 0, 0.05);
             border-left: 3px solid var(--color-primary);
             padding: 1rem;
             margin-bottom: 1rem;
