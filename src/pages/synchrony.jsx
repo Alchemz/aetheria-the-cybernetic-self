@@ -905,13 +905,13 @@ export default function Synchrony() {
 
         .sovereigns-counter {
           position: absolute;
-          top: 2rem;
-          right: 2rem;
+          top: calc(env(safe-area-inset-top) + 1rem);
+          right: 1rem;
           background: rgba(0, 31, 63, 0.9);
           backdrop-filter: blur(10px);
           border: 2px solid rgba(0, 255, 255, 0.3);
           border-radius: 15px;
-          padding: 1rem 1.5rem;
+          padding: 0.75rem 1rem;
           pointer-events: all;
           text-align: center;
         }
@@ -961,9 +961,17 @@ export default function Synchrony() {
           }
 
           .sovereigns-counter {
-            top: 1rem;
-            right: 1rem;
-            padding: 0.75rem 1rem;
+            top: calc(env(safe-area-inset-top) + 0.75rem);
+            right: 0.75rem;
+            padding: 0.5rem 0.75rem;
+          }
+          
+          .counter-label-small {
+            font-size: 0.55rem;
+          }
+          
+          .counter-value-small {
+            font-size: 1.2rem;
           }
         }
       `}</style>
