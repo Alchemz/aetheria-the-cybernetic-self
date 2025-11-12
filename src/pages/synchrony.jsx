@@ -703,6 +703,33 @@ export default function Synchrony() {
           margin-bottom: 1.5rem;
         }
 
+        .posture-instructions {
+          background: rgba(0, 255, 255, 0.05);
+          border: 1px solid rgba(0, 255, 255, 0.15);
+          border-radius: 12px;
+          padding: 1.25rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .posture-title {
+          font-family: 'Orbitron', monospace;
+          font-size: 0.85rem;
+          color: #00FFFF;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          margin-bottom: 0.75rem;
+          text-align: center;
+          text-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+        }
+
+        .posture-text {
+          color: rgba(255, 255, 255, 0.85);
+          font-size: 0.95rem;
+          line-height: 1.6;
+          text-align: center;
+          margin: 0;
+        }
+
         .participant-display {
           display: flex;
           align-items: center;
@@ -966,6 +993,16 @@ export default function Synchrony() {
                     to generate a unified field of consciousness, raising the planet's frequency.
                   </p>
 
+                  <div className="posture-instructions">
+                    <div className="posture-title">Prepare Your Posture</div>
+                    <p className="posture-text">
+                      Find a comfortable seated position with your back naturally straight. You may lean against 
+                      a wall, cushion, or bed frame for support—or sit freely without. If you're not feeling tired, 
+                      lying down is also acceptable. Once settled, gently close your eyes and allow yourself to be 
+                      guided through each step of the meditation.
+                    </p>
+                  </div>
+
                   <div className="participant-display">
                     <span className="participant-label">Sovereigns in Sync:</span>
                     <span className="participant-count">{participantCount.toLocaleString()}</span>
@@ -988,6 +1025,16 @@ export default function Synchrony() {
                     Join a global synchronized meditation. We use coherent breathing and the Aum vibration 
                     to generate a unified field of consciousness, raising the planet's frequency.
                   </p>
+
+                  <div className="posture-instructions">
+                    <div className="posture-title">Prepare Your Posture</div>
+                    <p className="posture-text">
+                      Find a comfortable seated position with your back naturally straight. You may lean against 
+                      a wall, cushion, or bed frame for support—or sit freely without. If you're not feeling tired, 
+                      lying down is also acceptable. Once settled, gently close your eyes and allow yourself to be 
+                      guided through each step of the meditation.
+                    </p>
+                  </div>
 
                   <div className="participant-display">
                     <span className="participant-label">Global Community:</span>
