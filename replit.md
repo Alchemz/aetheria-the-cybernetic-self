@@ -13,11 +13,11 @@ INNERSYNC is a meditation and wellness platform built with Vite and React, offer
 ### UI/UX Decisions
 - **The Synchrony Redesign**: Features a cyan aesthetic (`#00FFFF`), card-based pre-session lobby, animated pulsing circles for box breathing, and a breath visualizer bar for Aum toning. A 3D particle field ("Sovereign Galaxy") visualizes connected users.
 - **Portal as Landing Page**: The default landing page is Portal, prioritizing 3D graphics for initial user experience.
-- **Foundation (Dreamscape) Design**: Minimalist header with floating, glassmorphic circular icons (Home, Account) that glow on hover. Includes Pineal Atrium (Panel 4), an interactive 3D brain anatomy visualization.
+- **Foundation (Dreamscape) Design**: Minimalist header with floating, glassmorphic circular icons (Home, Account) that glow on hover. Features 3 navigation panels: Resonator (audio frequencies), Sanctuary (Dream Assistant), and Library (sleep courses).
 
 ### Technical Implementations
 - **Frontend**: Vite + React (JavaScript/JSX) with Tailwind CSS and Radix UI.
-- **3D Graphics**: Three.js for immersive visualizations (e.g., "Sovereign Galaxy," Pineal Atrium).
+- **3D Graphics**: Three.js for immersive visualizations (e.g., "Sovereign Galaxy," Nexus Pineal Atrium).
 - **State Management**: @tanstack/react-query for data fetching.
 - **Routing**: React Router DOM.
 - **Authentication**: Supabase Auth for user management and demo mode.
@@ -34,7 +34,13 @@ INNERSYNC is a meditation and wellness platform built with Vite and React, offer
 - **Dream Assistant**: AI for dream interpretation and sleep guidance.
 - **Athena AI**: AI for bio-protocol optimization, science explanations, and habit adjustments.
 - **Resonator & Meditation Chamber**: Audio libraries with healing frequencies and guided meditations, supporting background playback.
-- **Pineal Atrium (Brain Visualization)**: An interactive 3D brain anatomy explorer within Foundation (Panel 4) featuring a 3D brain model, glowing markers for 7 anatomical regions, interactive info cards, and camera controls for desktop and mobile.
+- **Pineal Atrium (Brain Visualization)**: An interactive 3D brain anatomy explorer within Nexus (`/nexus-pineal-atrium`) featuring wireframe brain images, glowing markers for 8 anatomical regions (pineal gland, prefrontal cortex, hippocampus, thalamus, amygdala, corpus callosum), and comprehensive camera controls. Enhanced with:
+  - **Performance Optimizations**: Animation gating (pauses when tab hidden), ResizeObserver for responsive sizing, comprehensive cleanup (disposes geometries/materials/textures)
+  - **Advanced Touch Controls**: Pinch zoom support (two-finger distance calculation, 0.01 sensitivity, 2-7 range), tap detection with both distance (<10px) and duration (<300ms) thresholds, `touchAction: 'none'` to prevent browser interference
+  - **Smooth Camera Controls**: Lerped zoom animation (0.05 lerp factor), Reset View button, wheel zoom with smooth easing
+  - **WebGL Error Handling**: Graceful fallback UI with helpful troubleshooting message when WebGL is unavailable
+  - **Interactive Features**: Hover/click to view region info cards with scientific explanations, esoteric meanings, and optimization practices; side panel with detailed region information
+  - **Visual Design**: Purple/pink theme (#BA55D3), glowing region markers with pulsing animations, neural connection particles, wireframe brain imagery from Supabase storage
 
 ### System Design Choices
 - **Secure Client-Server Architecture**: Frontend on Port 5000, Backend on Port 3000 (dev) or 5000 (prod), with frontend proxying API requests.

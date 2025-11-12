@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import * as THREE from 'three';
-import { ArrowLeft, X, Info, Zap, RotateCw } from 'lucide-react';
+import { ArrowLeft, X, Info, Zap, RotateCw, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function PinealAtrium() {
@@ -12,8 +12,16 @@ export default function PinealAtrium() {
   const rendererRef = useRef(null);
   const brainRegionsRef = useRef([]);
   const brainPlanesRef = useRef([]);
+  const targetZoomRef = useRef(4);
+  const animationFrameRef = useRef(null);
   const [selectedRegion, setSelectedRegion] = useState(null);
   const [hoveredRegion, setHoveredRegion] = useState(null);
+  const [webglAvailable, setWebglAvailable] = useState(true);
+
+  // Reset View handler
+  const handleResetView = () => {
+    targetZoomRef.current = 4;
+  };
 
   // Brain region data with SMALLER sizes to fit inside brain
   const brainRegions = [
@@ -164,22 +172,33 @@ export default function PinealAtrium() {
     scene.background = new THREE.Color(0x000510);
     sceneRef.current = scene;
 
+    // Get container dimensions
+    const containerWidth = mountRef.current.clientWidth || 1;
+    const containerHeight = mountRef.current.clientHeight || 1;
+
     // Camera
     const camera = new THREE.PerspectiveCamera(
       60,
-      window.innerWidth / window.innerHeight,
+      containerWidth / containerHeight,
       0.1,
       1000
     );
     camera.position.set(0, 0, 4);
     cameraRef.current = camera;
 
-    // Renderer
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    mountRef.current.appendChild(renderer.domElement);
-    rendererRef.current = renderer;
+    // Renderer with WebGL error handling
+    let renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(containerWidth, containerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      mountRef.current.appendChild(renderer.domElement);
+      rendererRef.current = renderer;
+    } catch (error) {
+      console.error('WebGL not available:', error);
+      setWebglAvailable(false);
+      return;
+    }
 
     // Lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -351,10 +370,18 @@ export default function PinealAtrium() {
     const particles = new THREE.Points(particlesGeometry, particlesMaterial);
     scene.add(particles);
 
-    // Animation loop - NO AUTO-ROTATION, only gentle pulsing
+    // Animation loop with visibility gating and lerped zoom
     const clock = new THREE.Clock();
     const animate = () => {
+      animationFrameRef.current = requestAnimationFrame(animate);
+
+      // Visibility gating - pause animation when tab is hidden
+      if (document.visibilityState === 'hidden') return;
+
       const elapsedTime = clock.getElapsedTime();
+      
+      // Lerped zoom for smooth camera movement
+      camera.position.z += (targetZoomRef.current - camera.position.z) * 0.05;
       
       // Only pulse the glows gently
       regions.forEach((r, idx) => {
@@ -369,7 +396,6 @@ export default function PinealAtrium() {
       particles.rotation.y += 0.0002;
 
       renderer.render(scene, camera);
-      requestAnimationFrame(animate);
     };
 
     animate();
@@ -490,29 +516,56 @@ export default function PinealAtrium() {
 
     const onWheel = (event) => {
       event.preventDefault();
-      camera.position.z += event.deltaY * 0.002;
-      camera.position.z = Math.max(2, Math.min(7, camera.position.z));
+      targetZoomRef.current += event.deltaY * 0.002;
+      targetZoomRef.current = Math.max(2, Math.min(7, targetZoomRef.current));
     };
 
-    // IMPROVED TOUCH HANDLING FOR MOBILE
+    // IMPROVED TOUCH HANDLING FOR MOBILE with pinch zoom and duration detection
     let touchStartPos = { x: 0, y: 0 };
     let touchCurrentPos = { x: 0, y: 0 };
+    let touchStartTime = 0;
     let isTouching = false;
+    let initialPinchDistance = null;
 
     const onTouchStart = (event) => {
-      event.preventDefault(); // Prevent default browser actions like scrolling
-      if (event.touches.length === 1) { // Only handle single touch for rotation/tap
+      event.preventDefault();
+      touchStartTime = Date.now();
+
+      if (event.touches.length === 1) {
         isTouching = true;
         touchStartPos = {
           x: event.touches[0].clientX,
           y: event.touches[0].clientY
         };
         touchCurrentPos = { ...touchStartPos };
+      } else if (event.touches.length === 2) {
+        // Initialize pinch zoom
+        const dx = event.touches[0].clientX - event.touches[1].clientX;
+        const dy = event.touches[0].clientY - event.touches[1].clientY;
+        initialPinchDistance = Math.sqrt(dx * dx + dy * dy);
+        isTouching = false;
       }
     };
 
     const onTouchMove = (event) => {
-      event.preventDefault(); // Prevent default browser actions like scrolling
+      event.preventDefault();
+
+      // Pinch zoom with 2 touches
+      if (event.touches.length === 2) {
+        const dx = event.touches[0].clientX - event.touches[1].clientX;
+        const dy = event.touches[0].clientY - event.touches[1].clientY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (initialPinchDistance !== null) {
+          const delta = (distance - initialPinchDistance) * 0.01;
+          targetZoomRef.current -= delta;
+          targetZoomRef.current = Math.max(2, Math.min(7, targetZoomRef.current));
+          initialPinchDistance = distance;
+        }
+        return;
+      }
+
+      // Single touch rotation
       if (!isTouching || event.touches.length !== 1) return;
 
       const touch = event.touches[0];
@@ -528,7 +581,7 @@ export default function PinealAtrium() {
 
       // Rotate brain planes
       brainPlanesRef.current.forEach(plane => {
-        plane.rotation.y += deltaMove.x * 0.008; // Slightly more sensitive for mobile
+        plane.rotation.y += deltaMove.x * 0.008;
         plane.rotation.x += deltaMove.y * 0.008;
       });
 
@@ -560,15 +613,21 @@ export default function PinealAtrium() {
     };
 
     const onTouchEnd = (event) => {
-      event.preventDefault(); // Prevent default browser actions
+      event.preventDefault();
+
+      // Reset pinch distance
+      if (event.touches.length < 2) {
+        initialPinchDistance = null;
+      }
       
-      // Check if it was a tap (not a drag)
+      // Check if it was a tap (distance < 10px AND duration < 300ms)
       const touchDistance = Math.sqrt(
         Math.pow(touchCurrentPos.x - touchStartPos.x, 2) +
         Math.pow(touchCurrentPos.y - touchStartPos.y, 2)
       );
+      const touchDuration = Date.now() - touchStartTime;
 
-      if (isTouching && touchDistance < 10 && event.changedTouches.length === 1) {
+      if (isTouching && touchDistance < 10 && touchDuration < 300 && event.changedTouches.length === 1) {
         // It was a tap - check for region click
         const touch = event.changedTouches[0];
         const rect = renderer.domElement.getBoundingClientRect();
@@ -599,17 +658,31 @@ export default function PinealAtrium() {
     renderer.domElement.addEventListener('touchmove', onTouchMove, { passive: false });
     renderer.domElement.addEventListener('touchend', onTouchEnd, { passive: false });
 
-    // Handle resize
-    const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    };
+    // ResizeObserver for better performance
+    const resizeObserver = new ResizeObserver(entries => {
+      if (entries[0]) {
+        const { width, height } = entries[0].contentRect;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+      }
+    });
+    
+    if (mountRef.current) {
+      resizeObserver.observe(mountRef.current);
+    }
 
-    window.addEventListener('resize', handleResize);
-
+    // Cleanup
     return () => {
-      window.removeEventListener('resize', handleResize);
+      // Cancel animation frame
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+
+      // Disconnect ResizeObserver
+      resizeObserver.disconnect();
+
+      // Remove event listeners
       renderer.domElement.removeEventListener('mousemove', onMouseMove);
       renderer.domElement.removeEventListener('mousedown', onMouseDown);
       renderer.domElement.removeEventListener('mouseup', onMouseUp);
@@ -618,13 +691,100 @@ export default function PinealAtrium() {
       renderer.domElement.removeEventListener('touchstart', onTouchStart);
       renderer.domElement.removeEventListener('touchmove', onTouchMove);
       renderer.domElement.removeEventListener('touchend', onTouchEnd);
+
+      // Dispose geometries and materials
+      regions.forEach(region => {
+        if (region.geometry) region.geometry.dispose();
+        if (region.material) region.material.dispose();
+        if (region.userData.glow) {
+          if (region.userData.glow.geometry) region.userData.glow.geometry.dispose();
+          if (region.userData.glow.material) region.userData.glow.material.dispose();
+        }
+      });
+
+      // Dispose brain planes
+      brainPlanesRef.current.forEach(plane => {
+        if (plane.geometry) plane.geometry.dispose();
+        if (plane.material) {
+          if (plane.material.map) plane.material.map.dispose();
+          plane.material.dispose();
+        }
+      });
+
+      // Dispose particles
+      if (particles) {
+        if (particles.geometry) particles.geometry.dispose();
+        if (particles.material) particles.material.dispose();
+      }
       
+      // Remove renderer
       if (mountRef.current && renderer.domElement) {
         mountRef.current.removeChild(renderer.domElement);
       }
       renderer.dispose();
     };
   }, [brainRegions]);
+
+  // WebGL fallback UI
+  if (!webglAvailable) {
+    return (
+      <div className="pineal-atrium">
+        <style>{`
+          .pineal-atrium {
+            min-height: 100vh;
+            background: #000;
+            color: white;
+            font-family: 'Exo 2', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+          }
+
+          .webgl-fallback {
+            max-width: 600px;
+            text-align: center;
+            padding: 40px;
+            background: rgba(186, 85, 211, 0.1);
+            border: 2px solid #BA55D3;
+            border-radius: 10px;
+          }
+
+          .webgl-fallback h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8rem;
+            color: #BA55D3;
+            margin-bottom: 20px;
+          }
+
+          .webgl-fallback p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+          }
+        `}</style>
+        
+        <Link to="/nexus" className="atrium-back" style={{ position: 'absolute', top: '20px', left: '20px' }}>
+          <ArrowLeft size={18} />
+          Back to Nexus
+        </Link>
+
+        <div className="webgl-fallback">
+          <h2>WebGL Not Available</h2>
+          <p>
+            3D visualization requires WebGL support. Please enable WebGL in your browser settings or try a different browser.
+          </p>
+          <Link to="/nexus">
+            <Button variant="outline" style={{ borderColor: '#BA55D3', color: '#BA55D3' }}>
+              Return to Nexus
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pineal-atrium">
@@ -648,6 +808,7 @@ export default function PinealAtrium() {
           height: 100%;
           z-index: 0;
           cursor: grab;
+          touch-action: none;
         }
 
         .atrium-bg:active {
@@ -684,6 +845,28 @@ export default function PinealAtrium() {
           color: #DDA0DD;
           border-color: #BA55D3;
           transform: translateX(-3px);
+        }
+
+        .atrium-reset {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          text-decoration: none;
+          color: #BA55D3;
+          font-family: 'Orbitron', monospace;
+          font-size: 14px;
+          font-weight: 600;
+          transition: all 0.3s ease;
+          padding: 10px 15px;
+          background: rgba(0, 0, 0, 0.7);
+          border: 1px solid rgba(186, 85, 211, 0.3);
+          cursor: pointer;
+        }
+
+        .atrium-reset:hover {
+          color: #DDA0DD;
+          border-color: #BA55D3;
+          transform: scale(1.05);
         }
 
         .atrium-title {
@@ -860,10 +1043,16 @@ export default function PinealAtrium() {
       <div ref={mountRef} className="atrium-bg" />
 
       <div className="atrium-controls">
-        <Link to="/nexus" className="atrium-back">
-          <ArrowLeft size={18} />
-          Back to Nexus
-        </Link>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <Link to="/nexus" className="atrium-back">
+            <ArrowLeft size={18} />
+            Back to Nexus
+          </Link>
+          <button onClick={handleResetView} className="atrium-reset">
+            <Home size={18} />
+            Reset View
+          </button>
+        </div>
         <div className="atrium-title">PINEAL ATRIUM</div>
         <div style={{ width: 100 }} />
       </div>
