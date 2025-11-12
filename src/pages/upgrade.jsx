@@ -327,7 +327,7 @@ export default function Upgrade() {
             </div>
             <h3 className="feature-title">Temple</h3>
             <p className="feature-desc">
-              Advanced bio-optimization protocols, HeartWave tracking, and Athena AI guidance
+              Align mind and body with proven biohacks to achieve complete inner and outer optimization
             </p>
           </div>
 
