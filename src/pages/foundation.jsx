@@ -961,9 +961,9 @@ export default function SleepSanctuary() { // Renamed from Foundation to SleepSa
       setSpeechRecognitionAvailable(true);
       recognitionRef.current = new SpeechRecognition();
       
-      // iOS-specific settings
+      // Speech recognition settings
       recognitionRef.current.continuous = false;
-      recognitionRef.current.interimResults = true; // Changed to true for better iOS compatibility
+      recognitionRef.current.interimResults = false; // Only capture final results to prevent rapid-fire transcription
       recognitionRef.current.lang = 'en-US';
       recognitionRef.current.maxAlternatives = 1;
 
@@ -983,35 +983,26 @@ export default function SleepSanctuary() { // Renamed from Foundation to SleepSa
         console.log('🤐 User stopped speaking');
       };
 
-      // Result event - transcription received
+      // Result event - transcription received (only final results)
       recognitionRef.current.onresult = (event) => {
         console.log('📝 Recognition result received:', event);
         
         let finalTranscript = '';
-        let interimTranscript = '';
         
-        // Process all results
+        // Process all results (should only be final since interimResults = false)
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcript = event.results[i][0].transcript;
           if (event.results[i].isFinal) {
             finalTranscript += transcript + ' ';
             console.log('✅ Final transcript:', transcript);
-          } else {
-            interimTranscript += transcript;
-            console.log('⏳ Interim transcript:', transcript);
           }
         }
         
-        // Use final transcript if available, otherwise use interim
-        const textToAdd = finalTranscript.trim() || interimTranscript.trim();
+        const textToAdd = finalTranscript.trim();
         
         if (textToAdd) {
           setChatInput(prev => {
-            // Prevent adding duplicate interim results if the previous one was the same
-            if (prev.endsWith(textToAdd) && !finalTranscript) {
-              return prev;
-            }
-            // For final results, add a space if there's existing input
+            // Add a space if there's existing input
             const newValue = prev ? prev + ' ' + textToAdd : textToAdd;
             console.log('📥 Updated chat input:', newValue);
             return newValue;
