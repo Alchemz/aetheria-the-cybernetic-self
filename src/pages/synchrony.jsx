@@ -300,9 +300,9 @@ export default function Synchrony() {
           setBreathPhase('inhale');
           lastPhase = 'inhale';
           
-          // Play "Inhale" voice cue only once at the very start
+          // Play "Breathe in for" voice cue only once at the very start
           if (isFirstCycle && !voiceCuesPlayed.boxBreathingCycle) {
-            playVoiceGuidance('inhale');
+            playVoiceGuidance('breatheIn');
           }
         }
         setBreathProgress((cyclePosition / phaseDuration) * 100);
@@ -312,9 +312,9 @@ export default function Synchrony() {
           setBreathPhase('hold1');
           lastPhase = 'hold1';
           
-          // Play "Hold your breath" voice cue only in first cycle
+          // Play "Hold 4 seconds" voice cue only in first cycle
           if (isFirstCycle && !voiceCuesPlayed.boxBreathingCycle) {
-            playVoiceGuidance('holdYourBreath');
+            playVoiceGuidance('hold4Seconds');
           }
         }
         setBreathProgress(100);
@@ -324,9 +324,9 @@ export default function Synchrony() {
           setBreathPhase('exhale');
           lastPhase = 'exhale';
           
-          // Play "Exhale" voice cue only in first cycle
+          // Play "And breathe out" voice cue only in first cycle
           if (isFirstCycle && !voiceCuesPlayed.boxBreathingCycle) {
-            playVoiceGuidance('exhale');
+            playVoiceGuidance('andBreatheOut');
           }
         }
         setBreathProgress(100 - ((cyclePosition - phaseDuration * 2) / phaseDuration) * 100);
@@ -399,15 +399,19 @@ export default function Synchrony() {
         setPhaseTimer(prev => {
           const newTime = prev + 1;
           
-          // After 2 minutes of box breathing, switch to Aum toning
+          // After 2 minutes of box breathing, switch to Aum toning with 6-audio transition
           if (meditationPhase === 'boxBreathing' && newTime >= 120) {
             setMeditationPhase('aumToning');
             
-            // Play transition voice cue
-            if (!voiceCuesPlayed.transitionToAum) {
+            // Play all 6 transition audios in sequence
+            if (!voiceCuesPlayed.aumTransitionComplete) {
               setTimeout(() => {
-                playVoiceGuidance('nowRelaxed');
-                setVoiceCuesPlayed(prev => ({ ...prev, transitionToAum: true }));
+                playAudioSequence(
+                  ['nowRelaxed', 'itIsTime', 'theGoal', 'imagineVibration', 'asMorePeople', 'thisNet'],
+                  () => {
+                    setVoiceCuesPlayed(prev => ({ ...prev, aumTransitionComplete: true }));
+                  }
+                );
               }, 500);
             }
             
@@ -420,7 +424,7 @@ export default function Synchrony() {
 
       return () => clearInterval(interval);
     }
-  }, [meditationPhase]);
+  }, [meditationPhase, playAudioSequence, voiceCuesPlayed.aumTransitionComplete]);
 
   // Preload voice guidance audio files - NEW 12-file premium system
   useEffect(() => {
