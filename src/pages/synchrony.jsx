@@ -51,10 +51,6 @@ export default function Synchrony() {
     boxBreathingCycle: false,
     aumTransitionComplete: false
   });
-  
-  // Audio sequencer state
-  const [currentAudioSequence, setCurrentAudioSequence] = useState([]);
-  const [sequenceIndex, setSequenceIndex] = useState(0);
 
   // Helper to create a Date object representing a specific time in Asia/Tokyo
   const getJapanDateTime = useCallback((date, hour, minute, second, addDays = 0) => {
@@ -266,6 +262,48 @@ export default function Synchrony() {
     return () => clearInterval(interval);
   }, [checkSessionActive, getJapanDateTime, getNextSessionTime]);
 
+  // Audio sequencer - plays audio files consecutively
+  const playAudioSequence = useCallback((audioKeys, onComplete) => {
+    if (!audioKeys || audioKeys.length === 0) {
+      if (onComplete) onComplete();
+      return;
+    }
+
+    let currentIndex = 0;
+
+    const playNext = () => {
+      if (currentIndex >= audioKeys.length) {
+        if (onComplete) onComplete();
+        return;
+      }
+
+      const audioKey = audioKeys[currentIndex];
+      const audio = voiceAudioRefs.current[audioKey];
+      
+      if (audio) {
+        audio.currentTime = 0;
+        
+        const handleEnded = () => {
+          audio.removeEventListener('ended', handleEnded);
+          currentIndex++;
+          playNext();
+        };
+        
+        audio.addEventListener('ended', handleEnded);
+        audio.play().catch(err => {
+          console.log(`Audio ${audioKey} autoplay prevented:`, err);
+          // Still continue sequence even if one fails
+          handleEnded();
+        });
+      } else {
+        currentIndex++;
+        playNext();
+      }
+    };
+
+    playNext();
+  }, []);
+
   // Pre-meditation phase - plays intro audios before any animation
   useEffect(() => {
     if (meditationPhase !== 'preMeditation' || voiceCuesPlayed.preMeditationComplete) return;
@@ -378,12 +416,6 @@ export default function Synchrony() {
         if (lastPhase !== 'exhale') {
           setBreathPhase('exhale');
           lastPhase = 'exhale';
-          
-          // Play AUM example audio only in first cycle
-          if (isFirstCycle && !voiceCuesPlayed.aumExample) {
-            playVoiceGuidance('aum');
-            setVoiceCuesPlayed(prev => ({ ...prev, aumExample: true }));
-          }
         }
         setBreathProgress(100 - ((cyclePosition - inhaleDuration) / exhaleDuration) * 100);
       }
@@ -470,48 +502,6 @@ export default function Synchrony() {
       }
     }
   }, [hasJoined]);
-
-  // Audio sequencer - plays audio files consecutively
-  const playAudioSequence = useCallback((audioKeys, onComplete) => {
-    if (!audioKeys || audioKeys.length === 0) {
-      if (onComplete) onComplete();
-      return;
-    }
-
-    let currentIndex = 0;
-
-    const playNext = () => {
-      if (currentIndex >= audioKeys.length) {
-        if (onComplete) onComplete();
-        return;
-      }
-
-      const audioKey = audioKeys[currentIndex];
-      const audio = voiceAudioRefs.current[audioKey];
-      
-      if (audio) {
-        audio.currentTime = 0;
-        
-        const handleEnded = () => {
-          audio.removeEventListener('ended', handleEnded);
-          currentIndex++;
-          playNext();
-        };
-        
-        audio.addEventListener('ended', handleEnded);
-        audio.play().catch(err => {
-          console.log(`Audio ${audioKey} autoplay prevented:`, err);
-          // Still continue sequence even if one fails
-          handleEnded();
-        });
-      } else {
-        currentIndex++;
-        playNext();
-      }
-    };
-
-    playNext();
-  }, []);
 
   // Play single voice guidance cue
   const playVoiceGuidance = (audioKey) => {
@@ -1013,7 +1003,7 @@ export default function Synchrony() {
           </div>
         )}
 
-        {(meditationPhase === 'boxBreathing' || meditationPhase === 'aumToning') && (
+        {(meditationPhase === 'preMeditation' || meditationPhase === 'boxBreathing' || meditationPhase === 'aumToning') && (
           <>
             <div className="sovereigns-counter">
               <div className="counter-label-small">SOVEREIGNS IN SYNC</div>
@@ -1022,7 +1012,9 @@ export default function Synchrony() {
 
             <div className="meditation-container">
               <div className="phase-indicator">
-                {meditationPhase === 'boxBreathing' ? 'PHASE 1: COHERENCE INDUCTION' : 'PHASE 2: SOVEREIGN VIBRATION'}
+                {meditationPhase === 'preMeditation' && 'PHASE 0: PREPARATION'}
+                {meditationPhase === 'boxBreathing' && 'PHASE 1: COHERENCE INDUCTION'}
+                {meditationPhase === 'aumToning' && 'PHASE 2: AUM RESONANCE'}
               </div>
 
               {meditationPhase === 'boxBreathing' && (
