@@ -600,6 +600,168 @@ export default function TheTemple() {
           why: '500ml warm water with lemon and sea salt upon waking hydrates cells and supports cellular detox pathways via kidney and liver function.'
         }
       ]
+    },
+    {
+      id: 'hormonal-optimization-women',
+      name: 'Hormonal Optimization for Women',
+      icon: Heart,
+      description: 'Harmonize and optimize female hormonal cycles naturally through rhythm, nourishment, and stress adaptation',
+      simpleExplanation: 'Your body has a natural monthly rhythm, like the moon\'s cycle. This bio-mod helps you work WITH that rhythm instead of fighting it. By eating, exercising, and resting in sync with your cycle, you\'ll feel more balanced, energized, and in tune with your body\'s natural wisdom.',
+      habits: [
+        {
+          name: 'Cycle Awareness Practice',
+          duration: 10,
+          difficulty: 'Easy',
+          why: 'Track your phases (follicular, ovulatory, luteal, menstrual) and align workouts, food, and focus with each. Creative work thrives in follicular phase, reflection in luteal.'
+        },
+        {
+          name: 'Morning Sunlight Ritual',
+          duration: 15,
+          difficulty: 'Easy',
+          why: 'Get sunlight on skin and eyes for 10-15 min within an hour of waking to stabilize estrogen-progesterone balance via circadian entrainment.'
+        },
+        {
+          name: 'Seed Cycling',
+          duration: 5,
+          difficulty: 'Easy',
+          why: 'Rotate seeds through the cycle: flax + pumpkin in follicular; sesame + sunflower in luteal. Natural phytoestrogens and zinc help regulate hormones gently.'
+        },
+        {
+          name: 'Adaptogen Pairing',
+          duration: 2,
+          difficulty: 'Easy',
+          why: 'Daily intake of maca (libido & vitality), ashwagandha (stress balance), and shatavari (female hormone tonic) to support natural hormonal harmony.'
+        },
+        {
+          name: 'Evening Wind-Down',
+          duration: 60,
+          difficulty: 'Medium',
+          why: 'No screens 1 hour before bed with magnesium + chamomile tea to lower cortisol and support progesterone production during sleep.'
+        },
+        {
+          name: 'Cycle-Sync Movement',
+          duration: 45,
+          difficulty: 'Medium',
+          why: 'Intense workouts in follicular & ovulatory phases when energy peaks; restorative yoga/walking in luteal & menstrual phases to honor the body\'s need for rest.'
+        }
+      ]
+    },
+    {
+      id: 'neuro-rhythm-alignment',
+      name: 'Neuro-Rhythm Alignment',
+      icon: Activity,
+      description: 'Align brainwave activity and cognitive performance with natural ultradian and circadian cycles',
+      simpleExplanation: 'Your brain works in waves and rhythms, just like music. Sometimes it\'s fast (focused), sometimes slow (creative). This bio-mod teaches you to ride these natural brain waves instead of forcing your mind to work the same way all day. You\'ll think clearer and get more done with LESS effort!',
+      habits: [
+        {
+          name: '90-Minute Deep Work Blocks',
+          duration: 90,
+          difficulty: 'Medium',
+          why: 'Match your work to the brain\'s natural ultradian rhythm (90-120 min cycles). Deep focus for 90 minutes, then mandatory rest to optimize cognitive performance.'
+        },
+        {
+          name: 'Binaural Priming',
+          duration: 10,
+          difficulty: 'Easy',
+          why: '10 min theta → alpha → beta progression audio in the morning primes brainwave states for optimal focus, creativity, and cognitive flow throughout the day.'
+        },
+        {
+          name: 'Digital Dusk',
+          duration: 120,
+          difficulty: 'Hard',
+          why: 'No high-stimulation input (social media, action content) 2 hours before bed protects melatonin production and allows brain to shift into slower, restorative frequencies.'
+        },
+        {
+          name: 'Cold Water Face Rinse',
+          duration: 3,
+          difficulty: 'Easy',
+          why: '3x/day cold water on face activates vagus nerve via mammalian dive reflex, instantly resetting attention and mental clarity.'
+        },
+        {
+          name: 'Breath-to-Beat Practice',
+          duration: 10,
+          difficulty: 'Easy',
+          why: 'Inhale 4s, exhale 6s while listening to music synchronizes heart rate variability with brain rhythm, creating coherent state for enhanced focus and emotional regulation.'
+        }
+      ]
+    },
+    {
+      id: 'energetic-core-calibration',
+      name: 'Energetic Core Calibration',
+      icon: Zap,
+      description: 'Strengthen the body\'s bioelectric and energetic coherence — bridge physical and subtle energy systems',
+      simpleExplanation: 'You\'re not just a body made of muscles and bones - you\'re also made of ENERGY! Like electricity running through wires. This bio-mod helps you feel and control that energy, making you feel more alive, centered, and powerful. It\'s like learning to charge your own battery!',
+      habits: [
+        {
+          name: 'Morning Qi Sweep',
+          duration: 5,
+          difficulty: 'Easy',
+          why: 'Standing, trace energy from feet to crown with your hands 3x up and down. Activates meridian pathways and clears stagnant bioelectric fields.'
+        },
+        {
+          name: 'Grounding Ritual',
+          duration: 10,
+          difficulty: 'Easy',
+          why: '10 minutes barefoot on natural earth daily. Direct contact with Earth\'s electromagnetic field (Schumann resonance) reduces inflammation and balances autonomic nervous system.'
+        },
+        {
+          name: 'Energy Hygiene',
+          duration: 1,
+          difficulty: 'Easy',
+          why: 'Quick 1-minute visualization of releasing others\' energy after social interactions. Prevents energetic absorption and maintains clear auric boundaries.'
+        },
+        {
+          name: 'Abdominal Fire Breath',
+          duration: 5,
+          difficulty: 'Medium',
+          why: '30 quick exhales, hold, exhale slowly (3 rounds). Activates solar plexus chakra, ignites core vitality, and stimulates mitochondrial energy production.'
+        },
+        {
+          name: 'Candle Focus Meditation',
+          duration: 3,
+          difficulty: 'Easy',
+          why: '3 minutes of single-point gaze (trataka) trains energy stability, strengthens concentration, and develops mental stillness by anchoring scattered awareness.'
+        }
+      ]
+    },
+    {
+      id: 'cellular-renewal-protocol',
+      name: 'Cellular Renewal Protocol',
+      icon: TrendingUp,
+      description: 'Slow biological aging by activating innate repair pathways at the cellular level',
+      simpleExplanation: 'Every cell in your body is like a tiny factory that can fix and rebuild itself. This bio-mod turns on your body\'s "repair mode" - like hitting the refresh button on your cells. You\'ll age slower, heal faster, and have more energy because your cells are working like they\'re young again!',
+      habits: [
+        {
+          name: '16:8 Intermittent Fasting Window',
+          duration: 960,
+          difficulty: 'Medium',
+          why: 'Eating within an 8-hour window (e.g., 12-8 PM) promotes autophagy - your cells\' self-cleaning process - and activates mitochondrial renewal pathways.'
+        },
+        {
+          name: 'Hydration Stack',
+          duration: 5,
+          difficulty: 'Easy',
+          why: 'Water + pinch of sea salt + lemon each morning restores electrolytes, supports cellular hydration, and kickstarts kidney detoxification pathways.'
+        },
+        {
+          name: 'Red Light Exposure',
+          duration: 10,
+          difficulty: 'Easy',
+          why: '5-10 min of sunset or infrared lamp exposure supports mitochondrial ATP production via cytochrome c oxidase activation, enhancing cellular energy and repair.'
+        },
+        {
+          name: 'Movement Snack Hourly',
+          duration: 1,
+          difficulty: 'Easy',
+          why: 'Stretch or squat for 30 seconds every hour keeps lymphatic system active, prevents cellular stagnation, and maintains mitochondrial function throughout the day.'
+        },
+        {
+          name: 'Sleep Consistency',
+          duration: 480,
+          difficulty: 'Hard',
+          why: 'Same sleep/wake time daily (±30 min) anchors all regenerative cycles - growth hormone release, cellular repair, and circadian gene expression for optimal longevity.'
+        }
+      ]
     }
   ];
 
