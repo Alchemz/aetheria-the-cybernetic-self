@@ -55,7 +55,7 @@ export default function SovereignPortal() {
     },
     {
       name: "THE TEMPLE",
-      caption: "Embody Your Spirit. Align Breath, Movement, Energy.",
+      caption: "Align Mind & Body. Proven Biohacks for Complete Optimization.",
       buttonText: "Begin Embodiment",
       path: "/heartwave",
       requiresSubscription: true, // PAID FEATURE
