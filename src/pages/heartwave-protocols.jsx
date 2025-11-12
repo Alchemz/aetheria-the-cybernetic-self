@@ -741,7 +741,7 @@ export default function HeartWaveProtocols() {
             width: 100%;
             background: #2C2C2C;
             border-top: 1px solid rgba(0, 168, 107, 0.3);
-            padding: 1rem;
+            padding: 1rem calc(1rem + var(--safe-area-right)) calc(1rem + var(--safe-area-bottom)) calc(1rem + var(--safe-area-left));
             display: flex;
             justify-content: space-around;
             z-index: 100;

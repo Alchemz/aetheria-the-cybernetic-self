@@ -800,7 +800,7 @@ export default function TheTemple() {
               min-height: 100vh;
               color: white;
               font-family: 'Rajdhani', sans-serif;
-              padding: calc(1rem + env(safe-area-inset-top)) 1rem 100px;
+              padding: calc(1rem + var(--safe-area-top)) 1rem 100px;
               background: transparent !important;
             }
 
@@ -1028,7 +1028,7 @@ export default function TheTemple() {
               background: linear-gradient(to top, #0A0A0F, rgba(10, 10, 15, 0.95));
               backdrop-filter: blur(10px);
               padding: 1rem;
-              padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+              padding-bottom: calc(1rem + var(--safe-area-bottom));
               display: flex;
               justify-content: space-around;
               border-top: 1px solid rgba(0, 168, 107, 0.3);

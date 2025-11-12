@@ -125,7 +125,7 @@ export default function CosmicLibrary() {
         .lib-content {
           position: relative;
           z-index: 10;
-          padding: 80px 20px 40px;
+          padding: calc(80px + var(--safe-area-top)) 20px calc(40px + var(--safe-area-bottom));
           max-width: 1200px;
           margin: 0 auto;
         }
@@ -133,7 +133,7 @@ export default function CosmicLibrary() {
         .lib-back-button {
           position: absolute;
           left: 20px;
-          top: 20px;
+          top: calc(20px + var(--safe-area-top));
           display: flex;
           align-items: center;
           gap: 8px;

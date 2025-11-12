@@ -616,8 +616,7 @@ export default function Synchrony() {
 
         .back-button {
           position: absolute;
-          top: 1.5rem;
-          top: calc(1.5rem + env(safe-area-inset-top));
+          top: calc(1.5rem + var(--safe-area-top));
           left: 1.5rem;
           pointer-events: all;
           z-index: 100;
@@ -656,7 +655,7 @@ export default function Synchrony() {
           color: #00FFFF;
           text-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
           text-align: center;
-          margin-top: calc(1rem + env(safe-area-inset-top));
+          margin-top: calc(1rem + var(--safe-area-top));
           margin-bottom: 0;
         }
 
@@ -905,7 +904,7 @@ export default function Synchrony() {
 
         .sovereigns-counter {
           position: absolute;
-          top: calc(env(safe-area-inset-top) + 1rem);
+          top: calc(var(--safe-area-top) + 1rem);
           right: 1rem;
           background: rgba(0, 31, 63, 0.9);
           backdrop-filter: blur(10px);
@@ -961,7 +960,7 @@ export default function Synchrony() {
           }
 
           .sovereigns-counter {
-            top: calc(env(safe-area-inset-top) + 0.75rem);
+            top: calc(var(--safe-area-top) + 0.75rem);
             right: 0.75rem;
             padding: 0.5rem 0.75rem;
           }

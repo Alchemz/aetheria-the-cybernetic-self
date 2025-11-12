@@ -215,7 +215,7 @@ export default function CosmicObservatory() {
         .observatory-content {
           position: relative;
           z-index: 10;
-          padding: 80px 20px 40px;
+          padding: calc(80px + var(--safe-area-top)) 20px calc(40px + var(--safe-area-bottom));
         }
 
         .observatory-back {

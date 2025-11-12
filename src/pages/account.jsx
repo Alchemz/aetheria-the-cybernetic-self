@@ -145,7 +145,7 @@ export default function AccountPage() {
           background: #000;
           color: white;
           font-family: 'Exo 2', sans-serif;
-          padding: 80px 20px 40px;
+          padding: calc(80px + var(--safe-area-top)) 20px calc(40px + var(--safe-area-bottom));
         }
 
         .account-container {
@@ -312,7 +312,7 @@ export default function AccountPage() {
 
         @media (max-width: 768px) {
           .account-page {
-            padding: 60px 15px 30px;
+            padding: calc(60px + var(--safe-area-top)) 15px calc(30px + var(--safe-area-bottom));
           }
 
           .account-title {

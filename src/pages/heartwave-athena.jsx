@@ -768,7 +768,7 @@ Respond as ATHENA, providing insightful, relevant, and actionable guidance based
 
           .hw-input-container {
             position: fixed;
-            bottom: 80px;
+            bottom: calc(80px + var(--safe-area-bottom));
             left: 0;
             right: 0;
             background: #2C2C2C;

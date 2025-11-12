@@ -416,7 +416,7 @@ export default function WisdomWell() {
         .wisdom-well {
           min-height: 100vh;
           background: radial-gradient(ellipse at center, #0A0A0A 0%, #000000 100%);
-          padding: 80px 20px 40px;
+          padding: calc(80px + var(--safe-area-top)) 20px calc(40px + var(--safe-area-bottom));
           font-family: 'Exo 2', sans-serif;
           color: #F5F5F5;
           position: relative;
@@ -642,7 +642,7 @@ export default function WisdomWell() {
 
         @media (max-width: 768px) {
           .wisdom-well {
-            padding: 60px 15px 30px;
+            padding: calc(60px + var(--safe-area-top)) 15px calc(30px + var(--safe-area-bottom));
           }
 
           .wisdom-back-button {

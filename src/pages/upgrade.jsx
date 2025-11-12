@@ -78,7 +78,7 @@ export default function Upgrade() {
           background: linear-gradient(135deg, #000000 0%, #1a0033 50%, #000033 100%);
           color: white;
           font-family: 'Rajdhani', sans-serif;
-          padding: 40px 20px;
+          padding: calc(40px + var(--safe-area-top)) 20px calc(40px + var(--safe-area-bottom));
           overflow-y: auto;
         }
 

@@ -1914,7 +1914,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
           
           .foundation-home-btn, .foundation-account-btn {
             position: fixed;
-            top: calc(1rem + env(safe-area-inset-top));
+            top: calc(1rem + var(--safe-area-top));
             color: rgba(255,255,255,0.9);
             transition: all 0.3s ease;
             display: flex;
@@ -1974,7 +1974,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
             z-index: 10;
-            padding-top: calc(60px + env(safe-area-inset-top)); /* Minimal space for floating icons */
+            padding-top: calc(60px + var(--safe-area-top)); /* Minimal space for floating icons */
             opacity: ${!showDailyQuote && swiperReady ? '1' : '0'};
             transition: opacity 0.3s ease;
           }
@@ -2006,7 +2006,7 @@ Provide a warm, insightful interpretation. Frame it as possibilities, connect sy
             display: flex;
             justify-content: space-around;
             padding: 1rem 0;
-            padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+            padding-bottom: calc(1rem + var(--safe-area-bottom));
             background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.6), transparent);
             z-index: 100;
           }

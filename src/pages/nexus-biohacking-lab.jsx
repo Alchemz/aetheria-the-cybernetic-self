@@ -509,7 +509,7 @@ export default function BiohackingLab() {
         .lab-content {
           position: relative;
           z-index: 10;
-          padding: 80px 20px 40px;
+          padding: calc(80px + var(--safe-area-top)) 20px calc(40px + var(--safe-area-bottom));
           max-width: 1400px;
           margin: 0 auto;
         }
