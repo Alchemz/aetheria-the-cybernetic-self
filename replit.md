@@ -49,6 +49,7 @@ INNERSYNC is a meditation and wellness platform built with Vite and React, offer
 - **Monetization**: Subscription-based access via RevenueCat, with free features (Portal, Synchrony, Wisdom Well) and paid features (Foundation, Temple, Nexus, Meditation Chamber, AI features). Upgrade page (`/upgrade`) handles purchase flow and displays offerings.
 - **Capacitor Configuration**: `capacitor.config.ts` defines App ID and Name. Includes iOS background audio support (Info.plist, AppDelegate.swift), safe area support, and voice/microphone permissions (NSMicrophoneUsageDescription, NSSpeechRecognitionUsageDescription). Custom chakra-themed app icon generated via `@capacitor/assets`.
 - **Backend Deployment**: Express backend deployed to Replit's autoscale platform, configured to serve API and static files from `dist/` on port 5000 in production, with environment-based API endpoint switching.
+- **Native Mobile App Behavior**: Viewport configured with `maximum-scale=1, user-scalable=no` to prevent pinch-zoom and double-tap zoom. Global CSS includes `touch-action: manipulation` to disable browser zoom gestures while preserving normal scrolling and tapping. Input fields use minimum 16px font size to prevent iOS auto-zoom. App behaves like a native mobile application across all platforms.
 
 ## External Dependencies
 - **Supabase**: Authentication and PostgreSQL database.
