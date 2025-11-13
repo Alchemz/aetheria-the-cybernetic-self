@@ -13,8 +13,6 @@ import { Button } from '@/components/ui/button';
 import { auth } from '@/api/supabaseClient';
 import { InvokeLLMStream } from '@/api/integrations';
 import { buildAthenaContext } from '@/api/openaiService';
-import SubscriptionGuard from '../components/SubscriptionGuard';
-
 export default function HeartWaveAthena() {
   const [messages, setMessages] = useState([
     {
@@ -29,13 +27,7 @@ export default function HeartWaveAthena() {
   const [user, setUser] = useState(null);
   const messagesEndRef = useRef(null);
 
-  // Set background immediately on mount to prevent flash
-  useEffect(() => {
-    document.body.style.background = '#2C2C2C';
-    return () => {
-      document.body.style.background = '#000000'; // Reset to default black on unmount
-    };
-  }, []);
+  // Background handled by TempleLayout parent
 
   // Load user data on mount
   useEffect(() => {
@@ -628,24 +620,21 @@ Respond as ATHENA, providing insightful, relevant, and actionable guidance based
   ];
 
   return (
-    <SubscriptionGuard requiredProduct="heartwave">
-      <div className="hw-athena-page" style={{ background: '#2C2C2C' }}>
+      <div className="hw-athena-page">
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
 
           .hw-athena-page {
-            min-height: 100vh;
-            background: #2C2C2C !important; /* Added !important */
             color: white;
             font-family: 'Rajdhani', sans-serif;
             display: flex;
             flex-direction: column;
-            height: 100vh; /* Added height */
-            overflow: hidden; /* Added overflow */
+            height: 100vh;
+            overflow: hidden;
           }
 
           .hw-athena-header {
-            background: #2C2C2C;
+            background: transparent;
             border-bottom: 1px solid rgba(0, 168, 107, 0.3);
             padding: 1rem;
           }
@@ -1016,23 +1005,6 @@ Respond as ATHENA, providing insightful, relevant, and actionable guidance based
             </button>
           </div>
         </div>
-
-        {/* BOTTOM NAVIGATION */}
-        <div className="hw-bottom-nav">
-          <Link to="/heartwave-console" className="hw-nav-btn">
-            <Target size={24} />
-            <span>Routine</span>
-          </Link>
-          <Link to="/heartwave-protocols" className="hw-nav-btn">
-            <Flame size={24} />
-            <span>Bio-Mods</span>
-          </Link>
-          <div className="hw-nav-btn active">
-            <Zap size={24} />
-            <span>ATHENA</span>
-          </div>
-        </div>
       </div>
-    </SubscriptionGuard>
   );
 }

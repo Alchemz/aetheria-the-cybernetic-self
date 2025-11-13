@@ -23,20 +23,12 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { auth } from '@/api/supabaseClient';
-import SubscriptionGuard from '../components/SubscriptionGuard';
-
 export default function HeartWaveProtocols() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeBioMods, setActiveBioMods] = useState([]);
   const [user, setUser] = useState(null);
 
-  // Set background immediately on mount to prevent flash
-  useEffect(() => {
-    document.body.style.background = '#2C2C2C';
-    return () => {
-      document.body.style.background = ''; // Revert to default or previous body background
-    };
-  }, []);
+  // Background handled by TempleLayout parent
 
   useEffect(() => {
     loadUserBioMods();
@@ -536,17 +528,14 @@ export default function HeartWaveProtocols() {
   );
 
   return (
-    <SubscriptionGuard requiredProduct="heartwave">
-      <div className="hw-biomods-page" style={{ background: '#2C2C2C' }}>
+      <div className="hw-biomods-page">
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
 
           .hw-biomods-page {
-            min-height: 100vh;
-            background: #2C2C2C !important;
             color: white;
             font-family: 'Rajdhani', sans-serif;
-            padding: 1rem 1rem 100px;
+            padding: 1rem;
           }
 
           .hw-biomods-header {
@@ -853,22 +842,6 @@ export default function HeartWaveProtocols() {
             );
           })}
         </div>
-
-        <div className="hw-bottom-nav">
-          <Link to="/heartwave-console" className="hw-nav-btn">
-            <Target size={24} />
-            <span>Console</span>
-          </Link>
-          <div className="hw-nav-btn active">
-            <Flame size={24} />
-            <span>Bio-Mods</span>
-          </div>
-          <Link to="/heartwave-athena" className="hw-nav-btn">
-            <Zap size={24} />
-            <span>ATHENA</span>
-          </Link>
-        </div>
       </div>
-    </SubscriptionGuard>
   );
 }
