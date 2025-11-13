@@ -7,10 +7,8 @@ export default function TempleLayout() {
   const mountRef = useRef(null);
   const location = useLocation();
 
-  // Apply safe area to body and disable StatusBar overlay on mount
+  // Set background and handle StatusBar on mount
   useEffect(() => {
-    document.body.style.paddingTop = 'var(--safe-area-top)';
-    document.body.style.paddingBottom = 'var(--safe-area-bottom)';
     document.body.style.background = '#2C2C2C';
     
     // Disable StatusBar overlay for iOS (only in native environment)
@@ -28,8 +26,6 @@ export default function TempleLayout() {
     disableOverlay();
     
     return () => {
-      document.body.style.paddingTop = '';
-      document.body.style.paddingBottom = '';
       document.body.style.background = '#000000';
     };
   }, []);
