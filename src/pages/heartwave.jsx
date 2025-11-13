@@ -1,7 +1,6 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import * as THREE from 'three';
 import {
   ArrowLeft,
   Search,
@@ -24,109 +23,13 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { auth } from '@/api/supabaseClient';
-import SubscriptionGuard from '../components/SubscriptionGuard';
 
 export default function TheTemple() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeBioMods, setActiveBioMods] = useState([]);
   const [user, setUser] = useState(null);
-  const mountRef = useRef(null);
 
-  // Set background immediately on mount to prevent flash
-  useEffect(() => {
-    document.body.style.background = '#2C2C2C';
-    return () => {
-      document.body.style.background = '#000000';
-    };
-  }, []);
-
-  // Three.js background animation
-  useEffect(() => {
-    if (!mountRef.current) return;
-
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x2C2C2C); // Changed from 0x000000 to 0x2C2C2C
-
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 5;
-
-    // Changed alpha to false and added setClearColor
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x2C2C2C); // Added this line
-    mountRef.current.appendChild(renderer.domElement);
-
-    // Create floating particles
-    const particlesGeometry = new THREE.BufferGeometry();
-    const particleCount = 200;
-    const positions = new Float32Array(particleCount * 3);
-    const velocities = new Float32Array(particleCount * 3);
-
-    for (let i = 0; i < particleCount; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 20;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
-      
-      velocities[i * 3] = (Math.random() - 0.5) * 0.02;
-      velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.02;
-      velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
-    }
-
-    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-    const particlesMaterial = new THREE.PointsMaterial({
-      size: 0.08,
-      color: 0x00A86B,
-      transparent: true,
-      opacity: 0.6,
-      blending: THREE.AdditiveBlending
-    });
-
-    const particles = new THREE.Points(particlesGeometry, particlesMaterial);
-    scene.add(particles);
-
-    const clock = new THREE.Clock();
-    const animate = () => {
-      const elapsedTime = clock.getElapsedTime();
-      
-      const positions = particles.geometry.attributes.position.array;
-      for (let i = 0; i < particleCount; i++) {
-        positions[i * 3] += velocities[i * 3];
-        positions[i * 3 + 1] += velocities[i * 3 + 1];
-        positions[i * 3 + 2] += velocities[i * 3 + 2];
-        
-        // Wrap around edges
-        if (Math.abs(positions[i * 3]) > 10) velocities[i * 3] *= -1;
-        if (Math.abs(positions[i * 3 + 1]) > 10) velocities[i * 3 + 1] *= -1;
-        if (Math.abs(positions[i * 3 + 2]) > 10) velocities[i * 3 + 2] *= -1;
-      }
-      
-      particles.geometry.attributes.position.needsUpdate = true;
-      particles.rotation.y = elapsedTime * 0.05;
-
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      if (mountRef.current && renderer.domElement) {
-        mountRef.current.removeChild(renderer.domElement);
-      }
-      renderer.dispose();
-    };
-  }, []);
+  // Background and Three.js animation handled by TempleLayout parent
 
   useEffect(() => {
     loadUserBioMods();
@@ -788,22 +691,14 @@ export default function TheTemple() {
   );
 
   return (
-    <SubscriptionGuard requiredProduct="heartwave">
-      <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden', background: '#2C2C2C' }}>
-        <div ref={mountRef} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, background: '#2C2C2C' }} />
-
-        <div className="heartwave-biomods-page" style={{ position: 'relative', zIndex: 1, background: 'transparent' }}>
+        <div className="heartwave-biomods-page">
           <style>{`
             @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
 
             .heartwave-biomods-page {
-              min-height: 100vh;
               color: white;
               font-family: 'Rajdhani', sans-serif;
               padding: 1rem;
-              padding-top: calc(1.5rem + var(--safe-area-top));
-              padding-bottom: calc(100px + var(--safe-area-bottom));
-              background: transparent !important;
             }
 
             .heartwave-header {
@@ -1149,23 +1044,6 @@ export default function TheTemple() {
               );
             })}
           </div>
-
-          <div className="heartwave-bottom-nav">
-            <Link to="/heartwave-console" className="heartwave-nav-btn">
-              <Target size={24} />
-              <span>Routine</span>
-            </Link>
-            <div className="heartwave-nav-btn active">
-              <Flame size={24} />
-              <span>Bio-Mods</span>
-            </div>
-            <Link to="/heartwave-athena" className="heartwave-nav-btn">
-              <Zap size={24} />
-              <span>ATHENA</span>
-            </Link>
-          </div>
         </div>
-      </div>
-    </SubscriptionGuard>
   );
 }
