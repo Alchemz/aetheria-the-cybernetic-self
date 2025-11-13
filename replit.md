@@ -31,7 +31,12 @@ INNERSYNC is a meditation and wellness platform built with Vite and React, offer
 - **Synchrony Global Meditation**: Guided box breathing and Aum toning with auto-progression and synchronized 3D effects, daily at 11 PM Japan time.
 - **Wisdom Well**: A spiritual knowledge library with 10 expandable wisdom threads, accessed via an Ankh symbol, featuring a cyan aesthetic and animated glows.
 - **Today's Cosmic Briefing**: AI-powered daily astrological insights (300-400 words) with extracted themes, cached in Supabase.
-- **Dream Assistant**: AI for dream interpretation and sleep guidance.
+- **Dream Assistant**: AI for dream interpretation and sleep guidance with voice input support:
+  - **Web Platform**: Uses Web Speech API (`SpeechRecognition`) for real-time speech-to-text, configured with `continuous: false` and `interimResults: false` to capture actual speech (not rhythm detection)
+  - **Native Platform**: Integrates Capacitor Voice Recorder for native audio capture on iOS/Android
+  - **Visual Feedback**: Pulsing mic button animation (`.chat-mic-button.recording` class) provides clear visual indication of listening state
+  - **Error Handling**: Comprehensive permission handling, microphone access checks, and user-friendly error messages
+  - **Permissions**: Info.plist includes NSMicrophoneUsageDescription and NSSpeechRecognitionUsageDescription for iOS
 - **Athena AI**: AI for bio-protocol optimization, science explanations, and habit adjustments.
 - **Resonator & Meditation Chamber**: Audio libraries with healing frequencies and guided meditations, supporting background playback.
 - **Pineal Atrium (Brain Visualization)**: An interactive 3D brain anatomy explorer within Nexus (`/nexus-pineal-atrium`) featuring wireframe brain images, glowing markers for 8 anatomical regions (pineal gland, prefrontal cortex, hippocampus, thalamus, amygdala, corpus callosum), and comprehensive camera controls. Enhanced with:
@@ -47,7 +52,7 @@ INNERSYNC is a meditation and wellness platform built with Vite and React, offer
 - **Supabase Integration**: Used for authentication and PostgreSQL database (`profiles`, `cosmic_briefings` tables) with Row Level Security.
 - **Environment Variables**: Managed via Replit Secrets (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `OPENAI_API_KEY`, `VITE_REVENUECAT_API_KEY`).
 - **Monetization**: Subscription-based access via RevenueCat, with free features (Portal, Synchrony, Wisdom Well) and paid features (Foundation, Temple, Nexus, Meditation Chamber, AI features). Upgrade page (`/upgrade`) handles purchase flow and displays offerings.
-- **Capacitor Configuration**: `capacitor.config.ts` defines App ID and Name. Includes iOS background audio support (Info.plist, AppDelegate.swift), safe area support, and voice/microphone permissions (NSMicrophoneUsageDescription, NSSpeechRecognitionUsageDescription). Custom chakra-themed app icon generated via `@capacitor/assets`.
+- **Capacitor Configuration**: `capacitor.config.ts` defines App ID and Name. Includes iOS background audio support (Info.plist, AppDelegate.swift), safe area support, and voice/microphone permissions (NSMicrophoneUsageDescription, NSSpeechRecognitionUsageDescription). Custom chakra-themed app icon generated via `@capacitor/assets`. Voice input powered by `capacitor-voice-recorder` for native platforms.
 - **Backend Deployment**: Express backend deployed to Replit's autoscale platform, configured to serve API and static files from `dist/` on port 5000 in production, with environment-based API endpoint switching.
 - **Native Mobile App Behavior**: Viewport configured with `maximum-scale=1, user-scalable=no` to prevent pinch-zoom and double-tap zoom. Global CSS includes `touch-action: manipulation` to disable browser zoom gestures while preserving normal scrolling and tapping. Input fields use minimum 16px font size to prevent iOS auto-zoom. App behaves like a native mobile application across all platforms.
 - **Safe Area Implementation**: 
