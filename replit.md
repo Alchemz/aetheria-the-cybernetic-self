@@ -61,6 +61,7 @@ INNERSYNC is a meditation and wellness platform built with Vite and React, offer
   - **Consistent Application**: All pages use these centralized variables via `calc()` for consistent padding/positioning offsets, ensuring content never overlaps with device UI on iPhone 6.7" and other devices with notches
   - **Applied To**: All immersive pages (Portal, Synchrony, Foundation, Temple, Nexus carousel, Nexus sub-pages, Pineal Atrium, Wisdom Well, Account, Upgrade)
   - **Specific Implementations**:
+    - Synchrony: HUD container uses safe-area-aware padding on all sides (padding-top/bottom/left/right with calc() and safe area variables), overflow-y scrolling enabled for tall content, justify-content flex-start prevents vertical centering cut-off, lobby/meditation containers have proper margins and reduced gaps for mobile
     - Nexus: Header uses padding-top with safe area variable
     - Temple: TempleLayout component provides persistent safe area wrapper for all Temple routes (/heartwave, /heartwave-protocols, /heartwave-athena, /heartwave-console). Uses nested routing with <Outlet/> to prevent safe area reset during navigation. Centralizes Three.js background, bottom navigation, and StatusBar control (conditionally imported on native platforms only via `window.Capacitor?.isNativePlatform()`). Applies safe area padding exactly once via `.safe-page.temple-page` class.
     - Pineal Atrium: Controls, instructions, and side panel all account for safe area insets

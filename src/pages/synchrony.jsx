@@ -606,12 +606,17 @@ export default function Synchrony() {
           width: 100%;
           height: 100%;
           z-index: 10;
-          pointer-events: none;
+          pointer-events: auto;
           display: flex;
           flex-direction: column;
           align-items: center;
-          justify-content: center;
-          padding: 2rem;
+          justify-content: flex-start;
+          padding-top: calc(2rem + var(--safe-area-top));
+          padding-bottom: calc(2rem + var(--safe-area-bottom));
+          padding-left: calc(1.5rem + var(--safe-area-left));
+          padding-right: calc(1.5rem + var(--safe-area-right));
+          overflow-y: auto;
+          overflow-x: hidden;
         }
 
         .back-button {
@@ -642,9 +647,11 @@ export default function Synchrony() {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 2rem;
+          gap: 1.5rem;
           max-width: 600px;
-          pointer-events: all;
+          width: 100%;
+          margin-top: 1rem;
+          margin-bottom: 1rem;
         }
 
         .lobby-title {
@@ -655,7 +662,7 @@ export default function Synchrony() {
           color: #00FFFF;
           text-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
           text-align: center;
-          margin-top: calc(1rem + var(--safe-area-top));
+          margin-top: 0;
           margin-bottom: 0;
         }
 
@@ -793,10 +800,11 @@ export default function Synchrony() {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 2rem;
+          gap: 1.5rem;
           width: 100%;
           max-width: 700px;
-          pointer-events: all;
+          margin-top: 1rem;
+          margin-bottom: 1rem;
         }
 
         .phase-indicator {
@@ -933,6 +941,18 @@ export default function Synchrony() {
         }
 
         @media (max-width: 768px) {
+          .synchrony-hud {
+            padding-top: calc(1.5rem + var(--safe-area-top));
+            padding-bottom: calc(1.5rem + var(--safe-area-bottom));
+            padding-left: calc(1rem + var(--safe-area-left));
+            padding-right: calc(1rem + var(--safe-area-right));
+          }
+
+          .lobby-container,
+          .meditation-container {
+            gap: 1rem;
+          }
+
           .lobby-title {
             font-size: 1.8rem;
           }
@@ -943,6 +963,10 @@ export default function Synchrony() {
 
           .mission-statement {
             font-size: 1rem;
+          }
+
+          .info-card {
+            padding: 1.5rem;
           }
 
           .breath-circle-container {
