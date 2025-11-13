@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import * as THREE from 'three';
 import { Target, Flame, Zap } from 'lucide-react';
-import { StatusBar } from '@capacitor/status-bar';
 
 export default function TempleLayout() {
   const mountRef = useRef(null);
@@ -14,12 +13,14 @@ export default function TempleLayout() {
     document.body.style.paddingBottom = 'var(--safe-area-bottom)';
     document.body.style.background = '#2C2C2C';
     
-    // Disable StatusBar overlay for iOS
+    // Disable StatusBar overlay for iOS (only in native environment)
     const disableOverlay = async () => {
       try {
+        const { StatusBar } = await import('@capacitor/status-bar');
         await StatusBar.setOverlaysWebView({ overlay: false });
       } catch (error) {
-        // StatusBar not available (web environment)
+        // StatusBar not available (web environment or import failed)
+        console.log('StatusBar not available:', error.message);
       }
     };
     
@@ -122,7 +123,7 @@ export default function TempleLayout() {
   }, []);
 
   // Determine active route
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => location.pathname === path || location.pathname.startsWith(path);
 
   return (
     <div className="safe-page temple-page">
@@ -180,7 +181,7 @@ export default function TempleLayout() {
           flex-direction: column;
           align-items: center;
           gap: 0.3rem;
-          font-size: 0.75rem;
+          font-size: 0.65rem;
           font-family: 'Orbitron', monospace;
           text-transform: uppercase;
           letter-spacing: 0.1em;
@@ -206,23 +207,30 @@ export default function TempleLayout() {
       <div className="temple-bottom-nav">
         <Link 
           to="/heartwave-console" 
-          className={`temple-nav-btn ${isActive('/heartwave-console') ? 'active' : ''}`}
+          className={`temple-nav-btn ${isActive('/heartwave-console') || isActive('/heartwave/console') ? 'active' : ''}`}
         >
-          <Target size={24} />
+          <Target size={20} />
           <span>Routine</span>
         </Link>
         <Link 
           to="/heartwave" 
-          className={`temple-nav-btn ${isActive('/heartwave') ? 'active' : ''}`}
+          className={`temple-nav-btn ${isActive('/heartwave') && location.pathname === '/heartwave' ? 'active' : ''}`}
         >
-          <Flame size={24} />
+          <Flame size={20} />
           <span>Bio-Mods</span>
         </Link>
         <Link 
-          to="/heartwave-athena" 
-          className={`temple-nav-btn ${isActive('/heartwave-athena') ? 'active' : ''}`}
+          to="/heartwave-protocols" 
+          className={`temple-nav-btn ${isActive('/heartwave-protocols') || isActive('/heartwave/protocols') ? 'active' : ''}`}
         >
-          <Zap size={24} />
+          <Flame size={20} />
+          <span>Protocols</span>
+        </Link>
+        <Link 
+          to="/heartwave-athena" 
+          className={`temple-nav-btn ${isActive('/heartwave-athena') || isActive('/heartwave/athena') ? 'active' : ''}`}
+        >
+          <Zap size={20} />
           <span>ATHENA</span>
         </Link>
       </div>

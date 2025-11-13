@@ -121,18 +121,12 @@ function PagesContent() {
                 <Route path="/nexus-biohacking-lab" element={<ProtectedRoute><NexusBiohackingLab /></ProtectedRoute>} />
                 <Route path="/nexus-cosmic-observatory" element={<ProtectedRoute><NexusCosmicObservatory /></ProtectedRoute>} />
                 
-                {/* Temple Routes - Nested under TempleLayout */}
-                <Route path="/heartwave" element={<ProtectedRoute><TempleLayout /></ProtectedRoute>}>
-                  <Route index element={<Heartwave />} />
-                </Route>
-                <Route path="/heartwave-protocols" element={<ProtectedRoute><TempleLayout /></ProtectedRoute>}>
-                  <Route index element={<HeartwaveProtocols />} />
-                </Route>
-                <Route path="/heartwave-athena" element={<ProtectedRoute><TempleLayout /></ProtectedRoute>}>
-                  <Route index element={<HeartwaveAthena />} />
-                </Route>
-                <Route path="/heartwave-console" element={<ProtectedRoute><TempleLayout /></ProtectedRoute>}>
-                  <Route index element={<HeartwaveConsole />} />
+                {/* Temple Routes - Single persistent TempleLayout parent */}
+                <Route element={<ProtectedRoute><TempleLayout /></ProtectedRoute>}>
+                  <Route path="/heartwave" element={<Heartwave />} />
+                  <Route path="/heartwave-protocols" element={<HeartwaveProtocols />} />
+                  <Route path="/heartwave-athena" element={<HeartwaveAthena />} />
+                  <Route path="/heartwave-console" element={<HeartwaveConsole />} />
                 </Route>
                 
                 <Route path="/subscribe" element={<ProtectedRoute><Subscribe /></ProtectedRoute>} />
