@@ -57,7 +57,7 @@ INNERSYNC is a meditation and wellness platform built with Vite and React, offer
   - **Applied To**: All immersive pages (Portal, Synchrony, Foundation, Temple, Nexus carousel, Nexus sub-pages, Pineal Atrium, Wisdom Well, Account, Upgrade)
   - **Specific Implementations**:
     - Nexus: Header uses padding-top with safe area variable
-    - Temple: Page padding-top and header margin-top ensure title clears notch
+    - Temple: TempleLayout component provides persistent safe area wrapper for all Temple routes (/heartwave, /heartwave-protocols, /heartwave-athena, /heartwave-console). Uses nested routing with <Outlet/> to prevent safe area reset during navigation. Centralizes Three.js background, bottom navigation, and StatusBar control (conditionally imported on native platforms only via `window.Capacitor?.isNativePlatform()`). Applies safe area padding exactly once via `.safe-page.temple-page` class.
     - Pineal Atrium: Controls, instructions, and side panel all account for safe area insets
 
 ## External Dependencies
