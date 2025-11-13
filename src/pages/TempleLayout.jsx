@@ -15,12 +15,13 @@ export default function TempleLayout() {
     
     // Disable StatusBar overlay for iOS (only in native environment)
     const disableOverlay = async () => {
-      try {
-        const { StatusBar } = await import('@capacitor/status-bar');
-        await StatusBar.setOverlaysWebView({ overlay: false });
-      } catch (error) {
-        // StatusBar not available (web environment or import failed)
-        console.log('StatusBar not available:', error.message);
+      if (typeof window !== 'undefined' && window.Capacitor?.isNativePlatform()) {
+        try {
+          const { StatusBar } = await import('@capacitor/status-bar');
+          await StatusBar.setOverlaysWebView({ overlay: false });
+        } catch (error) {
+          console.log('StatusBar error:', error);
+        }
       }
     };
     
