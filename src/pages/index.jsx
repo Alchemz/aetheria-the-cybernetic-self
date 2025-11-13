@@ -27,8 +27,6 @@ import Heartwave from "./heartwave";
 
 import AdminSetup from "./admin-setup";
 
-import HeartwaveProtocols from "./heartwave-protocols";
-
 import HeartwaveAthena from "./heartwave-athena";
 
 import HeartwaveConsole from "./heartwave-console";
@@ -68,8 +66,6 @@ const PAGES = {
     heartwave: Heartwave,
     
     'admin-setup': AdminSetup,
-    
-    'heartwave-protocols': HeartwaveProtocols,
     
     'heartwave-athena': HeartwaveAthena,
     
@@ -124,7 +120,6 @@ function PagesContent() {
                 {/* Temple Routes - Single persistent TempleLayout parent */}
                 <Route element={<ProtectedRoute><TempleLayout /></ProtectedRoute>}>
                   <Route path="/heartwave" element={<Heartwave />} />
-                  <Route path="/heartwave-protocols" element={<HeartwaveProtocols />} />
                   <Route path="/heartwave-athena" element={<HeartwaveAthena />} />
                   <Route path="/heartwave-console" element={<HeartwaveConsole />} />
                 </Route>

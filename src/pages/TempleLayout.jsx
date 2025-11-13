@@ -217,13 +217,6 @@ export default function TempleLayout() {
           <span>Bio-Mods</span>
         </Link>
         <Link 
-          to="/heartwave-protocols" 
-          className={`temple-nav-btn ${isActive('/heartwave-protocols') || isActive('/heartwave/protocols') ? 'active' : ''}`}
-        >
-          <Flame size={20} />
-          <span>Protocols</span>
-        </Link>
-        <Link 
           to="/heartwave-athena" 
           className={`temple-nav-btn ${isActive('/heartwave-athena') || isActive('/heartwave/athena') ? 'active' : ''}`}
         >
