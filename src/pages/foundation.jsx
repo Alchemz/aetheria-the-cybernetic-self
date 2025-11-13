@@ -14,6 +14,7 @@ import {
   Play,
   Pause
 } from 'lucide-react';
+import { VoiceRecorder } from 'capacitor-voice-recorder';
 
 import { auth } from '@/api/supabaseClient';
 import { InvokeLLMStream } from '@/api/integrations';
@@ -954,145 +955,206 @@ export default function SleepSanctuary() { // Renamed from Foundation to SleepSa
     }, 500); // Match fadeOut animation duration
   };
 
-  // Initialize Speech Recognition with iOS-specific handling
+  // Initialize Speech Recognition (Web) or Voice Recorder (Native)
   useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      setSpeechRecognitionAvailable(true);
-      recognitionRef.current = new SpeechRecognition();
+    const initializeVoiceInput = async () => {
+      // Check if running in native Capacitor environment
+      const isNative = typeof window !== 'undefined' && window.Capacitor?.isNativePlatform();
       
-      // Speech recognition settings
-      recognitionRef.current.continuous = false;
-      recognitionRef.current.interimResults = false; // Only capture final results to prevent rapid-fire transcription
-      recognitionRef.current.lang = 'en-US';
-      recognitionRef.current.maxAlternatives = 1;
-
-      // Start event - confirms recording has begun
-      recognitionRef.current.onstart = () => {
-        console.log('🎤 Speech recognition started');
-        setIsRecording(true);
-      };
-
-      // Speech start - user actually started speaking
-      recognitionRef.current.onspeechstart = () => {
-        console.log('🗣️ User started speaking');
-      };
-
-      // Speech end - user stopped speaking
-      recognitionRef.current.onspeechend = () => {
-        console.log('🤐 User stopped speaking');
-      };
-
-      // Result event - transcription received (only final results)
-      recognitionRef.current.onresult = (event) => {
-        console.log('📝 Recognition result received:', event);
-        
-        let finalTranscript = '';
-        
-        // Process all results (should only be final since interimResults = false)
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            finalTranscript += transcript + ' ';
-            console.log('✅ Final transcript:', transcript);
+      if (isNative) {
+        console.log('🔧 Initializing Voice Recorder for native platform');
+        try {
+          // Request permissions for native voice recording
+          const permissionStatus = await VoiceRecorder.requestAudioRecordingPermission();
+          if (permissionStatus.value) {
+            setSpeechRecognitionAvailable(true);
+            console.log('✅ Voice Recorder permissions granted');
+          } else {
+            setSpeechRecognitionAvailable(false);
+            console.log('❌ Voice Recorder permissions denied');
           }
+        } catch (error) {
+          console.error('❌ Voice Recorder initialization failed:', error);
+          setSpeechRecognitionAvailable(false);
         }
-        
-        const textToAdd = finalTranscript.trim();
-        
-        if (textToAdd) {
-          setChatInput(prev => {
-            // Add a space if there's existing input
-            const newValue = prev ? prev + ' ' + textToAdd : textToAdd;
-            console.log('📥 Updated chat input:', newValue);
-            return newValue;
-          });
-        }
-      };
+      } else {
+        // Web platform - use Web Speech API
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+          setSpeechRecognitionAvailable(true);
+          recognitionRef.current = new SpeechRecognition();
+          
+          // Speech recognition settings - optimized for actual speech, not rhythm
+          recognitionRef.current.continuous = false; // Stop after one phrase
+          recognitionRef.current.interimResults = false; // Only final results (no rhythm detection)
+          recognitionRef.current.lang = 'en-US';
+          recognitionRef.current.maxAlternatives = 1;
 
-      // End event - recognition session ended
-      recognitionRef.current.onend = () => {
-        console.log('🛑 Speech recognition ended');
-        setIsRecording(false);
-      };
+          // Start event - confirms recording has begun
+          recognitionRef.current.onstart = () => {
+            console.log('🎤 Speech recognition started');
+            setIsRecording(true);
+          };
 
-      // Error event - something went wrong
-      recognitionRef.current.onerror = (event) => {
-        console.error('❌ Speech recognition error:', event.error);
-        setIsRecording(false);
-        
-        let errorMessage = '';
-        switch(event.error) {
-          case 'no-speech':
-            errorMessage = 'No speech detected. Please try again and speak clearly.';
-            break;
-          case 'audio-capture':
-            errorMessage = 'No microphone found. Please check if your microphone is connected.';
-            break;
-          case 'not-allowed':
-            errorMessage = 'Microphone access is required. Please enable microphone permissions in your device settings and try again.';
-            break;
-          case 'network':
-            errorMessage = 'Network error occurred. Please check your connection.';
-            break;
-          case 'aborted':
-            // Don't show error for aborted (user stopped it intentionally)
-            return;
-          case 'bad-grammar':
-            errorMessage = 'Could not understand speech. Please try again.';
-            break;
-          default:
-            errorMessage = `Speech recognition error: ${event.error}`;
-        }
-        
-        if (errorMessage) {
-          setChatMessages(prev => [...prev, { 
-            role: 'assistant', 
-            content: errorMessage
-          }]);
-        }
-      };
+          // Speech start - user actually started speaking
+          recognitionRef.current.onspeechstart = () => {
+            console.log('🗣️ User started speaking');
+          };
 
-      console.log('✅ Speech recognition initialized');
-    } else {
-      setSpeechRecognitionAvailable(false);
-      console.log('❌ Speech recognition not available on this device');
-    }
+          // Speech end - user stopped speaking
+          recognitionRef.current.onspeechend = () => {
+            console.log('🤐 User stopped speaking');
+          };
+
+          // Result event - transcription received (only final results)
+          recognitionRef.current.onresult = (event) => {
+            console.log('📝 Recognition result received:', event);
+            
+            let finalTranscript = '';
+            
+            // Process all results (should only be final since interimResults = false)
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+              const transcript = event.results[i][0].transcript;
+              if (event.results[i].isFinal) {
+                finalTranscript += transcript + ' ';
+                console.log('✅ Final transcript:', transcript);
+              }
+            }
+            
+            const textToAdd = finalTranscript.trim();
+            
+            if (textToAdd) {
+              setChatInput(prev => {
+                // Add a space if there's existing input
+                const newValue = prev ? prev + ' ' + textToAdd : textToAdd;
+                console.log('📥 Updated chat input:', newValue);
+                return newValue;
+              });
+            }
+          };
+
+          // End event - recognition session ended
+          recognitionRef.current.onend = () => {
+            console.log('🛑 Speech recognition ended');
+            setIsRecording(false);
+          };
+
+          // Error event - something went wrong
+          recognitionRef.current.onerror = (event) => {
+            console.error('❌ Speech recognition error:', event.error);
+            setIsRecording(false);
+            
+            let errorMessage = '';
+            switch(event.error) {
+              case 'no-speech':
+                errorMessage = 'No speech detected. Please try again and speak clearly.';
+                break;
+              case 'audio-capture':
+                errorMessage = 'No microphone found. Please check if your microphone is connected.';
+                break;
+              case 'not-allowed':
+                errorMessage = 'Microphone access is required. Please enable microphone permissions in your device settings and try again.';
+                break;
+              case 'network':
+                errorMessage = 'Network error occurred. Please check your connection.';
+                break;
+              case 'aborted':
+                // Don't show error for aborted (user stopped it intentionally)
+                return;
+              case 'bad-grammar':
+                errorMessage = 'Could not understand speech. Please try again.';
+                break;
+              default:
+                errorMessage = `Speech recognition error: ${event.error}`;
+            }
+            
+            if (errorMessage) {
+              setChatMessages(prev => [...prev, { 
+                role: 'assistant', 
+                content: errorMessage
+              }]);
+            }
+          };
+
+          console.log('✅ Speech recognition initialized (Web Speech API)');
+        } else {
+          setSpeechRecognitionAvailable(false);
+          console.log('❌ Speech recognition not available on this device');
+        }
+      }
+    };
+
+    initializeVoiceInput();
   }, []);
 
-  const handleMicToggle = () => {
-    if (!recognitionRef.current) {
-      setChatMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: 'Voice recording is not supported on your device. Please type your message instead.' 
-      }]);
-      return;
-    }
-
-    if (isRecording) {
-      console.log('⏹️ Stopping recording...');
-      recognitionRef.current.stop();
-    } else {
-      console.log('▶️ Starting recording...');
+  const handleMicToggle = async () => {
+    const isNative = typeof window !== 'undefined' && window.Capacitor?.isNativePlatform();
+    
+    if (isNative) {
+      // Native platform - use VoiceRecorder
       try {
-        recognitionRef.current.start();
-        setIsRecording(true);
-        console.log('🎤 Recognition started');
-      } catch (error) {
-        console.error('❌ Error starting speech recognition:', error);
-        setIsRecording(false);
-        
-        // Provide more helpful error message
-        if (error.name === 'NotAllowedError') {
+        if (isRecording) {
+          console.log('⏹️ Stopping native recording...');
+          const result = await VoiceRecorder.stopRecording();
+          setIsRecording(false);
+          
+          // Note: For actual speech-to-text on native, you would need to:
+          // 1. Send result.value.recordDataBase64 to a speech-to-text API
+          // 2. Process the transcription
+          // For now, show a message that this is being developed
           setChatMessages(prev => [...prev, { 
             role: 'assistant', 
-            content: 'Microphone access is required. Please enable microphone permissions in your device settings and try again.' 
+            content: 'Voice recording stopped. Native speech-to-text is being integrated.' 
           }]);
         } else {
-          setChatMessages(prev => [...prev, { 
-            role: 'assistant', 
-            content: 'Could not start recording. Please try again.' 
-          }]);
+          console.log('▶️ Starting native recording...');
+          await VoiceRecorder.startRecording();
+          setIsRecording(true);
+          console.log('🎤 Native recording started');
+        }
+      } catch (error) {
+        console.error('❌ Error with native voice recording:', error);
+        setIsRecording(false);
+        setChatMessages(prev => [...prev, { 
+          role: 'assistant', 
+          content: 'Could not start recording. Please ensure microphone permissions are enabled.' 
+        }]);
+      }
+    } else {
+      // Web platform - use SpeechRecognition
+      if (!recognitionRef.current) {
+        setChatMessages(prev => [...prev, { 
+          role: 'assistant', 
+          content: 'Voice recording is not supported on your device. Please type your message instead.' 
+        }]);
+        return;
+      }
+
+      if (isRecording) {
+        console.log('⏹️ Stopping speech recognition...');
+        recognitionRef.current.stop();
+      } else {
+        console.log('▶️ Starting speech recognition...');
+        try {
+          recognitionRef.current.start();
+          setIsRecording(true);
+          console.log('🎤 Speech recognition started');
+        } catch (error) {
+          console.error('❌ Error starting speech recognition:', error);
+          setIsRecording(false);
+          
+          // Provide more helpful error message
+          if (error.name === 'NotAllowedError') {
+            setChatMessages(prev => [...prev, { 
+              role: 'assistant', 
+              content: 'Microphone access is required. Please enable microphone permissions in your device settings and try again.' 
+            }]);
+          } else {
+            setChatMessages(prev => [...prev, { 
+              role: 'assistant', 
+              content: 'Could not start recording. Please try again.' 
+            }]);
+          }
         }
       }
     }

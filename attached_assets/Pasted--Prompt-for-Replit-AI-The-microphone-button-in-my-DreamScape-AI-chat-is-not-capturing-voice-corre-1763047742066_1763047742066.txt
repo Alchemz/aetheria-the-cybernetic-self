@@ -1,0 +1,86 @@
+🎤 Prompt for Replit AI
+
+The microphone button in my DreamScape AI chat is not capturing voice correctly.
+It detects some rhythm but struggles to actually pick up and transcribe speech.
+
+Fix this microphone extension completely so that:
+
+When the user taps the mic button, it requests microphone access and starts listening.
+
+It records clear voice input and converts it to text in real time using the Web Speech API (SpeechRecognition) or Capacitor Voice plugin if available.
+
+The speech transcription is stable — not restarting or cutting off mid-sentence.
+
+It automatically stops listening when the user taps the button again, or after a few seconds of silence.
+
+Add full error handling for permissions, unsupported browsers, or missing audio devices.
+
+Show a visual state (e.g., glowing mic icon or pulsing animation) while listening.
+
+Here’s a solid example structure:
+
+import React, { useState, useEffect } from 'react';
+
+const VoiceInput = ({ onResult }) => {
+  const [listening, setListening] = useState(false);
+  const [recognition, setRecognition] = useState(null);
+
+  useEffect(() => {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      console.error('SpeechRecognition not supported');
+      return;
+    }
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const rec = new SpeechRecognition();
+    rec.lang = 'en-US';
+    rec.continuous = false;
+    rec.interimResults = false;
+    rec.onresult = (e) => {
+      const text = e.results[0][0].transcript;
+      onResult(text);
+    };
+    rec.onerror = (e) => console.error('Speech error:', e);
+    setRecognition(rec);
+  }, []);
+
+  const toggleListening = () => {
+    if (!recognition) return;
+    if (listening) {
+      recognition.stop();
+      setListening(false);
+    } else {
+      recognition.start();
+      setListening(true);
+    }
+  };
+
+  return (
+    <button onClick={toggleListening} className={listening ? 'mic-active' : 'mic'}>
+      🎤
+    </button>
+  );
+};
+
+export default VoiceInput;
+
+
+Style .mic-active with a pulse animation to show it’s listening.
+
+If the app is running as a Capacitor native build, detect the environment and use:
+
+import { VoiceRecorder } from 'capacitor-voice-recorder';
+
+
+and then feed the audio to your AI endpoint or speech-to-text API.
+
+Also verify that microphone permission is properly declared in Info.plist:
+
+<key>NSMicrophoneUsageDescription</key>
+<string>We need microphone access for voice input in DreamScape AI.</string>
+
+
+Test flow:
+
+Tap mic → permission prompt → listens → transcribes → stops cleanly → sends text to chat input.
+
+No repeating restarts or partial detection.
