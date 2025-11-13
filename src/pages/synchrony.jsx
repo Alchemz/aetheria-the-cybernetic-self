@@ -262,17 +262,20 @@ export default function Synchrony() {
     return () => clearInterval(interval);
   }, [checkSessionActive, getJapanDateTime, getNextSessionTime]);
 
-  // Audio sequencer - plays audio files consecutively
+  // Audio sequencer - plays audio files consecutively with timeout fallback
   const playAudioSequence = useCallback((audioKeys, onComplete) => {
     if (!audioKeys || audioKeys.length === 0) {
+      console.log('✅ Audio sequence complete (no audios to play)');
       if (onComplete) onComplete();
       return;
     }
 
     let currentIndex = 0;
+    let timeoutId = null;
 
     const playNext = () => {
       if (currentIndex >= audioKeys.length) {
+        console.log('✅ Audio sequence complete');
         if (onComplete) onComplete();
         return;
       }
@@ -280,22 +283,35 @@ export default function Synchrony() {
       const audioKey = audioKeys[currentIndex];
       const audio = voiceAudioRefs.current[audioKey];
       
+      console.log(`🎵 Playing audio ${currentIndex + 1}/${audioKeys.length}: ${audioKey}`);
+      
       if (audio) {
         audio.currentTime = 0;
         
         const handleEnded = () => {
+          if (timeoutId) clearTimeout(timeoutId);
           audio.removeEventListener('ended', handleEnded);
+          console.log(`✅ Audio ${audioKey} ended`);
           currentIndex++;
           playNext();
         };
         
+        // Fallback timeout - if audio doesn't end in 30 seconds, move on
+        timeoutId = setTimeout(() => {
+          console.log(`⏭️ Audio ${audioKey} timeout - moving to next`);
+          audio.removeEventListener('ended', handleEnded);
+          currentIndex++;
+          playNext();
+        }, 30000);
+        
         audio.addEventListener('ended', handleEnded);
         audio.play().catch(err => {
-          console.log(`Audio ${audioKey} autoplay prevented:`, err);
+          console.log(`⚠️ Audio ${audioKey} autoplay prevented:`, err);
           // Still continue sequence even if one fails
           handleEnded();
         });
       } else {
+        console.log(`⚠️ Audio ${audioKey} not found - skipping`);
         currentIndex++;
         playNext();
       }
@@ -306,11 +322,21 @@ export default function Synchrony() {
 
   // Pre-meditation phase - plays intro audios before any animation
   useEffect(() => {
-    if (meditationPhase !== 'preMeditation' || voiceCuesPlayed.preMeditationComplete) return;
+    if (meditationPhase !== 'preMeditation') {
+      console.log(`⏭️ Not in preMeditation phase (current: ${meditationPhase})`);
+      return;
+    }
+    
+    if (voiceCuesPlayed.preMeditationComplete) {
+      console.log('⏭️ PreMeditation already completed');
+      return;
+    }
 
+    console.log('🎬 Starting preMeditation sequence...');
     // Play the 2 intro audios in sequence
     playAudioSequence(['letsBegin', 'forTwoMinutes'], () => {
       // After both audios complete, transition to box breathing
+      console.log('✅ PreMeditation complete - transitioning to box breathing');
       setVoiceCuesPlayed(prev => ({ ...prev, preMeditationComplete: true }));
       setMeditationPhase('boxBreathing');
       setPhaseTimer(0);
@@ -814,6 +840,8 @@ export default function Synchrony() {
           letter-spacing: 0.2em;
           text-transform: uppercase;
           text-align: center;
+          margin-bottom: 1rem;
+          width: 100%;
         }
 
         .breath-guide {
@@ -911,7 +939,7 @@ export default function Synchrony() {
         }
 
         .sovereigns-counter {
-          position: absolute;
+          position: fixed;
           top: calc(var(--safe-area-top) + 1rem);
           right: 1rem;
           background: rgba(0, 31, 63, 0.9);
@@ -921,6 +949,7 @@ export default function Synchrony() {
           padding: 0.75rem 1rem;
           pointer-events: all;
           text-align: center;
+          z-index: 100;
         }
 
         .counter-label-small {

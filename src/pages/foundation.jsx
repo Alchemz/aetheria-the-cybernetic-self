@@ -955,26 +955,27 @@ export default function SleepSanctuary() { // Renamed from Foundation to SleepSa
     }, 500); // Match fadeOut animation duration
   };
 
-  // Initialize Speech Recognition (Web) or Voice Recorder (Native)
+  // Initialize Speech Recognition (Web) - DO NOT request permissions here
   useEffect(() => {
     const initializeVoiceInput = async () => {
       // Check if running in native Capacitor environment
       const isNative = typeof window !== 'undefined' && window.Capacitor?.isNativePlatform();
       
       if (isNative) {
-        console.log('🔧 Initializing Voice Recorder for native platform');
+        console.log('🔧 Voice Recorder available for native platform');
+        // Check if permission already granted, but don't request yet
         try {
-          // Request permissions for native voice recording
-          const permissionStatus = await VoiceRecorder.requestAudioRecordingPermission();
+          const permissionStatus = await VoiceRecorder.hasPermission();
           if (permissionStatus.value) {
             setSpeechRecognitionAvailable(true);
-            console.log('✅ Voice Recorder permissions granted');
+            console.log('✅ Voice Recorder permissions already granted');
           } else {
-            setSpeechRecognitionAvailable(false);
-            console.log('❌ Voice Recorder permissions denied');
+            // Permission will be requested when user clicks mic button
+            setSpeechRecognitionAvailable(true);
+            console.log('🎤 Voice Recorder ready - will request permission on first use');
           }
         } catch (error) {
-          console.error('❌ Voice Recorder initialization failed:', error);
+          console.error('❌ Voice Recorder check failed:', error);
           setSpeechRecognitionAvailable(false);
         }
       } else {
@@ -1107,6 +1108,24 @@ export default function SleepSanctuary() { // Renamed from Foundation to SleepSa
             content: 'Voice recording stopped. Native speech-to-text is being integrated.' 
           }]);
         } else {
+          console.log('🔐 Checking microphone permissions...');
+          // Check permission first
+          const hasPermission = await VoiceRecorder.hasPermission();
+          
+          if (!hasPermission.value) {
+            console.log('📝 Requesting microphone permission...');
+            const requestResult = await VoiceRecorder.requestAudioRecordingPermission();
+            
+            if (!requestResult.value) {
+              console.log('❌ Permission denied');
+              setChatMessages(prev => [...prev, { 
+                role: 'assistant', 
+                content: 'Microphone permission is required for voice input. Please enable it in your device settings and try again.' 
+              }]);
+              return;
+            }
+          }
+          
           console.log('▶️ Starting native recording...');
           await VoiceRecorder.startRecording();
           setIsRecording(true);
@@ -1117,7 +1136,7 @@ export default function SleepSanctuary() { // Renamed from Foundation to SleepSa
         setIsRecording(false);
         setChatMessages(prev => [...prev, { 
           role: 'assistant', 
-          content: 'Could not start recording. Please ensure microphone permissions are enabled.' 
+          content: 'Could not start recording. Please ensure microphone permissions are enabled in your device settings.' 
         }]);
       }
     } else {
