@@ -817,7 +817,7 @@ export default function PinealAtrium() {
 
         .atrium-controls {
           position: fixed;
-          top: 20px;
+          top: calc(20px + var(--safe-area-top));
           left: 20px;
           right: 20px;
           z-index: 10;
@@ -882,7 +882,7 @@ export default function PinealAtrium() {
 
         .atrium-instructions {
           position: fixed;
-          bottom: 20px;
+          bottom: calc(20px + var(--safe-area-bottom));
           left: 50%;
           transform: translateX(-50%);
           z-index: 10;
@@ -908,15 +908,19 @@ export default function PinealAtrium() {
           right: 0;
           top: 0;
           width: 400px;
-          height: 100vh;
+          max-height: 100vh;
+          height: auto;
           background: rgba(0, 0, 0, 0.95);
           border-left: 2px solid #BA55D3;
           z-index: 20;
           padding: 30px;
-          padding-top: calc(30px + env(safe-area-inset-top));
+          padding-top: calc(30px + var(--safe-area-top));
+          padding-bottom: calc(30px + var(--safe-area-bottom));
           overflow-y: auto;
           transform: translateX(${selectedRegion ? '0' : '100%'});
           transition: transform 0.4s ease;
+          display: flex;
+          flex-direction: column;
         }
 
         .panel-header {
@@ -988,7 +992,7 @@ export default function PinealAtrium() {
 
         .hover-indicator {
           position: fixed;
-          bottom: 80px;
+          bottom: calc(80px + var(--safe-area-bottom));
           left: 50%;
           transform: translateX(-50%);
           z-index: 10;
@@ -1006,11 +1010,13 @@ export default function PinealAtrium() {
         @media (max-width: 768px) {
           .region-panel {
             width: 100%;
+            max-height: calc(100vh - var(--safe-area-top) - var(--safe-area-bottom));
           }
 
           .atrium-instructions {
             font-size: 0.7rem;
             padding: 10px 15px;
+            padding-bottom: calc(10px + var(--safe-area-bottom));
             flex-wrap: wrap;
             gap: 10px;
           }

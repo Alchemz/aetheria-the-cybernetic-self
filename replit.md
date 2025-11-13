@@ -50,7 +50,15 @@ INNERSYNC is a meditation and wellness platform built with Vite and React, offer
 - **Capacitor Configuration**: `capacitor.config.ts` defines App ID and Name. Includes iOS background audio support (Info.plist, AppDelegate.swift), safe area support, and voice/microphone permissions (NSMicrophoneUsageDescription, NSSpeechRecognitionUsageDescription). Custom chakra-themed app icon generated via `@capacitor/assets`.
 - **Backend Deployment**: Express backend deployed to Replit's autoscale platform, configured to serve API and static files from `dist/` on port 5000 in production, with environment-based API endpoint switching.
 - **Native Mobile App Behavior**: Viewport configured with `maximum-scale=1, user-scalable=no` to prevent pinch-zoom and double-tap zoom. Global CSS includes `touch-action: manipulation` to disable browser zoom gestures while preserving normal scrolling and tapping. Input fields use minimum 16px font size to prevent iOS auto-zoom. App behaves like a native mobile application across all platforms.
-- **Safe Area Implementation**: Global CSS custom properties (`--safe-area-top`, `--safe-area-bottom`, `--safe-area-left`, `--safe-area-right`) defined in `src/index.css` wrap `env(safe-area-inset-*)` to handle iPhone notches and home indicators. All pages use these centralized variables via `calc()` for consistent padding/positioning offsets, ensuring content never overlaps with device UI on iPhone 6.7" and other devices with notches. Applied across all immersive pages (Portal, Synchrony, Foundation, Temple, Nexus variants, Wisdom Well, Account, Upgrade).
+- **Safe Area Implementation**: 
+  - **Viewport Meta Tag**: `viewport-fit=cover` in `index.html` enables full-screen rendering with safe area support
+  - **Global CSS Variables**: (`--safe-area-top`, `--safe-area-bottom`, `--safe-area-left`, `--safe-area-right`) defined in `src/index.css` wrap `env(safe-area-inset-*)` to handle iPhone notches and home indicators
+  - **Consistent Application**: All pages use these centralized variables via `calc()` for consistent padding/positioning offsets, ensuring content never overlaps with device UI on iPhone 6.7" and other devices with notches
+  - **Applied To**: All immersive pages (Portal, Synchrony, Foundation, Temple, Nexus carousel, Nexus sub-pages, Pineal Atrium, Wisdom Well, Account, Upgrade)
+  - **Specific Implementations**:
+    - Nexus: Header uses padding-top with safe area variable
+    - Temple: Page padding-top and header margin-top ensure title clears notch
+    - Pineal Atrium: Controls, instructions, and side panel all account for safe area insets
 
 ## External Dependencies
 - **Supabase**: Authentication and PostgreSQL database.

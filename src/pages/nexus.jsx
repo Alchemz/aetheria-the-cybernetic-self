@@ -248,14 +248,14 @@ export default function Nexus() {
 
           .nexus-header {
             position: absolute;
-            top: calc(2rem + var(--safe-area-top));
+            top: 0;
             left: 0;
             right: 0;
             z-index: 200;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 2rem;
+            padding: calc(2rem + var(--safe-area-top)) 2rem 1rem;
           }
 
           .nexus-back {
@@ -280,7 +280,7 @@ export default function Nexus() {
 
           .nexus-subtitle {
             position: absolute;
-            top: calc(7rem + var(--safe-area-top));
+            top: calc(6.5rem + var(--safe-area-top));
             left: 0;
             right: 0;
             text-align: center;

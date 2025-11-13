@@ -1,0 +1,145 @@
+🛠️ One-Shot Prompt for Replit AI (safe-area + notch fix)
+
+I migrated a React web app (built for browser) into a native iOS app using Capacitor/CocoaPods. Titles are rendering under the notch. Fix safe-area handling across the app with these exact changes:
+
+1) index.html (viewport)
+
+Ensure the viewport tag is EXACTLY this (replace if different):
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+
+
+2) Global CSS (create or update src/styles/safe-area.css and import it once in the app root)
+
+Add safe-area CSS variables and helpers:
+
+:root {
+  /* Fallbacks for non-notch devices */
+  --safe-top: 0px;
+  --safe-bottom: 0px;
+  --safe-left: 0px;
+  --safe-right: 0px;
+}
+
+/* iOS notch support */
+@supports (padding-top: env(safe-area-inset-top)) {
+  :root {
+    --safe-top: env(safe-area-inset-top);
+    --safe-bottom: env(safe-area-inset-bottom);
+    --safe-left: env(safe-area-inset-left);
+    --safe-right: env(safe-area-inset-right);
+  }
+}
+
+/* Common layout helpers */
+.safe-page {
+  /* app background behind the notch */
+  background: #000; /* or your app bg */
+  min-height: 100dvh; /* modern viewport unit */
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+}
+
+/* Fixed/Sticky headers should sit below the notch */
+.safe-header {
+  position: sticky;
+  top: 0;
+  padding-top: var(--safe-top);
+  background: inherit;
+  z-index: 1000;
+}
+
+/* If you use position:fixed headers */
+.safe-header-fixed {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0; /* visual top */
+  padding-top: var(--safe-top);
+  z-index: 1000;
+}
+
+/* Body scroll bounce + overscroll behavior for iOS */
+html, body, #root {
+  height: 100%;
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
+  background: #000; /* match app bg to avoid white notch strip */
+}
+
+
+Import this once (e.g., in src/main.tsx or src/index.tsx):
+
+import './styles/safe-area.css';
+
+
+Ensure each top-level page/container wraps content with className="safe-page" and headers use safe-header or safe-header-fixed.
+
+3) Capacitor Status Bar (disable overlay OR account for it)
+
+Install plugin if missing: npm i @capacitor/status-bar
+
+In your app startup (e.g., src/capacitor-setup.ts called from main.tsx), add:
+
+import { StatusBar, Style } from '@capacitor/status-bar';
+
+(async () => {
+  try {
+    // Do NOT draw web content under the status bar
+    await StatusBar.setOverlaysWebView({ overlay: false });
+    // Optional: choose style that matches your header
+    await StatusBar.setStyle({ style: Style.Light });
+    // Optional: set status bar bg if needed
+    // await StatusBar.setBackgroundColor({ color: '#000000' });
+  } catch {}
+})();
+
+
+Ensure this file runs exactly once at app boot.
+
+4) Capacitor config
+
+In capacitor.config.ts or .json, verify platform defaults (iOS) don’t re-enable overlay:
+
+const config = {
+  appId: 'YOUR.APP.ID',
+  appName: 'YourApp',
+  webDir: 'build',
+  ios: {
+    // keep default; StatusBar plugin call controls overlay
+  }
+}
+export default config;
+
+
+5) Input zoom + accidental scaling (mobile Safari quirks)
+
+Prevent iOS auto-zoom on inputs and double-tap zoom. In global CSS (same file or global):
+
+/* Stop double-tap zoom & improve touch hit behavior */
+html, body {
+  touch-action: manipulation;
+}
+/* iOS zooms if font < 16px on inputs */
+input, textarea, select, button {
+  font-size: 16px;
+}
+
+
+6) Header components audit
+
+For every page with a title/header:
+
+If header is position: fixed or sticky, apply safe-header or safe-header-fixed.
+
+If you manually set top: 0, add padding-top: var(--safe-top) on the header or margin-top: var(--safe-top) on the first content section.
+
+7) Test checklist (automate if possible)
+
+iPhone with notch (simulator and device): titles must NOT render under the notch in portrait or landscape.
+
+Pages with scrollable content: ensure the first line of content isn’t obscured.
+
+Modals/Drawers/Toasts: add padding-top: var(--safe-top) if they anchor to the top.
+
+Apply these changes across the codebase and refactor any inline styles that hard-code top: 0 headers to use the provided helpers. Do not introduce breaking layout rewrites—just the safe-area fixes above.

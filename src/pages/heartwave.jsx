@@ -800,12 +800,15 @@ export default function TheTemple() {
               min-height: 100vh;
               color: white;
               font-family: 'Rajdhani', sans-serif;
-              padding: calc(1rem + var(--safe-area-top)) 1rem 100px;
+              padding: 1rem;
+              padding-top: calc(1.5rem + var(--safe-area-top));
+              padding-bottom: calc(100px + var(--safe-area-bottom));
               background: transparent !important;
             }
 
             .heartwave-header {
               margin-bottom: 2rem;
+              margin-top: 0.5rem;
             }
 
             .heartwave-header-top {
