@@ -261,6 +261,7 @@ export default function MeditationChamber() {
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap');
 
         .meditation-chamber {
+          min-height: 100dvh;
           min-height: 100vh;
           background: #000;
           color: white;

@@ -92,6 +92,7 @@ export default function AccountPage() {
       <div className="account-page">
         <style>{`
           .account-page {
+            min-height: 100dvh;
             min-height: 100vh;
             background: #000;
             color: white;
@@ -117,6 +118,7 @@ export default function AccountPage() {
       <div className="account-page">
         <style>{`
           .account-page {
+            min-height: 100dvh;
             min-height: 100vh;
             background: #000;
             color: white;
@@ -141,6 +143,7 @@ export default function AccountPage() {
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap');
 
         .account-page {
+          min-height: 100dvh;
           min-height: 100vh;
           background: #000;
           color: white;

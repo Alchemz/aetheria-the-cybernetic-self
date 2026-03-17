@@ -1,81 +1,42 @@
+import React, { Suspense } from 'react';
+import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import Layout from "./Layout.jsx";
 import TempleLayout from "./TempleLayout.jsx";
-
-import Foundation from "./foundation";
-
-import Portal from "./portal";
-
-import Wisdomwell from "./wisdomwell";
-
-import Nexus from "./nexus";
-
-import NexusFrequencyLab from "./nexus-frequency-lab";
-
-import NexusCosmicLibrary from "./nexus-cosmic-library";
-
-import Account from "./account";
-
-import NexusPinealAtrium from "./nexus-pineal-atrium";
-
-import NexusBiohackingLab from "./nexus-biohacking-lab";
-
-import NexusCosmicObservatory from "./nexus-cosmic-observatory";
-
-import Subscribe from "./subscribe";
-
-import Heartwave from "./heartwave";
-
-import AdminSetup from "./admin-setup";
-
-import HeartwaveAthena from "./heartwave-athena";
-
-import HeartwaveConsole from "./heartwave-console";
-
-import Synchrony from "./synchrony";
-
-import Upgrade from "./upgrade";
-
 import ProtectedRoute from "@/components/ProtectedRoute";
 
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+const LandingPage = React.lazy(() => import("./landing"));
+const MasterPortal = React.lazy(() => import("./master-portal"));
+const Wisdomwell = React.lazy(() => import("./wisdomwell"));
+const NexusFrequencyLab = React.lazy(() => import("./nexus-frequency-lab"));
+const NexusCosmicLibrary = React.lazy(() => import("./nexus-cosmic-library"));
+const Account = React.lazy(() => import("./account"));
+const NexusPinealAtrium = React.lazy(() => import("./nexus-pineal-atrium"));
+const NexusBiohackingLab = React.lazy(() => import("./nexus-biohacking-lab"));
+const Subscribe = React.lazy(() => import("./subscribe"));
+const Heartwave = React.lazy(() => import("./heartwave"));
+const AdminSetup = React.lazy(() => import("./admin-setup"));
+const HeartwaveAthena = React.lazy(() => import("./heartwave-athena"));
+const HeartwaveConsole = React.lazy(() => import("./heartwave-console"));
+const Synchrony = React.lazy(() => import("./synchrony"));
+const NexusOracle = React.lazy(() => import("./nexus-oracle"));
 
 const PAGES = {
-    
-    foundation: Foundation,
-    
-    portal: Portal,
-    
+    landing: LandingPage,
+    'master-portal': MasterPortal,
     wisdomwell: Wisdomwell,
-    
-    nexus: Nexus,
-    
     'nexus-frequency-lab': NexusFrequencyLab,
-    
     'nexus-cosmic-library': NexusCosmicLibrary,
-    
     account: Account,
-    
     'nexus-pineal-atrium': NexusPinealAtrium,
-    
     'nexus-biohacking-lab': NexusBiohackingLab,
-    
-    'nexus-cosmic-observatory': NexusCosmicObservatory,
-    
+    'nexus-oracle': NexusOracle,
     subscribe: Subscribe,
-    
     heartwave: Heartwave,
-    
     'admin-setup': AdminSetup,
-    
     'heartwave-athena': HeartwaveAthena,
-    
     'heartwave-console': HeartwaveConsole,
-    
     synchrony: Synchrony,
-    
-    upgrade: Upgrade,
-    
-}
+};
 
 function _getCurrentPage(url) {
     if (url.endsWith('/')) {
@@ -87,45 +48,50 @@ function _getCurrentPage(url) {
     }
 
     const pageName = Object.keys(PAGES).find(page => page.toLowerCase() === urlLastPart.toLowerCase());
-    return pageName || Object.keys(PAGES)[0];
+    return pageName || 'landing';
 }
 
-// Create a wrapper component that uses useLocation inside the Router context
 function PagesContent() {
     const location = useLocation();
     const currentPage = _getCurrentPage(location.pathname);
-    
+
     return (
         <Layout currentPageName={currentPage}>
-            <Routes>            
-                {/* Free Pages - No Protection */}
-                <Route path="/" element={<Portal />} />
-                <Route path="/portal" element={<Portal />} />
-                <Route path="/wisdomwell" element={<Wisdomwell />} />
-                <Route path="/wisdom-well" element={<Wisdomwell />} />
-                <Route path="/synchrony" element={<Synchrony />} />
-                <Route path="/upgrade" element={<Upgrade />} />
-                <Route path="/account" element={<Account />} />
-                <Route path="/admin-setup" element={<AdminSetup />} />
-                
-                {/* Paid Pages - Protected */}
-                <Route path="/foundation" element={<ProtectedRoute><Foundation /></ProtectedRoute>} />
-                <Route path="/nexus" element={<ProtectedRoute><Nexus /></ProtectedRoute>} />
-                <Route path="/nexus-frequency-lab" element={<ProtectedRoute><NexusFrequencyLab /></ProtectedRoute>} />
-                <Route path="/nexus-cosmic-library" element={<ProtectedRoute><NexusCosmicLibrary /></ProtectedRoute>} />
-                <Route path="/nexus-pineal-atrium" element={<ProtectedRoute><NexusPinealAtrium /></ProtectedRoute>} />
-                <Route path="/nexus-biohacking-lab" element={<ProtectedRoute><NexusBiohackingLab /></ProtectedRoute>} />
-                <Route path="/nexus-cosmic-observatory" element={<ProtectedRoute><NexusCosmicObservatory /></ProtectedRoute>} />
-                
-                {/* Temple Routes - Single persistent TempleLayout parent */}
-                <Route element={<ProtectedRoute><TempleLayout /></ProtectedRoute>}>
-                  <Route path="/heartwave" element={<Heartwave />} />
-                  <Route path="/heartwave-athena" element={<HeartwaveAthena />} />
-                  <Route path="/heartwave-console" element={<HeartwaveConsole />} />
-                </Route>
-                
-                <Route path="/subscribe" element={<ProtectedRoute><Subscribe /></ProtectedRoute>} />
-            </Routes>
+            <Suspense fallback={<div className="fixed inset-0 bg-black flex items-center justify-center text-white font-[Orbitron] tracking-widest animate-pulse">INITIATING DATA STREAM...</div>}>
+                <Routes>
+                    {/* Free Pages - No Protection */}
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/portal" element={<MasterPortal />} />
+                    <Route path="/account" element={<Account />} />
+                    <Route path="/admin-setup" element={<AdminSetup />} />
+
+                    {/* Unified Portal Experience */}
+                    <Route path="/foundation" element={<ProtectedRoute><MasterPortal /></ProtectedRoute>} />
+                    <Route path="/nexus" element={<ProtectedRoute><MasterPortal /></ProtectedRoute>} />
+                    <Route path="/wisdomwell" element={<ProtectedRoute><Wisdomwell /></ProtectedRoute>} />
+                    <Route path="/wisdom-well" element={<ProtectedRoute><Wisdomwell /></ProtectedRoute>} />
+                    <Route path="/synchrony" element={<ProtectedRoute><Synchrony /></ProtectedRoute>} />
+
+                    {/* Sub-modules remain separate for now until fully absorbed */}
+                    <Route path="/nexus-frequency-lab" element={<ProtectedRoute><NexusFrequencyLab /></ProtectedRoute>} />
+                    <Route path="/nexus-cosmic-library" element={<ProtectedRoute><NexusCosmicLibrary /></ProtectedRoute>} />
+                    <Route path="/nexus-pineal-atrium" element={<ProtectedRoute><NexusPinealAtrium /></ProtectedRoute>} />
+                    <Route path="/nexus-biohacking-lab" element={<ProtectedRoute><NexusBiohackingLab /></ProtectedRoute>} />
+                    <Route path="/nexus-oracle" element={<ProtectedRoute><NexusOracle /></ProtectedRoute>} />
+
+                    {/* Backward Compatibility Redirects */}
+                    <Route path="/nexus-cosmic-observatory" element={<Navigate to="/nexus" replace />} />
+
+                    {/* Temple Routes - Single persistent TempleLayout parent */}
+                    <Route element={<ProtectedRoute><TempleLayout /></ProtectedRoute>}>
+                        <Route path="/heartwave" element={<Heartwave />} />
+                        <Route path="/heartwave-athena" element={<HeartwaveAthena />} />
+                        <Route path="/heartwave-console" element={<HeartwaveConsole />} />
+                    </Route>
+
+                    <Route path="/subscribe" element={<ProtectedRoute><Subscribe /></ProtectedRoute>} />
+                </Routes>
+            </Suspense>
         </Layout>
     );
 }

@@ -13,19 +13,19 @@ export default function Synchrony() {
   const particlesRef = useRef([]);
   const centralLightRef = useRef(null);
   const audioRef = useRef(null);
-  
+
   const [participantCount, setParticipantCount] = useState(8421); // Simulated count
   const [timeUntilNext, setTimeUntilNext] = useState({ hours: 0, minutes: 0, seconds: 0 });
   const [sessionActive, setSessionActive] = useState(false);
   const [hasJoined, setHasJoined] = useState(false);
   const [sessionTime, setSessionTime] = useState(900); // 15 minutes in seconds
-  
+
   // New states for guided meditation
   const [meditationPhase, setMeditationPhase] = useState('lobby'); // 'lobby', 'preMeditation', 'boxBreathing', 'aumToning'
   const [breathPhase, setBreathPhase] = useState('inhale'); // 'inhale', 'hold1', 'exhale', 'hold2'
   const [breathProgress, setBreathProgress] = useState(0); // 0-100
   const [phaseTimer, setPhaseTimer] = useState(0); // Seconds in current phase
-  
+
   // Voice guidance audio refs - NEW 12-file system
   const voiceAudioRefs = useRef({
     // Pre-meditation (2 files)
@@ -44,7 +44,7 @@ export default function Synchrony() {
     asMorePeople: null,
     thisNet: null
   });
-  
+
   // Track which voice cues have been played
   const [voiceCuesPlayed, setVoiceCuesPlayed] = useState({
     preMeditationComplete: false,
@@ -58,11 +58,11 @@ export default function Synchrony() {
     d.setDate(d.getDate() + addDays);
 
     const options = {
-        timeZone: 'Asia/Tokyo',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hourCycle: 'h23'
+      timeZone: 'Asia/Tokyo',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hourCycle: 'h23'
     };
     const formatter = new Intl.DateTimeFormat('en-US', options);
     const parts = formatter.formatToParts(d);
@@ -70,9 +70,9 @@ export default function Synchrony() {
     const year = parts.find(p => p.type === 'year').value;
     const month = parts.find(p => p.type === 'month').value;
     const day = parts.find(p => p.type === 'day').value;
-    
+
     const japanISOString = `${year}-${month}-${day}T${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}.000+09:00`;
-    
+
     return new Date(japanISOString);
   }, []);
 
@@ -95,7 +95,7 @@ export default function Synchrony() {
     if (!mountRef.current) return;
 
     let renderer, scene, camera, centralLight, animationId;
-    
+
     try {
       scene = new THREE.Scene();
       scene.background = new THREE.Color(0x000000);
@@ -109,32 +109,68 @@ export default function Synchrony() {
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       mountRef.current.appendChild(renderer.domElement);
 
-      // Central Light Source - CYAN
-      const lightGeometry = new THREE.SphereGeometry(1, 32, 32);
-      const lightMaterial = new THREE.MeshBasicMaterial({
+      // Central AUM Core - PBR Premium Glass
+      const coreGeometry = new THREE.SphereGeometry(1, 64, 64);
+      const coreMaterial = new THREE.MeshPhysicalMaterial({
         color: 0x00FFFF,
+        metalness: 0.1,
+        roughness: 0.05,
+        transmission: 0.95, // Glass effect
+        thickness: 2,
+        iridescence: 1,
+        iridescenceIOR: 1.3,
         transparent: true,
-        opacity: 0.8
+        opacity: 0.8,
+        emissive: 0x00FFFF,
+        emissiveIntensity: 0.5
       });
-      centralLight = new THREE.Mesh(lightGeometry, lightMaterial);
+      centralLight = new THREE.Mesh(coreGeometry, coreMaterial);
       scene.add(centralLight);
       centralLightRef.current = centralLight;
 
-      // Add glow effect to central light - CYAN
-      const glowGeometry = new THREE.SphereGeometry(1.5, 32, 32);
-      const glowMaterial = new THREE.MeshBasicMaterial({
-        color: 0x00FFFF,
-        transparent: true,
-        opacity: 0.3,
-        side: THREE.BackSide
-      });
-      const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-      centralLight.add(glow);
+      // Internal Radiance Node
+      const innerGeometry = new THREE.SphereGeometry(0.4, 32, 32);
+      const innerMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+      const innerCore = new THREE.Mesh(innerGeometry, innerMaterial);
+      centralLight.add(innerCore);
 
-      // Grid background - CYAN
-      const gridHelper = new THREE.GridHelper(50, 50, 0x00FFFF, 0x003333);
-      gridHelper.position.y = -10;
-      gridHelper.material.opacity = 0.1;
+      // Multi-layered Glow Shells
+      for (let i = 0; i < 3; i++) {
+        const shellGeo = new THREE.SphereGeometry(1.2 + i * 0.4, 32, 32);
+        const shellMat = new THREE.MeshBasicMaterial({
+          color: 0x00FFFF,
+          transparent: true,
+          opacity: 0.15 - i * 0.04,
+          side: THREE.BackSide
+        });
+        const shell = new THREE.Mesh(shellGeo, shellMat);
+        centralLight.add(shell);
+      }
+
+      // Add Environmental Lights
+      const pointLight = new THREE.PointLight(0x00FFFF, 2, 50);
+      pointLight.position.set(5, 5, 5);
+      scene.add(pointLight);
+
+      const ambLight = new THREE.AmbientLight(0x404040, 0.5);
+      scene.add(ambLight);
+
+      // Starfield Background
+      const starGeometry = new THREE.BufferGeometry();
+      const starCount = 5000;
+      const starPos = new Float32Array(starCount * 3);
+      for (let i = 0; i < starCount * 3; i++) {
+        starPos[i] = (Math.random() - 0.5) * 100;
+      }
+      starGeometry.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+      const starMaterial = new THREE.PointsMaterial({ color: 0xFFFFFF, size: 0.05, transparent: true, opacity: 0.5 });
+      const stars = new THREE.Points(starGeometry, starMaterial);
+      scene.add(stars);
+
+      // Stylized Neon Grid
+      const gridHelper = new THREE.GridHelper(100, 50, 0x00D4FF, 0x001122);
+      gridHelper.position.y = -15;
+      gridHelper.material.opacity = 0.2;
       gridHelper.material.transparent = true;
       scene.add(gridHelper);
 
@@ -142,25 +178,25 @@ export default function Synchrony() {
 
       const animate = () => {
         const elapsedTime = clock.getElapsedTime();
-        
+
         // Pulsate central light based on meditation phase
         let pulse = Math.sin(elapsedTime * 2) * 0.2 + 1;
-        
+
         // Sync pulse with breath in active meditation
         if (meditationPhase === 'boxBreathing') {
           pulse = (breathProgress / 100) * 0.5 + 0.7;
         } else if (meditationPhase === 'aumToning') {
           pulse = (breathProgress / 100) * 0.8 + 0.6;
         }
-        
+
         centralLight.scale.set(pulse, pulse, pulse);
-        
+
         // Rotate particles
         particlesRef.current.forEach((particle, index) => {
           const radius = 3 + (index % 5);
           const speed = 0.3 + (index % 3) * 0.1;
           const offset = (index * Math.PI * 2) / particlesRef.current.length;
-          
+
           particle.position.x = Math.cos(elapsedTime * speed + offset) * radius;
           particle.position.y = Math.sin(elapsedTime * speed * 0.5 + offset) * (radius * 0.5);
           particle.position.z = Math.sin(elapsedTime * speed + offset) * radius;
@@ -190,7 +226,7 @@ export default function Synchrony() {
       };
     } catch (error) {
       console.warn('WebGL not available, running without 3D graphics:', error);
-      return () => {}; // Return empty cleanup function
+      return () => { }; // Return empty cleanup function
     }
   }, [meditationPhase, breathProgress]);
 
@@ -210,7 +246,7 @@ export default function Synchrony() {
           opacity: 0.9
         });
         const particle = new THREE.Mesh(particleGeometry, particleMaterial);
-        
+
         sceneRef.current.add(particle);
         particlesRef.current.push(particle);
       }
@@ -247,12 +283,12 @@ export default function Synchrony() {
         const diff = nextSession.getTime() - now.getTime();
 
         if (diff <= 0) {
-             setTimeUntilNext({ hours: 0, minutes: 0, seconds: 0 }); 
+          setTimeUntilNext({ hours: 0, minutes: 0, seconds: 0 });
         } else {
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-            setTimeUntilNext({ hours, minutes, seconds });
+          const hours = Math.floor(diff / (1000 * 60 * 60));
+          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+          setTimeUntilNext({ hours, minutes, seconds });
         }
       }
     };
@@ -282,12 +318,12 @@ export default function Synchrony() {
 
       const audioKey = audioKeys[currentIndex];
       const audio = voiceAudioRefs.current[audioKey];
-      
+
       console.log(`🎵 Playing audio ${currentIndex + 1}/${audioKeys.length}: ${audioKey}`);
-      
+
       if (audio) {
         audio.currentTime = 0;
-        
+
         const handleEnded = () => {
           if (timeoutId) clearTimeout(timeoutId);
           audio.removeEventListener('ended', handleEnded);
@@ -295,7 +331,7 @@ export default function Synchrony() {
           currentIndex++;
           playNext();
         };
-        
+
         // Fallback timeout - if audio doesn't end in 30 seconds, move on
         timeoutId = setTimeout(() => {
           console.log(`⏭️ Audio ${audioKey} timeout - moving to next`);
@@ -303,7 +339,7 @@ export default function Synchrony() {
           currentIndex++;
           playNext();
         }, 30000);
-        
+
         audio.addEventListener('ended', handleEnded);
         audio.play().catch(err => {
           console.log(`⚠️ Audio ${audioKey} autoplay prevented:`, err);
@@ -326,7 +362,7 @@ export default function Synchrony() {
       console.log(`⏭️ Not in preMeditation phase (current: ${meditationPhase})`);
       return;
     }
-    
+
     if (voiceCuesPlayed.preMeditationComplete) {
       console.log('⏭️ PreMeditation already completed');
       return;
@@ -351,19 +387,19 @@ export default function Synchrony() {
     const phaseDuration = 4000; // 4 seconds per phase
     const startTime = Date.now();
     let lastPhase = null;
-    
+
     const interval = setInterval(() => {
       const now = Date.now();
       const elapsedTime = now - startTime;
       const cyclePosition = elapsedTime % breathCycleDuration;
       const isFirstCycle = elapsedTime < breathCycleDuration;
-      
+
       if (cyclePosition < phaseDuration) {
         // Phase 1: Inhale (0-4s)
         if (lastPhase !== 'inhale') {
           setBreathPhase('inhale');
           lastPhase = 'inhale';
-          
+
           // Play "Breathe in for" voice cue only once at the very start
           if (isFirstCycle && !voiceCuesPlayed.boxBreathingCycle) {
             playVoiceGuidance('breatheIn');
@@ -375,7 +411,7 @@ export default function Synchrony() {
         if (lastPhase !== 'hold1') {
           setBreathPhase('hold1');
           lastPhase = 'hold1';
-          
+
           // Play "Hold 4 seconds" voice cue only in first cycle
           if (isFirstCycle && !voiceCuesPlayed.boxBreathingCycle) {
             playVoiceGuidance('hold4Seconds');
@@ -387,7 +423,7 @@ export default function Synchrony() {
         if (lastPhase !== 'exhale') {
           setBreathPhase('exhale');
           lastPhase = 'exhale';
-          
+
           // Play "And breathe out" voice cue only in first cycle
           if (isFirstCycle && !voiceCuesPlayed.boxBreathingCycle) {
             playVoiceGuidance('andBreatheOut');
@@ -399,7 +435,7 @@ export default function Synchrony() {
         if (lastPhase !== 'hold2') {
           setBreathPhase('hold2');
           lastPhase = 'hold2';
-          
+
           // Play "And hold" voice cue only in first cycle
           if (isFirstCycle && !voiceCuesPlayed.boxBreathingCycle) {
             playVoiceGuidance('andHold');
@@ -423,13 +459,13 @@ export default function Synchrony() {
     const exhaleDuration = 15000; // 15 seconds exhale with Aum
     const startTime = Date.now();
     let lastPhase = null;
-    
+
     const interval = setInterval(() => {
       const now = Date.now();
       const elapsedTime = now - startTime;
       const cyclePosition = elapsedTime % breathCycleDuration;
       const isFirstCycle = elapsedTime < breathCycleDuration;
-      
+
       if (cyclePosition < inhaleDuration) {
         // Inhale phase (0-10s)
         if (lastPhase !== 'inhale') {
@@ -456,11 +492,11 @@ export default function Synchrony() {
       const interval = setInterval(() => {
         setPhaseTimer(prev => {
           const newTime = prev + 1;
-          
+
           // After 2 minutes of box breathing, switch to Aum toning with 6-audio transition
           if (meditationPhase === 'boxBreathing' && newTime >= 120) {
             setMeditationPhase('aumToning');
-            
+
             // Play all 6 transition audios in sequence
             if (!voiceCuesPlayed.aumTransitionComplete) {
               setTimeout(() => {
@@ -472,10 +508,10 @@ export default function Synchrony() {
                 );
               }, 500);
             }
-            
+
             return 0;
           }
-          
+
           return newTime;
         });
       }, 1000);
@@ -555,7 +591,7 @@ export default function Synchrony() {
       setMeditationPhase('preMeditation'); // Start with pre-meditation phase
       setPhaseTimer(0);
       setParticipantCount(prev => prev + 1);
-      
+
       // Reset voice cues tracking for new session
       setVoiceCuesPlayed({
         preMeditationComplete: false,
@@ -570,7 +606,7 @@ export default function Synchrony() {
         setMeditationPhase('preMeditation'); // Start with pre-meditation phase
         setPhaseTimer(0);
         setParticipantCount(prev => prev + 1);
-        
+
         // Reset voice cues tracking for new session
         setVoiceCuesPlayed({
           preMeditationComplete: false,
@@ -597,7 +633,7 @@ export default function Synchrony() {
         default: return 'BREATHE';
       }
     } else if (meditationPhase === 'aumToning') {
-      return breathPhase === 'inhale' ? 'SLOW, DEEP INHALE...' : 'EXHALE WITH AUM...';
+      return breathPhase === 'inhale' ? 'NEURAL_INHALATION...' : 'AUM_RESONANCE_BROADCAST...';
     }
     return '';
   };
@@ -610,6 +646,7 @@ export default function Synchrony() {
         .synchrony-container {
           position: relative;
           width: 100vw;
+          height: 100dvh;
           height: 100vh;
           overflow: hidden;
           background: #000000;
@@ -682,137 +719,180 @@ export default function Synchrony() {
 
         .lobby-title {
           font-family: 'Orbitron', monospace;
-          font-size: 2.5rem;
+          font-size: 3rem;
           font-weight: 900;
-          letter-spacing: 0.2em;
-          color: #00FFFF;
-          text-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+          letter-spacing: 0.4em;
+          background: linear-gradient(to right, #FFFFFF, #00FFFF, #9370DB, #FFFFFF);
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: spectral-flow 8s linear infinite;
           text-align: center;
           margin-top: 0;
-          margin-bottom: 0;
+          margin-bottom: 1rem;
+          filter: drop-shadow(0 0 30px rgba(0, 255, 255, 0.3));
+        }
+
+        @keyframes spectral-flow {
+          0% { background-position: 0% center; }
+          100% { background-position: 200% center; }
         }
 
         .info-card {
-          background: rgba(0, 31, 63, 0.9);
-          backdrop-filter: blur(15px);
-          border: 2px solid rgba(0, 255, 255, 0.3);
-          border-radius: 20px;
-          padding: 2rem;
-          box-shadow: 
-            0 8px 32px rgba(0, 0, 0, 0.7),
-            inset 0 1px 0 rgba(0, 255, 255, 0.2);
+          background: rgba(0, 5, 20, 0.4);
+          backdrop-filter: blur(40px) saturate(180%);
+          -webkit-backdrop-filter: blur(40px) saturate(180%);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 32px;
+          padding: 2.5rem;
+          box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
           width: 100%;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .info-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0; height: 1px;
+          background: linear-gradient(90deg, transparent, #00FFFF, transparent);
+          opacity: 0.3;
         }
 
         .timer-large {
           text-align: center;
-          margin-bottom: 1.5rem;
+          margin-bottom: 2rem;
         }
 
         .timer-label {
           font-family: 'Orbitron', monospace;
-          font-size: 0.75rem;
-          color: rgba(0, 255, 255, 0.8);
-          letter-spacing: 0.2em;
-          margin-bottom: 0.75rem;
+          font-size: 0.7rem;
+          color: rgba(0, 255, 255, 0.5);
+          letter-spacing: 0.4em;
+          margin-bottom: 1rem;
           text-transform: uppercase;
+          font-weight: 900;
         }
 
         .timer-value {
           font-family: 'Orbitron', monospace;
-          font-size: 2.5rem;
-          font-weight: 700;
-          color: #00FFFF;
-          text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+          font-size: 3rem;
+          font-weight: 900;
+          background: linear-gradient(to bottom, #FFFFFF, #00FFFF);
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+          filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.4));
           letter-spacing: 0.1em;
         }
 
         .mission-statement {
-          color: rgba(255, 255, 255, 0.9);
+          color: rgba(255, 255, 255, 0.6);
           font-size: 1.1rem;
-          line-height: 1.7;
+          line-height: 1.8;
           text-align: center;
-          margin-bottom: 1.5rem;
+          margin-bottom: 2rem;
+          font-weight: 300;
         }
 
         .posture-instructions {
-          background: rgba(0, 255, 255, 0.05);
-          border: 1px solid rgba(0, 255, 255, 0.15);
-          border-radius: 12px;
-          padding: 1.25rem;
-          margin-bottom: 1.5rem;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 20px;
+          padding: 1.5rem;
+          margin-bottom: 2rem;
         }
 
         .posture-title {
           font-family: 'Orbitron', monospace;
-          font-size: 0.85rem;
+          font-size: 0.8rem;
           color: #00FFFF;
-          letter-spacing: 0.15em;
+          letter-spacing: 0.2em;
           text-transform: uppercase;
-          margin-bottom: 0.75rem;
+          margin-bottom: 1rem;
           text-align: center;
-          text-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+          font-weight: 900;
+          opacity: 0.8;
         }
 
         .posture-text {
-          color: rgba(255, 255, 255, 0.85);
-          font-size: 0.95rem;
-          line-height: 1.6;
+          color: rgba(255, 255, 255, 0.5);
+          font-size: 0.9rem;
+          line-height: 1.8;
           text-align: center;
           margin: 0;
+          font-family: 'Rajdhani', sans-serif;
         }
 
         .participant-display {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.75rem;
-          padding: 1rem;
-          background: rgba(0, 255, 255, 0.1);
-          border-radius: 10px;
-          border: 1px solid rgba(0, 255, 255, 0.2);
+          gap: 1rem;
+          padding: 1.2rem;
+          background: rgba(0, 255, 255, 0.05);
+          border-radius: 16px;
+          border: 1px solid rgba(0, 255, 255, 0.1);
+          margin-bottom: 1.5rem;
         }
 
         .participant-label {
           font-family: 'Orbitron', monospace;
           font-size: 0.7rem;
-          color: rgba(0, 255, 255, 0.8);
-          letter-spacing: 0.15em;
+          color: rgba(0, 255, 255, 0.6);
+          letter-spacing: 0.2em;
           text-transform: uppercase;
+          font-weight: 700;
         }
 
         .participant-count {
           font-family: 'Orbitron', monospace;
-          font-size: 1.8rem;
+          font-size: 2rem;
           font-weight: 900;
-          color: #00FFFF;
-          text-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+          color: #FFFFFF;
+          text-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
         }
 
         .join-wave-button {
-          background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(0, 212, 255, 0.1));
-          border: 2px solid #00FFFF;
-          color: #00FFFF;
-          padding: 1.2rem 3rem;
+          background: rgba(0, 255, 255, 0.1);
+          border: 1px solid rgba(0, 255, 255, 0.5);
+          color: #FFFFFF;
+          padding: 1.5rem 3rem;
           font-family: 'Orbitron', monospace;
-          font-size: 1.1rem;
-          font-weight: 700;
-          letter-spacing: 0.2em;
+          font-size: 1rem;
+          font-weight: 900;
+          letter-spacing: 0.4em;
           cursor: pointer;
-          transition: all 0.4s ease;
-          border-radius: 50px;
+          transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+          border-radius: 4px;
           text-transform: uppercase;
-          box-shadow: 
-            0 0 30px rgba(0, 255, 255, 0.4),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+          box-shadow: 0 0 40px rgba(0, 255, 255, 0.1);
           width: 100%;
           margin-top: 1rem;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .join-wave-button::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
+          transform: translateX(-100%);
+          transition: transform 0.8s ease;
+        }
+
+        .join-wave-button:hover:not(:disabled)::before {
+          transform: translateX(100%);
         }
 
         .join-wave-button:hover:not(:disabled) {
-          background: linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(0, 212, 255, 0.2));
-          box-shadow: 0 0 50px rgba(0, 255, 255, 0.8);
-          transform: scale(1.05);
+          background: rgba(0, 255, 255, 0.2);
+          border-color: #00FFFF;
+          box-shadow: 0 0 60px rgba(0, 255, 255, 0.3);
+          transform: translateY(-2px);
+          letter-spacing: 0.5em;
         }
 
         .join-wave-button:disabled {
@@ -835,13 +915,14 @@ export default function Synchrony() {
 
         .phase-indicator {
           font-family: 'Orbitron', monospace;
-          font-size: 0.9rem;
-          color: rgba(0, 255, 255, 0.7);
-          letter-spacing: 0.2em;
+          font-size: 0.8rem;
+          color: rgba(0, 255, 255, 0.4);
+          letter-spacing: 0.4em;
           text-transform: uppercase;
           text-align: center;
-          margin-bottom: 1rem;
+          margin-bottom: 2rem;
           width: 100%;
+          font-weight: 900;
         }
 
         .breath-guide {
@@ -863,18 +944,29 @@ export default function Synchrony() {
         }
 
         .breath-circle {
-          width: 200px;
-          height: 200px;
+          width: 220px;
+          height: 220px;
           border-radius: 50%;
-          background: radial-gradient(circle, rgba(0, 255, 255, 0.3), rgba(0, 212, 255, 0.1));
-          border: 3px solid #00FFFF;
+          background: radial-gradient(circle, rgba(0, 255, 255, 0.1), rgba(0, 0, 0, 0.5));
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
           box-shadow: 
-            0 0 40px rgba(0, 255, 255, 0.6),
-            inset 0 0 40px rgba(0, 255, 255, 0.2);
+            0 0 60px rgba(0, 255, 255, 0.2),
+            inset 0 0 30px rgba(255, 255, 255, 0.05);
           transition: all 0.1s ease-out;
           display: flex;
           align-items: center;
           justify-content: center;
+          position: relative;
+        }
+
+        .breath-circle::after {
+          content: '';
+          position: absolute;
+          inset: -5px;
+          border-radius: 50%;
+          border: 1px solid rgba(0, 255, 255, 0.3);
+          opacity: 0.5;
         }
 
         .breath-instruction {
@@ -900,9 +992,9 @@ export default function Synchrony() {
 
         .breath-bar {
           height: 100%;
-          background: linear-gradient(90deg, #00FFFF, #00D4FF);
+          background: linear-gradient(90deg, #00FFFF, #9370DB);
           transition: width 0.1s ease-out;
-          box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+          box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
           display: flex;
           align-items: center;
           justify-content: flex-end;
@@ -940,16 +1032,21 @@ export default function Synchrony() {
 
         .sovereigns-counter {
           position: fixed;
-          top: calc(var(--safe-area-top) + 1rem);
-          right: 1rem;
-          background: rgba(0, 31, 63, 0.9);
-          backdrop-filter: blur(10px);
-          border: 2px solid rgba(0, 255, 255, 0.3);
-          border-radius: 15px;
-          padding: 0.75rem 1rem;
+          bottom: calc(var(--safe-area-bottom) + 6rem);
+          right: 1.5rem;
+          background: rgba(0, 5, 20, 0.4);
+          backdrop-filter: blur(25px) saturate(180%);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 20px;
+          padding: 1.2rem 1.5rem;
           pointer-events: all;
           text-align: center;
           z-index: 100;
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          min-width: 140px;
         }
 
         .counter-label-small {
@@ -1013,9 +1110,9 @@ export default function Synchrony() {
           }
 
           .sovereigns-counter {
-            top: calc(var(--safe-area-top) + 0.75rem);
-            right: 0.75rem;
-            padding: 0.5rem 0.75rem;
+            bottom: calc(var(--safe-area-bottom) + 5rem);
+            right: 1rem;
+            padding: 0.75rem 1rem;
           }
           
           .counter-label-small {
@@ -1039,7 +1136,7 @@ export default function Synchrony() {
         {meditationPhase === 'lobby' && (
           <div className="lobby-container">
             <h1 className="lobby-title">THE SYNCHRONY</h1>
-            
+
             <div className="info-card">
               {sessionActive ? (
                 <>
@@ -1047,18 +1144,18 @@ export default function Synchrony() {
                     <div className="timer-label">SESSION ACTIVE - TIME REMAINING</div>
                     <div className="timer-value">{formatTime(sessionTime)}</div>
                   </div>
-                  
+
                   <p className="mission-statement">
-                    Join a global synchronized meditation. We use coherent breathing and the Aum vibration 
+                    Join a global synchronized meditation. We use coherent breathing and the Aum vibration
                     to generate a unified field of consciousness, raising the planet's frequency.
                   </p>
 
                   <div className="posture-instructions">
                     <div className="posture-title">Prepare Your Posture</div>
                     <p className="posture-text">
-                      Find a comfortable seated position with your back naturally straight. You may lean against 
-                      a wall, cushion, or bed frame for support—or sit freely without. If you're not feeling tired, 
-                      lying down is also acceptable. Once settled, gently close your eyes and allow yourself to be 
+                      Find a comfortable seated position with your back naturally straight. You may lean against
+                      a wall, cushion, or bed frame for support—or sit freely without. If you're not feeling tired,
+                      lying down is also acceptable. Once settled, gently close your eyes and allow yourself to be
                       guided through each step of the meditation.
                     </p>
                   </div>
@@ -1080,18 +1177,18 @@ export default function Synchrony() {
                       {timeUntilNext.hours.toString().padStart(2, '0')}H {timeUntilNext.minutes.toString().padStart(2, '0')}M
                     </div>
                   </div>
-                  
+
                   <p className="mission-statement">
-                    Join a global synchronized meditation. We use coherent breathing and the Aum vibration 
+                    Join a global synchronized meditation. We use coherent breathing and the Aum vibration
                     to generate a unified field of consciousness, raising the planet's frequency.
                   </p>
 
                   <div className="posture-instructions">
                     <div className="posture-title">Prepare Your Posture</div>
                     <p className="posture-text">
-                      Find a comfortable seated position with your back naturally straight. You may lean against 
-                      a wall, cushion, or bed frame for support—or sit freely without. If you're not feeling tired, 
-                      lying down is also acceptable. Once settled, gently close your eyes and allow yourself to be 
+                      Find a comfortable seated position with your back naturally straight. You may lean against
+                      a wall, cushion, or bed frame for support—or sit freely without. If you're not feeling tired,
+                      lying down is also acceptable. Once settled, gently close your eyes and allow yourself to be
                       guided through each step of the meditation.
                     </p>
                   </div>
@@ -1113,22 +1210,22 @@ export default function Synchrony() {
         {(meditationPhase === 'preMeditation' || meditationPhase === 'boxBreathing' || meditationPhase === 'aumToning') && (
           <>
             <div className="sovereigns-counter">
-              <div className="counter-label-small">SOVEREIGNS IN SYNC</div>
+              <div className="counter-label-small">NEURAL_SYNC_COUNT</div>
               <div className="counter-value-small">{participantCount.toLocaleString()}</div>
             </div>
 
             <div className="meditation-container">
               <div className="phase-indicator">
-                {meditationPhase === 'preMeditation' && 'PHASE 0: PREPARATION'}
-                {meditationPhase === 'boxBreathing' && 'PHASE 1: COHERENCE INDUCTION'}
-                {meditationPhase === 'aumToning' && 'PHASE 2: AUM RESONANCE'}
+                {meditationPhase === 'preMeditation' && 'STAGE_00 // INITIAL_CALIBRATION'}
+                {meditationPhase === 'boxBreathing' && 'STAGE_01 // COHERENCE_INDUCTION'}
+                {meditationPhase === 'aumToning' && 'STAGE_02 // AUM_RESONANCE_BROADCAST'}
               </div>
 
               {meditationPhase === 'boxBreathing' && (
                 <div className="breath-guide">
                   <div className="breath-circle-container">
-                    <div 
-                      className="breath-circle" 
+                    <div
+                      className="breath-circle"
                       style={{
                         transform: `scale(${0.7 + (breathProgress / 100) * 0.6})`
                       }}
@@ -1171,7 +1268,7 @@ export default function Synchrony() {
       </div>
 
       {/* Hidden audio element for 963 Hz meditation */}
-      <audio 
+      <audio
         ref={audioRef}
         src="https://Innersync-media.s3.us-east-005.backblazeb2.com/963+Hz+to+Connect++healing+Meditation+and+Healing+.mp3"
         loop

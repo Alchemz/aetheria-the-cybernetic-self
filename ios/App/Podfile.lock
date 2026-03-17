@@ -1,0 +1,63 @@
+PODS:
+  - Capacitor (7.4.4):
+    - CapacitorCordova
+  - CapacitorCommunitySpeechRecognition (7.0.1):
+    - Capacitor
+  - CapacitorCordova (7.4.4)
+  - CapacitorLocalNotifications (7.0.4):
+    - Capacitor
+  - CapacitorStatusBar (7.0.3):
+    - Capacitor
+  - CapacitorVoiceRecorder (7.0.6):
+    - Capacitor
+  - PurchasesHybridCommon (17.12.0):
+    - RevenueCat (= 5.45.0)
+  - RevenueCat (5.45.0)
+  - RevenuecatPurchasesCapacitor (11.2.9):
+    - Capacitor
+    - PurchasesHybridCommon (= 17.12.0)
+
+DEPENDENCIES:
+  - "Capacitor (from `../../node_modules/@capacitor/ios`)"
+  - "CapacitorCommunitySpeechRecognition (from `../../node_modules/@capacitor-community/speech-recognition`)"
+  - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
+  - "CapacitorLocalNotifications (from `../../node_modules/@capacitor/local-notifications`)"
+  - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
+  - CapacitorVoiceRecorder (from `../../node_modules/capacitor-voice-recorder`)
+  - "RevenuecatPurchasesCapacitor (from `../../node_modules/@revenuecat/purchases-capacitor`)"
+
+SPEC REPOS:
+  trunk:
+    - PurchasesHybridCommon
+    - RevenueCat
+
+EXTERNAL SOURCES:
+  Capacitor:
+    :path: "../../node_modules/@capacitor/ios"
+  CapacitorCommunitySpeechRecognition:
+    :path: "../../node_modules/@capacitor-community/speech-recognition"
+  CapacitorCordova:
+    :path: "../../node_modules/@capacitor/ios"
+  CapacitorLocalNotifications:
+    :path: "../../node_modules/@capacitor/local-notifications"
+  CapacitorStatusBar:
+    :path: "../../node_modules/@capacitor/status-bar"
+  CapacitorVoiceRecorder:
+    :path: "../../node_modules/capacitor-voice-recorder"
+  RevenuecatPurchasesCapacitor:
+    :path: "../../node_modules/@revenuecat/purchases-capacitor"
+
+SPEC CHECKSUMS:
+  Capacitor: 358dd1c3fdd71d969547b17e159fd8a7736cb45f
+  CapacitorCommunitySpeechRecognition: 3e03566c44c2bb3b52391a33d4518b1adbdeb38f
+  CapacitorCordova: bf648a636f3c153f652d312ae145fb508b6ffced
+  CapacitorLocalNotifications: ba2a08bd92887b08f352e6b2db430575cef0cea3
+  CapacitorStatusBar: 0659ddc7b1713764a05831463d215b177a15d054
+  CapacitorVoiceRecorder: 9158861be982f32d411769723a4d813d6ce46135
+  PurchasesHybridCommon: c8f805e0f6d3a557a6d63300d0402b8ae5219a48
+  RevenueCat: 9d0328a098bd0e1b425d91d136e643b72cd70326
+  RevenuecatPurchasesCapacitor: 163b3e05d6222ed479dd20c46ffd9efe5f943c68
+
+PODFILE CHECKSUM: d2cf2b106e3e9bad2a6a8c27900ac320d0cd5cdd
+
+COCOAPODS: 1.16.2

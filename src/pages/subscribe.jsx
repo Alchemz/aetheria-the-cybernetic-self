@@ -165,8 +165,9 @@ export default function SubscribePage() {
   if (loading) {
     return (
       <div style={{
-        width: '100vw',
-        height: '100vh',
+        width: '100%',
+        height: '100dvh',
+        minHeight: '-webkit-fill-available',
         background: '#000',
         display: 'flex',
         alignItems: 'center',
@@ -185,6 +186,7 @@ export default function SubscribePage() {
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap');
 
         .subscribe-page {
+          min-height: 100dvh;
           min-height: 100vh;
           background: #000;
           color: white;

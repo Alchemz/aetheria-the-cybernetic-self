@@ -60,7 +60,7 @@ export default function AdminSetup() {
 
   return (
     <div style={{
-      minHeight: '100vh',
+      minHeight: '100dvh',
       background: '#000',
       color: 'white',
       fontFamily: 'Orbitron, monospace',

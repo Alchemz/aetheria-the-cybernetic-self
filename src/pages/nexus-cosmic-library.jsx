@@ -106,6 +106,7 @@ export default function CosmicLibrary() {
     <div className="cosmic-library">
       <style>{`
         .cosmic-library {
+          min-height: 100dvh;
           min-height: 100vh;
           background: #000;
           color: white;

@@ -19,6 +19,7 @@ export default function Layout({ children, currentPageName }) {
         }
         
         .aetheria-layout {
+          min-height: 100dvh;
           min-height: 100vh;
           background: #000000;
           color: white;

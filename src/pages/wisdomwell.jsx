@@ -1,7 +1,64 @@
 
 import React, { useState } from 'react';
-import { ArrowLeft, ChevronDown, ChevronUp, Sparkles, Eye, Star, Sun, Moon, Flower2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  ArrowLeft, ChevronDown, ChevronUp, Sparkles, Eye, Star, Sun, Moon,
+  Flower2, Search, Database, ShieldCheck, Cpu, KeyRound, Flame,
+  CircleDashed, Focus, Sword, Gem, Waves, Music, LayoutGrid
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+const HolographicSigil = ({ Icon, isExpanded, id }) => {
+  return (
+    <div className="relative w-16 h-16 md:w-24 md:h-24 flex items-center justify-center group/sigil shrink-0">
+      {/* Orbital Discovery Ring */}
+      <div className={`absolute inset-0 border border-[#72A0FF]/10 rounded-full ${isExpanded ? 'animate-[spin_10s_linear_infinite]' : 'group-hover/sigil:animate-[spin_15s_linear_infinite]'}`}>
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#72A0FF] rounded-full shadow-[0_0_10px_#72A0FF]"></div>
+      </div>
+
+      {/* Secondary Pulse Ring */}
+      <motion.div
+        animate={isExpanded ? { scale: [1, 1.1, 1], opacity: [0.1, 0.3, 0.1] } : {}}
+        transition={{ duration: 4, repeat: Infinity }}
+        className="absolute inset-2 border border-[#72A0FF]/5 rounded-full"
+      />
+
+      {/* The Core Glass Container */}
+      <div className={`relative z-10 w-12 h-12 md:w-16 md:h-16 flex items-center justify-center transition-all duration-700 ${isExpanded ? 'bg-[#4A9EFF]/15 border-[#72A0FF] shadow-[0_0_50px_rgba(72,160,255,0.3)] scale-110' : 'bg-white/5 border-white/10 group-hover/sigil:bg-[#4A9EFF]/5 group-hover/sigil:border-[#72A0FF]/30'}`}
+        style={{
+          clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)',
+          borderWidth: '1px'
+        }}
+      >
+        {/* Internal Nebula Glow */}
+        <div className={`absolute inset-0 opacity-0 transition-opacity duration-700 bg-[radial-gradient(circle_at_50%_50%,rgba(74,158,255,0.3),transparent_70%)] ${isExpanded ? 'opacity-100' : 'group-hover/sigil:opacity-50'}`}></div>
+
+        {/* The Icon itself with bespoke styling */}
+        <div className="relative z-20">
+          <svg width="0" height="0" className="absolute">
+            <defs>
+              <linearGradient id={`icon-grad-${id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="white" />
+                <stop offset="100%" stopColor="#72A0FF" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <Icon
+            size={22}
+            strokeWidth={1.2}
+            className={`transition-all duration-700 md:w-7 md:h-7 ${isExpanded ? 'drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]' : 'text-white/40 group-hover/sigil:text-white'}`}
+            style={{ stroke: isExpanded ? `url(#icon-grad-${id})` : '' }}
+          />
+        </div>
+      </div>
+
+      {/* Background Static Geometric Burst */}
+      <div className={`absolute inset-4 opacity-[0.03] transition-all duration-700 pointer-events-none ${isExpanded ? 'rotate-45 scale-150 opacity-[0.07]' : ''}`}
+        style={{ backgroundImage: 'repeating-conic-gradient(#72A0FF 0% 1%, transparent 1% 10%)' }}>
+      </div>
+    </div>
+  );
+};
 
 export default function WisdomWell() {
   const [expandedCard, setExpandedCard] = useState(null);
@@ -9,84 +66,84 @@ export default function WisdomWell() {
   const wisdomThreads = [
     {
       id: 1,
-      icon: Star,
+      icon: KeyRound,
       title: "The Hermetic Principles",
       description: "The 7 universal laws governing reality from The Kybalion.",
       content: (
         <>
           <h3>THE HERMETIC PRINCIPLES: THE ARCHITECT'S BLUEPRINT</h3>
-          
+
           <p><em>Do not read this as philosophy. Read it as the source code of reality itself, the operating system your soul agreed to run on before you entered this dream of form.</em></p>
-          
+
           <p>These seven laws, whispered from the heart of Thoth-Hermes, are the master keys to understanding everything—from the spin of a galaxy to the storm in your mind. To master your sleep and your dreams, you must first understand the nature of the reality in which you are dreaming.</p>
-          
+
           <h4>I. THE PRINCIPLE OF MENTALISM</h4>
           <p><strong>"THE ALL is MIND; The Universe is Mental."</strong></p>
           <p>This is the first and final truth. The cosmos is not a dead, mechanical void. It is a living, thinking, infinite consciousness. The physical world you perceive is a mental construct, a projection of this one infinite mind. You are not a drop in the ocean; you are the entire ocean in a drop. Your thoughts are not harmless whispers; they are the first drafts of reality. The "silent alchemy of sleep" is where you, as a sovereign focal point of THE ALL, have the most direct access to the drafting table to rewrite your being.</p>
-          
+
           <h4>II. THE PRINCIPLE OF CORRESPONDENCE</h4>
           <p><strong>"As above, so below; as below, so above."</strong></p>
           <p>This is the law of fractal harmony. The spiral of a galaxy and the spiral of your DNA are the same pattern. The chaos of your day (the "below") is a perfect reflection of the chaos in your mind (the "above"). The external world is a mirror, showing you the vibrational state of your inner world. To calm your sleep, you must first calm your inner cosmos. The macrocosm and microcosm are in constant, unspoken dialogue.</p>
-          
+
           <h4>III. THE PRINCIPLE OF VIBRATION</h4>
           <p><strong>"Nothing rests; everything moves; everything vibrates."</strong></p>
           <p>Your fear has a frequency. Your love has a frequency. A rock has a frequency. The 432 Hz tone you listen to is not a metaphor; it is a surgical tool to recalibrate the dissonant vibration of stress back into the coherent frequency of peace. You are a walking symphony of vibrating energy, and sleep is your daily tuning session. To change your state, you must change your vibration.</p>
-          
+
           <h4>IV. THE PRINCIPLE OF POLARITY</h4>
           <p><strong>"Everything is dual; everything has poles; everything has its pair of opposites..."</strong></p>
           <p>Heat and cold, love and hate, wakefulness and sleep—these are not enemies, but the same thing, differing only in degree. The anxiety that keeps you awake is not the opposite of peace; it is undeveloped peace. By applying the mental art of Transmutation, you can shift your perspective along the pole. See the "nightmare" not as a terror, but as an intense, unintegrated lesson. The shadow cannot exist without a light to cast it.</p>
-          
+
           <h4>V. THE PRINCIPLE OF RHYTHM</h4>
           <p><strong>"Everything flows, out and in; everything has its tides..."</strong></p>
           <p>All of life is a pendulum swing. Your energy, your mood, your focus—they all have their rhythm. The descent into sleep and the ascent into wakefulness are the most fundamental rhythms you possess. You cannot hold the pendulum still. But by understanding this law, you can learn to neutralize its effects in your mind. You can observe the swing from anxiety to calm without being swept away by it, finding the still point in the center—the eye of the storm.</p>
-          
+
           <h4>VI. THE PRINCIPLE OF CAUSE AND EFFECT</h4>
           <p><strong>"Every Cause has its Effect; every Effect has its Cause..."</strong></p>
           <p>There is no such thing as chance. The universe is a court of divine justice. The effect of "restless sleep" has a cause: perhaps the caffeine, the unprocessed stress, the chaotic energy of the day. The effect of "vivid, healing dreams" also has a cause: the wind-down ritual, the clear intention, the coherent frequency. You are not a victim of your sleep. You are its cause. Take sovereignty.</p>
-          
+
           <h4>VII. THE PRINCIPLE OF GENDER</h4>
           <p><strong>"Gender is in everything; everything has its Masculine and Feminine Principles..."</strong></p>
           <p>This is not about biology. It is about the fundamental creative forces. The Masculine principle is the focused, active, projecting energy—your intention to sleep. The Feminine principle is the receptive, nurturing, generative energy—the state of allowing sleep to come. You must wield both. You cannot force sleep (overuse of Masculine), nor can you be a passive victim of insomnia (overuse of Feminine). You must set the clear intention, and then surrender to the process, allowing your body to perform its natural alchemy.</p>
-          
+
           <h4>TO INTEGRATE THIS, ASK YOURSELF:</h4>
           <p>• Which of these principles feels most alive to me right now?</p>
           <p>• Where in my life do I see the Principle of Correspondence playing out?</p>
           <p>• How can I use the Principle of Vibration tonight to shift my state before sleep?</p>
-          
+
           <p><em>This is not knowledge to be collected. It is a lens through which to see the world. Wield it wisely.</em></p>
         </>
       )
     },
     {
       id: 2,
-      icon: Sparkles,
+      icon: Flame,
       title: "The Christ Consciousness",
       description: "The esoteric wisdom of Jesus from the Sermon on the Mount.",
       content: (
         <>
           <h3>THE TEACHINGS OF CHRIST CONSCIOUSNESS</h3>
           <p><em>A roadmap to awakening the divine awareness within—the understanding that you are one with the Source of all life.</em></p>
-          
+
           <h4>THE BEATITUDES - The Path to Divine Consciousness</h4>
           <p><em>These are not passive blessings but active, energetic stances for the awakened seeker.</em></p>
-          
+
           <p><strong>"Blessed are the poor in spirit, for theirs is the kingdom of heaven."</strong></p>
           <p>This is the sacred starting point: the emptying of the ego. It is the conscious choice to release the need to know, control, and appear spiritually full. In this state of humble receptivity—this "holy emptiness"—the noise of the personal self subsides, and you become a clear vessel for the infinite. The "kingdom of heaven" is the direct experience of this unified consciousness.</p>
-          
+
           <p><strong>"Blessed are those who mourn, for they shall be comforted."</strong></p>
           <p>This sanctifies the full human experience. To "mourn" is to allow yourself to feel deeply—grief, pain, or the longing for a world more beautiful. This is not a state of victimhood, but of profound authenticity. By courageously feeling your pain without resistance, you alchemize it into compassion and profound inner peace. The "comfort" is the arrival of a grace that knows you are more than your suffering.</p>
-          
+
           <p><strong>"Blessed are the meek, for they shall inherit the earth."</strong></p>
           <p>"Meekness" is not weakness; it is mastered strength. It is the power of a river, not a dam. It is the quiet confidence that needs no validation, the gentle firmness that needs no force. This is the essence of Inner Sovereignty—you are unshakable because your power comes from your connection to Source, not from external approval or domination. You "inherit the earth" by living in harmonious, empowered co-creation with it.</p>
-          
+
           <h4>THE TEACHING ON LIGHT: Your Fundamental Identity</h4>
           <p><strong>"You are the light of the world. A city on a hill cannot be hidden. Let your light shine before others."</strong></p>
           <p>This is a declaration of your true nature, not a future goal. The journey is not one of becoming the light, but of remembering it and removing all that you have been taught that dims it. Your unique expression of this light is essential to the whole. To "hide your light" is to withhold your unique gift from a world that needs it. Your authentic expression—your joy, your creativity, your love—is your greatest service.</p>
-          
+
           <h4>THE LAW OF DIVINE RECIPROCITY: The Responsive Universe</h4>
           <p><strong>"Ask, and it will be given to you; seek, and you will find; knock, and it will be opened to you."</strong></p>
           <p>This is the cosmic law of cause and effect in action. The "asking" is the setting of a clear, heartfelt intention from your sovereign self. The "seeking" is the taking of aligned action—moving in faith toward your vision. The "knocking" is persistent, patient faith. The Universe is a conscious, responsive partner in your awakening, meeting your genuine vibration with matching opportunities and grace.</p>
-          
+
           <h4>THE INNER KINGDOM: The Seat of Your Sovereignty</h4>
           <p><strong>"The kingdom of God is within you."</strong></p>
           <p>All seeking ends here, in the silent space of your own being. You need not petition an external god or achieve a distant goal to find peace, love, or power. These are native qualities of your own consciousness, waiting to be discovered in the quiet mind and open heart. Turning inward is not an escape from the world, but the only way to engage with it from a place of wholeness and divine truth.</p>
@@ -95,27 +152,27 @@ export default function WisdomWell() {
     },
     {
       id: 3,
-      icon: Flower2,
+      icon: CircleDashed,
       title: "The Buddha's Path",
       description: "The Four Noble Truths and the Noble Eightfold Path to liberation.",
       content: (
         <>
           <h3>THE FOUR NOBLE TRUTHS</h3>
-          
+
           <h4>1. THE TRUTH OF SUFFERING (Dukkha)</h4>
           <p>Life contains suffering, dissatisfaction, and impermanence. This is not pessimism but realistic observation.</p>
-          
+
           <h4>2. THE TRUTH OF THE CAUSE OF SUFFERING (Samudaya)</h4>
           <p>Suffering arises from craving, attachment, and ignorance. We suffer because we cling to what is temporary and resist what is.</p>
-          
+
           <h4>3. THE TRUTH OF THE END OF SUFFERING (Nirodha)</h4>
           <p>Suffering can cease. Liberation is possible through the elimination of craving and the realization of true nature.</p>
-          
+
           <h4>4. THE TRUTH OF THE PATH (Magga)</h4>
           <p>There is a practical path to the end of suffering: The Noble Eightfold Path.</p>
-          
+
           <h3>THE NOBLE EIGHTFOLD PATH</h3>
-          
+
           <p><strong>RIGHT VIEW:</strong> Understanding the Four Noble Truths and the nature of reality.</p>
           <p><strong>RIGHT INTENTION:</strong> Commitment to mental and ethical growth with thoughts of renunciation, goodwill, and harmlessness.</p>
           <p><strong>RIGHT SPEECH:</strong> Speaking truthfully, avoiding gossip, harsh words, and idle chatter.</p>
@@ -129,42 +186,42 @@ export default function WisdomWell() {
     },
     {
       id: 4,
-      icon: Eye,
+      icon: Focus,
       title: "The Yoga Sutras of Patanjali",
       description: "The 8 limbs of Yoga—the path to self-realization.",
       content: (
         <>
           <h3>THE EIGHT LIMBS OF YOGA</h3>
-          
+
           <h4>1. YAMA (Ethical Restraints)</h4>
           <p><strong>Ahimsa:</strong> Non-violence in thought, word, and deed.</p>
           <p><strong>Satya:</strong> Truthfulness.</p>
           <p><strong>Asteya:</strong> Non-stealing.</p>
           <p><strong>Brahmacharya:</strong> Moderation and control of the senses.</p>
           <p><strong>Aparigraha:</strong> Non-possessiveness, letting go of greed.</p>
-          
+
           <h4>2. NIYAMA (Personal Observances)</h4>
           <p><strong>Saucha:</strong> Purity of body and mind.</p>
           <p><strong>Santosha:</strong> Contentment.</p>
           <p><strong>Tapas:</strong> Self-discipline and austerity.</p>
           <p><strong>Svadhyaya:</strong> Self-study and study of sacred texts.</p>
           <p><strong>Ishvara Pranidhana:</strong> Surrender to the divine.</p>
-          
+
           <h4>3. ASANA (Physical Postures)</h4>
           <p>Steady and comfortable postures that prepare the body for meditation.</p>
-          
+
           <h4>4. PRANAYAMA (Breath Control)</h4>
           <p>Regulation of the breath to control the flow of prana (life force energy).</p>
-          
+
           <h4>5. PRATYAHARA (Withdrawal of Senses)</h4>
           <p>Turning inward by withdrawing the senses from external objects.</p>
-          
+
           <h4>6. DHARANA (Concentration)</h4>
           <p>Focused attention on a single point or object.</p>
-          
+
           <h4>7. DHYANA (Meditation)</h4>
           <p>Uninterrupted flow of concentration, sustained meditation.</p>
-          
+
           <h4>8. SAMADHI (Absorption)</h4>
           <p>Complete absorption, union with the object of meditation, enlightenment.</p>
         </>
@@ -172,31 +229,31 @@ export default function WisdomWell() {
     },
     {
       id: 5,
-      icon: Sun,
+      icon: Sword,
       title: "The Bhagavad Gita",
       description: "The path of Dharma, duty, and devotion from Krishna's teachings.",
       content: (
         <>
           <h3>THE TEACHINGS OF THE BHAGAVAD GITA</h3>
-          
+
           <h4>THE THREE PATHS TO LIBERATION</h4>
-          
+
           <p><strong>KARMA YOGA (Path of Action):</strong></p>
           <p>"You have a right to perform your prescribed duties, but you are not entitled to the fruits of your actions."</p>
           <p>Act without attachment to outcomes. Perform your duty with devotion, offering the results to the divine.</p>
-          
+
           <p><strong>BHAKTI YOGA (Path of Devotion):</strong></p>
           <p>"Those who worship Me with devotion, I am in them and they are in Me."</p>
           <p>Cultivate love and devotion to the divine in all its forms. Surrender the ego and find union through love.</p>
-          
+
           <p><strong>JNANA YOGA (Path of Knowledge):</strong></p>
           <p>"The soul is neither born, and nor does it die. It is unborn, eternal, ever-existing, and primeval."</p>
           <p>Realize the true self (Atman) through wisdom and discrimination between the real and unreal.</p>
-          
+
           <h4>ON DHARMA (Righteous Duty)</h4>
           <p>"It is better to perform one's own duties imperfectly than to master the duties of another."</p>
           <p>Live in alignment with your true nature and purpose. Your dharma is your unique expression of the divine.</p>
-          
+
           <h4>ON EQUANIMITY</h4>
           <p>"One who is not disturbed in mind even amidst the threefold miseries or elated when there is happiness has attained true wisdom."</p>
           <p>Cultivate balance and steadiness in all circumstances.</p>
@@ -205,30 +262,30 @@ export default function WisdomWell() {
     },
     {
       id: 6,
-      icon: Star,
+      icon: Gem,
       title: "The Emerald Tablet",
       description: "The ancient alchemical wisdom of Hermes Trismegistus.",
       content: (
         <>
           <h3>THE EMERALD TABLET OF HERMES</h3>
-          
+
           <p><em>True, without falsehood, certain and most true:</em></p>
-          
+
           <p><strong>"That which is below is like that which is above, and that which is above is like that which is below, to accomplish the miracles of the one thing."</strong></p>
           <p>The fundamental law of correspondence—patterns repeat at all levels of existence.</p>
-          
+
           <p><strong>"And as all things have been and arose from One, by the mediation of One, so all things have their birth from this One Thing by adaptation."</strong></p>
           <p>All creation emanates from a single source. Diversity arises from unity.</p>
-          
+
           <p><strong>"The Sun is its father, the Moon its mother, the Wind hath carried it in its belly, the Earth is its nurse."</strong></p>
           <p>The four elements and celestial forces combine to create and sustain life.</p>
-          
+
           <p><strong>"Separate thou the earth from the fire, the subtle from the gross, sweetly with great industry."</strong></p>
           <p>The alchemical process of purification—refining consciousness by separating the essential from the non-essential.</p>
-          
+
           <p><strong>"It ascends from the earth to the heaven and again it descends to the earth, and receives the force of things superior and inferior."</strong></p>
           <p>The cycle of evolution—spirit descends into matter and matter ascends back to spirit, gaining wisdom through experience.</p>
-          
+
           <p><strong>"By this means you shall have the glory of the whole world, and thereby all obscurity shall fly from you."</strong></p>
           <p>Through this understanding, you gain mastery over reality and illuminate all darkness.</p>
         </>
@@ -236,33 +293,33 @@ export default function WisdomWell() {
     },
     {
       id: 7,
-      icon: Moon,
+      icon: Waves,
       title: "The Tao Te Ching",
       description: "The philosophy of Wu Wei and the flow of the Tao.",
       content: (
         <>
           <h3>THE WAY OF THE TAO</h3>
-          
+
           <h4>THE NATURE OF THE TAO</h4>
           <p>"The Tao that can be told is not the eternal Tao. The name that can be named is not the eternal name."</p>
           <p>Ultimate reality transcends words and concepts. It must be experienced directly.</p>
-          
+
           <h4>WU WEI (Non-Action)</h4>
           <p>"The Tao does nothing, yet leaves nothing undone."</p>
           <p>Wu Wei is not inaction but effortless action—acting in harmony with the natural flow of life, without force or struggle.</p>
-          
+
           <h4>THE POWER OF SOFTNESS</h4>
           <p>"Nothing in the world is as soft and yielding as water. Yet for dissolving the hard and inflexible, nothing can surpass it."</p>
           <p>True strength lies in flexibility and gentleness, not in rigidity and force.</p>
-          
+
           <h4>EMBRACING SIMPLICITY</h4>
           <p>"In the pursuit of learning, every day something is acquired. In the pursuit of Tao, every day something is dropped."</p>
           <p>Wisdom comes through unlearning, simplification, and returning to natural spontaneity.</p>
-          
+
           <h4>THE UNCARVED BLOCK (P'u)</h4>
           <p>"Return to the root and you will find the meaning."</p>
           <p>Maintain the simplicity and purity of your original nature, unconditioned by society and ego.</p>
-          
+
           <h4>YIN AND YANG</h4>
           <p>"Being and non-being create each other. Difficult and easy support each other."</p>
           <p>Opposites are complementary. Harmony arises from the balance of polarities.</p>
@@ -271,29 +328,29 @@ export default function WisdomWell() {
     },
     {
       id: 8,
-      icon: Sparkles,
+      icon: Music,
       title: "The Stories of Krishna",
       description: "Divine plays and teachings from the Bhagavata Purana.",
       content: (
         <>
           <h3>THE DIVINE LEELAS OF KRISHNA</h3>
-          
+
           <h4>THE BUTTER THIEF</h4>
           <p>Young Krishna steals butter from the village homes, enchanting all with his innocence and charm.</p>
           <p><strong>The Teaching:</strong> The divine comes to steal your heart—not through force, but through irresistible love and playfulness. Surrender is sweet, not serious.</p>
-          
+
           <h4>LIFTING GOVARDHAN HILL</h4>
           <p>When villagers worship Indra out of fear, Krishna teaches them to honor their immediate environment—the hill that provides for them. When Indra rages, Krishna lifts the entire Govardhan Hill on his little finger to shelter all.</p>
           <p><strong>The Teaching:</strong> True divinity protects without effort. The divine doesn't need grand displays—it simply IS, and that is enough.</p>
-          
+
           <h4>THE DANCE WITH THE GOPIS (Rasa Lila)</h4>
           <p>Krishna multiplies himself to dance with each gopi simultaneously, each believing she alone is with him.</p>
           <p><strong>The Teaching:</strong> The divine is infinitely present, fully available to each soul individually. God's love is not divided—it is complete for everyone.</p>
-          
+
           <h4>KALIYA THE SERPENT</h4>
           <p>Krishna dances on the heads of the poisonous serpent Kaliya, subduing but not killing him, then sends him away to live peacefully.</p>
           <p><strong>The Teaching:</strong> Darkness and poison are not to be destroyed but transformed. Even the toxic parts of existence have their place when balanced by consciousness.</p>
-          
+
           <h4>THE FLUTE</h4>
           <p>Krishna's flute calls all beings irresistibly to him. The flute itself is hollow—empty.</p>
           <p><strong>The Teaching:</strong> To receive the divine, become empty like the flute. The ego must hollow itself to become an instrument of the infinite.</p>
@@ -308,27 +365,27 @@ export default function WisdomWell() {
       content: (
         <>
           <h3>THE GOSPEL OF THOMAS - SAYINGS OF JESUS</h3>
-          
+
           <h4>THE KINGDOM IS WITHIN</h4>
           <p>"If those who lead you say, 'See, the Kingdom is in the sky,' then the birds will precede you. If they say, 'It is in the sea,' then the fish will precede you. Rather, the Kingdom is inside of you, and it is outside of you."</p>
           <p>The divine realm is not a distant place but a state of consciousness, accessible here and now.</p>
-          
+
           <h4>KNOW THYSELF</h4>
           <p>"When you come to know yourselves, then you will be known, and you will realize that you are the children of the living Father."</p>
           <p>Self-knowledge is God-knowledge. To know your true nature is to know divinity.</p>
-          
+
           <h4>BECOME AS A CHILD</h4>
           <p>"When you make the two one, and when you make the inside like the outside... then you will enter the Kingdom."</p>
           <p>Integration and wholeness—transcending duality—is the key to enlightenment.</p>
-          
+
           <h4>THE LIGHT WITHIN</h4>
           <p>"There is light within a person of light, and it lights up the whole world. If it does not shine, there is darkness."</p>
           <p>You are either emanating consciousness or unconsciousness. There is no neutral state.</p>
-          
+
           <h4>SEEK AND YOU WILL FIND</h4>
           <p>"Let him who seeks continue seeking until he finds. When he finds, he will become troubled. When he becomes troubled, he will be astonished, and he will rule over all."</p>
           <p>The path to truth disturbs the false self before revealing liberation.</p>
-          
+
           <h4>SPLIT A PIECE OF WOOD</h4>
           <p>"Split a piece of wood; I am there. Lift up the stone, and you will find me there."</p>
           <p>The Christ consciousness (divine awareness) pervades all of material reality. God is immanent, not transcendent alone.</p>
@@ -337,40 +394,43 @@ export default function WisdomWell() {
     },
     {
       id: 10,
-      icon: Flower2,
+      icon: LayoutGrid,
       title: "Jungian Archetypes",
       description: "Carl Jung's concepts of the Collective Unconscious and archetypes.",
       content: (
         <>
           <h3>THE JUNGIAN ARCHETYPES</h3>
-          
+
           <h4>THE COLLECTIVE UNCONSCIOUS</h4>
           <p>Beneath personal consciousness lies a deeper layer shared by all humanity—the collective unconscious. It contains universal patterns of experience and behavior: the archetypes.</p>
-          
+
           <h4>THE MAJOR ARCHETYPES</h4>
-          
+
           <p><strong>THE SELF:</strong></p>
           <p>The totality of the psyche, the union of conscious and unconscious. The Self is the organizing principle, the source of wholeness. The goal of individuation is to realize the Self.</p>
-          
+
           <p><strong>THE SHADOW:</strong></p>
           <p>The unconscious, rejected aspects of your personality. What you deny in yourself. Integrating the shadow is essential for wholeness—you cannot be whole by only accepting the "good" parts.</p>
-          
+
           <p><strong>THE ANIMA/ANIMUS:</strong></p>
           <p>The Anima is the feminine aspect within a man; the Animus is the masculine aspect within a woman. These are the inner contrasexual images that mediate between ego and unconscious.</p>
-          
+
           <p><strong>THE PERSONA:</strong></p>
           <p>The mask you wear in social situations—the public self. While necessary for functioning, over-identification with the persona leads to loss of genuine self.</p>
-          
+
           <h4>OTHER KEY ARCHETYPES</h4>
-          
+
           <p><strong>THE HERO:</strong> The one who confronts challenges and emerges transformed.</p>
           <p><strong>THE WISE OLD MAN/WOMAN:</strong> The archetype of wisdom and guidance.</p>
           <p><strong>THE TRICKSTER:</strong> The disruptor, the one who breaks rules and brings necessary chaos.</p>
           <p><strong>THE MOTHER:</strong> Nourishment, protection, unconditional love.</p>
           <p><strong>THE FATHER:</strong> Structure, authority, law.</p>
-          
+
           <h4>INDIVIDUATION</h4>
-          <p>"Until you make the unconscious conscious, it will direct your life and you will call it fate."</p>
+          <div className="wisdom-dossier-card">
+            <div className="data-stream-glow"></div>
+            <p>"Until you make the unconscious conscious, it will direct your life and you will call it fate."</p>
+          </div>
           <p>The process of becoming a psychologically mature individual—integrating the conscious and unconscious, the personal and collective, into a unified Self.</p>
         </>
       )
@@ -382,367 +442,295 @@ export default function WisdomWell() {
   };
 
   return (
-    <div className="wisdom-well">
+    <div className="wisdom-well bg-black text-white font-['Exo_2'] min-h-screen relative overflow-x-hidden pt-24 pb-20">
+      {/* HUD OVERLAYS */}
+      <div className="fixed inset-0 pointer-events-none z-[1]">
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] mix-blend-overlay"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black/80"></div>
+        {/* Scanlines */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.02),rgba(0,255,0,0.01),rgba(0,0,255,0.02))] bg-[length:100%_4px,3px_100%] pointer-events-none"></div>
+      </div>
+
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&family=Space+Mono&display=swap');
+        
+        .wisdom-well { isolation: isolate; }
+        .wisdom-well * { border-color: rgba(74, 158, 255, 0.2); }
 
-        @keyframes cyan-glow {
-          0%, 100% {
-            text-shadow: 0 0 20px #4A9EFF, 0 0 30px #00FFFF;
-          }
-          50% {
-            text-shadow: 0 0 30px #4A9EFF, 0 0 50px #00FFFF, 0 0 60px #A0D8FF;
-          }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { 
+          background: linear-gradient(to bottom, transparent, #4A9EFF, transparent); 
+          border-radius: 10px;
         }
 
-        @keyframes icon-shine {
-          0%, 100% {
-            filter: drop-shadow(0 0 10px #4A9EFF);
-          }
-          50% {
-            filter: drop-shadow(0 0 20px #00FFFF) drop-shadow(0 0 30px #A0D8FF);
-          }
+        .ancient-glass {
+          background: rgba(15, 20, 30, 0.4);
+          backdrop-filter: blur(40px) saturate(180%);
+          border: 1px solid rgba(74, 158, 255, 0.2);
+          box-shadow: 
+            inset 0 0 30px rgba(74, 158, 255, 0.05),
+            0 20px 50px rgba(0, 0, 0, 0.5);
         }
 
-        @keyframes shimmer {
-          0% {
-            background-position: -1000px 0;
-          }
-          100% {
-            background-position: 1000px 0;
-          }
-        }
-
-        .wisdom-well {
-          min-height: 100vh;
-          background: radial-gradient(ellipse at center, #0A0A0A 0%, #000000 100%);
-          padding: calc(80px + var(--safe-area-top)) 20px calc(40px + var(--safe-area-bottom));
-          font-family: 'Exo 2', sans-serif;
-          color: #F5F5F5;
+        .wisdom-dossier-card {
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.2));
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          backdrop-filter: blur(10px);
+          padding: 1.5rem;
+          @media (min-width: 768px) { padding: 3rem; }
+          margin-bottom: 2.5rem;
           position: relative;
-          overflow-x: hidden;
+          border-radius: 2px;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
         }
 
-        .wisdom-well::before {
+        .wisdom-dossier-card::before {
           content: '';
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: 
-            radial-gradient(circle at 20% 50%, rgba(74, 158, 255, 0.03) 0%, transparent 50%),
-            radial-gradient(circle at 80% 50%, rgba(0, 255, 255, 0.03) 0%, transparent 50%);
-          pointer-events: none;
-          z-index: 0;
-        }
-
-        .wisdom-header {
-          text-align: center;
-          margin-bottom: 60px;
-          max-width: 900px;
-          margin-left: auto;
-          margin-right: auto;
-          position: relative;
-          z-index: 1;
-        }
-
-        .wisdom-back-button {
           position: absolute;
-          left: 0;
-          top: -40px;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          text-decoration: none;
-          color: #4A9EFF;
-          font-family: 'Orbitron', monospace;
-          font-size: 14px;
-          font-weight: 600;
-          transition: all 0.3s ease;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
+          top: -1px; left: -1px;
+          width: 20px; height: 2px;
+          background: #4A9EFF;
+          opacity: 0.3;
         }
 
-        .wisdom-back-button:hover {
-          color: #00FFFF;
-          transform: translateX(-3px);
-          text-shadow: 0 0 15px #4A9EFF;
+        .wisdom-dossier-card::after {
+          content: '';
+          position: absolute;
+          bottom: -1px; right: -1px;
+          width: 2px; height: 20px;
+          background: #4A9EFF;
+          opacity: 0.3;
         }
 
-        .wisdom-title {
+        .data-stream-glow {
+          position: absolute;
+          top: 0; left: 0; right: 0; height: 1px;
+          background: linear-gradient(90deg, transparent, #72A0FF, transparent);
+          opacity: 0.15;
+          animation: stream-linear 6s infinite linear;
+        }
+
+        @keyframes stream-linear {
+          0% { transform: translateY(-100%) scaleX(0.5); opacity: 0; }
+          50% { opacity: 0.5; }
+          100% { transform: translateY(1000%) scaleX(2); opacity: 0; }
+        }
+
+        .prose-intel h3 {
           font-family: 'Orbitron', monospace;
-          font-size: 3rem;
           font-weight: 900;
-          color: #4A9EFF;
-          margin-bottom: 20px;
-          letter-spacing: 0.15em;
-          animation: cyan-glow 4s ease-in-out infinite;
-          background: linear-gradient(90deg, #4A9EFF, #00FFFF, #A0D8FF, #00FFFF, #4A9EFF);
-          background-size: 200% auto;
+          letter-spacing: 0.3em;
+          @media (min-width: 768px) { letter-spacing: 0.6em; }
+          background: linear-gradient(to bottom, rgba(255,255,255,0.9), #4A9EFF);
           -webkit-background-clip: text;
           background-clip: text;
           -webkit-text-fill-color: transparent;
-          animation: cyan-glow 4s ease-in-out infinite, shimmer 3s linear infinite;
-        }
-
-        .wisdom-subtitle {
+          text-transform: uppercase;
+          text-align: center;
+          margin-bottom: 2rem;
+          @media (min-width: 768px) { margin-bottom: 3.5rem; }
+          filter: drop-shadow(0 0 20px rgba(74, 158, 255, 0.4));
+          opacity: 0.8;
           font-size: 1.1rem;
-          color: rgba(74, 158, 255, 0.8);
-          line-height: 1.6;
-          max-width: 700px;
-          margin: 0 auto;
-          text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+          @media (min-width: 768px) { font-size: 1.5rem; }
         }
 
-        .wisdom-grid {
-          max-width: 900px;
-          margin: 0 auto;
+        .prose-intel h4 {
+          font-family: 'Orbitron', monospace;
+          font-size: 0.7rem;
+          letter-spacing: 0.3em;
+          color: #72A0FF;
+          margin-top: 3.5rem;
+          margin-bottom: 1.5rem;
           display: flex;
-          flex-direction: column;
-          gap: 20px;
-          position: relative;
-          z-index: 1;
-        }
-
-        .wisdom-card {
-          background: linear-gradient(135deg, rgba(74, 158, 255, 0.08), rgba(74, 158, 255, 0.03));
-          border: 2px solid rgba(74, 158, 255, 0.4);
-          transition: all 0.4s ease;
-          cursor: pointer;
-          overflow: hidden;
-          position: relative;
-          backdrop-filter: blur(10px);
-        }
-
-        .wisdom-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.1), transparent);
-          transition: left 0.5s ease;
-        }
-
-        .wisdom-card:hover::before {
-          left: 100%;
-        }
-
-        .wisdom-card:hover {
-          background: linear-gradient(135deg, rgba(74, 158, 255, 0.15), rgba(74, 158, 255, 0.08));
-          border-color: #4A9EFF;
-          box-shadow: 0 0 30px rgba(74, 158, 255, 0.3), inset 0 0 20px rgba(0, 255, 255, 0.1);
-          transform: translateY(-2px);
-        }
-
-        .card-header {
-          padding: 25px;
-          display: flex;
-          justify-content: space-between;
           align-items: center;
           gap: 15px;
+          opacity: 0.7;
+          text-transform: uppercase;
         }
 
-        .card-header-left {
-          display: flex;
-          align-items: center;
-          gap: 20px;
+        .prose-intel h4::before {
+            content: '>>';
+            font-size: 8px;
+            opacity: 0.5;
+        }
+
+        .prose-intel h4::after {
+          content: '';
+          height: 1px;
           flex: 1;
+          background: linear-gradient(90deg, #72A0FF33, transparent);
         }
 
-        .card-icon-wrapper {
-          flex-shrink: 0;
+        .prose-intel p {
+          font-family: 'Space Mono', monospace;
+          font-size: 12px;
+          line-height: 2.2;
+          color: rgba(255, 255, 255, 0.5);
+          margin-bottom: 2.5rem;
+          text-align: justify;
+          letter-spacing: 0.02em;
+        }
+
+        .prose-intel strong {
           color: #4A9EFF;
-          animation: icon-shine 4s ease-in-out infinite;
-        }
-
-        .card-header-content {
-          flex: 1;
-        }
-
-        .card-title {
-          font-family: 'Orbitron', monospace;
-          font-size: 1.4rem;
+          opacity: 0.9;
           font-weight: 700;
-          color: #4A9EFF;
-          margin-bottom: 8px;
-          letter-spacing: 0.05em;
-          text-shadow: 0 0 15px rgba(74, 158, 255, 0.5);
         }
 
-        .card-description {
-          font-size: 0.95rem;
-          color: rgba(74, 158, 255, 0.7);
-          line-height: 1.5;
-        }
-
-        .card-expand-icon {
-          color: #4A9EFF;
-          flex-shrink: 0;
-          transition: transform 0.3s ease;
-        }
-
-        .wisdom-card.expanded .card-expand-icon {
-          transform: rotate(180deg);
-        }
-
-        .card-content {
-          max-height: 0;
-          overflow: hidden;
-          transition: max-height 0.5s ease, padding 0.5s ease;
-          padding: 0 25px;
-          background: linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(10, 10, 10, 0.3));
-        }
-
-        .card-content.expanded {
-          max-height: 5000px;
-          padding: 30px 25px;
-          border-top: 1px solid rgba(74, 158, 255, 0.3);
-        }
-
-        .card-content h3 {
-          font-family: 'Orbitron', monospace;
-          font-size: 1.3rem;
-          color: #00FFFF;
-          margin-bottom: 20px;
-          letter-spacing: 0.08em;
-          text-align: center;
-          text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-        }
-
-        .card-content h4 {
-          font-family: 'Orbitron', monospace;
-          font-size: 1.1rem;
-          color: #4A9EFF;
-          margin-top: 25px;
-          margin-bottom: 12px;
-          letter-spacing: 0.05em;
-          text-shadow: 0 0 10px rgba(74, 158, 255, 0.3);
-        }
-
-        .card-content p {
-          font-size: 1rem;
-          line-height: 1.8;
-          color: rgba(255, 255, 255, 0.85);
-          margin-bottom: 15px;
-        }
-
-        .card-content strong {
-          color: #00FFFF;
-          font-weight: 600;
-          text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
-        }
-
-        .card-content em {
-          color: rgba(74, 158, 255, 0.8);
-          font-style: italic;
-        }
-
-        @media (max-width: 768px) {
-          .wisdom-well {
-            padding: calc(60px + var(--safe-area-top)) 15px calc(30px + var(--safe-area-bottom));
-          }
-
-          .wisdom-back-button {
-            position: static;
-            margin-bottom: 20px;
-            justify-content: center;
-          }
-
-          .wisdom-title {
-            font-size: 2rem;
-            margin-bottom: 15px;
-          }
-
-          .wisdom-subtitle {
-            font-size: 0.95rem;
-          }
-
-          .wisdom-header {
-            margin-bottom: 40px;
-          }
-
-          .card-title {
-            font-size: 1.2rem;
-          }
-
-          .card-description {
-            font-size: 0.9rem;
-          }
-
-          .card-header {
-            padding: 20px;
-          }
-
-          .card-header-left {
-            gap: 15px;
-          }
-
-          .card-content.expanded {
-            padding: 25px 20px;
-          }
-
-          .card-content h3 {
-            font-size: 1.1rem;
-          }
-
-          .card-content h4 {
-            font-size: 1rem;
-          }
-
-          .card-content p {
-            font-size: 0.95rem;
-          }
+        .prose-intel em {
+          font-style: normal;
+          color: #72A0FF;
+          border-bottom: 1px solid rgba(114, 160, 255, 0.2);
+          padding-bottom: 2px;
+          font-size: 11px;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
         }
       `}</style>
 
-      <div className="wisdom-header">
-        <Link to="/portal" className="wisdom-back-button">
-          <ArrowLeft size={18} />
-          Back to Portal
-        </Link>
-        <h1 className="wisdom-title">THE WISDOM WELL</h1>
-        <p className="wisdom-subtitle">
-          A sacred collection of timeless wisdom from the world's profound spiritual traditions. 
-          Tap each thread to explore its depths.
-        </p>
-      </div>
+      <div className="max-w-4xl mx-auto px-6 relative z-[2]">
+        <div className="wisdom-header text-center mb-16 relative">
+          <Link to="/portal" className="absolute -top-12 left-0 flex items-center gap-2 text-[#4A9EFF]/60 hover:text-[#4A9EFF] transition-all group font-mono text-xs tracking-widest uppercase">
+            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+            Control Center
+          </Link>
 
-      <div className="wisdom-grid">
-        {wisdomThreads.map((thread) => {
-          const Icon = thread.icon;
-          return (
-            <div 
-              key={thread.id} 
-              className={`wisdom-card ${expandedCard === thread.id ? 'expanded' : ''}`}
-              onClick={() => handleCardClick(thread.id)}
-            >
-              <div className="card-header">
-                <div className="card-header-left">
-                  <div className="card-icon-wrapper">
-                    <Icon size={32} />
+          <div className="inline-block px-4 py-1 border border-[#72A0FF]/30 rounded-none text-[9px] font-mono text-[#72A0FF] tracking-[0.4em] uppercase mb-4 bg-[#72A0FF]/5 backdrop-blur-sm">
+            SUB-CONSCIOUS ARCHIVE // AUTH_NODE: ENABLED
+          </div>
+
+          <h1 className="font-[Orbitron] text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-[#72A0FF] to-white tracking-[0.3em] drop-shadow-[0_0_30px_rgba(74,158,255,0.3)] mb-6">
+            WISDOM WELL
+          </h1>
+
+          <p className="text-[#4A9EFF]/40 font-[Orbitron] text-[10px] tracking-[0.5em] uppercase mb-8 flex items-center justify-center gap-6">
+            <span className="w-16 h-[1px] bg-gradient-to-r from-transparent via-[#4A9EFF]/20 to-transparent"></span>
+            Streaming Ancient Intel Data
+            <span className="w-16 h-[1px] bg-gradient-to-l from-transparent via-[#4A9EFF]/20 to-transparent"></span>
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-12">
+          {wisdomThreads.map((thread) => {
+            const isExpanded = expandedCard === thread.id;
+            const Icon = thread.icon;
+
+            return (
+              <motion.div
+                key={thread.id}
+                layout
+                initial={false}
+                className={`ancient-glass relative overflow-hidden group transition-all duration-700 rounded-px ${isExpanded ? 'ring-1 ring-[#72A0FF]/40' : 'hover:bg-[#4A9EFF]/5 hover:border-[#4A9EFF]/30'}`}
+                style={{
+                  clipPath: isExpanded ? 'none' : 'polygon(0 0, 95% 0, 100% 10%, 100% 100%, 5% 100%, 0 90%)',
+                  borderRadius: '2px'
+                }}
+              >
+                {/* Tech Highlights */}
+                <div className="absolute top-0 left-0 w-[1px] h-full bg-gradient-to-b from-[#4A9EFF] via-transparent to-transparent opacity-20" />
+
+                <div
+                  className="p-6 md:p-10 cursor-pointer relative z-10"
+                  onClick={() => handleCardClick(thread.id)}
+                >
+                  <div className="flex justify-between items-center gap-4 md:gap-8">
+                    <div className="flex items-center gap-4 md:gap-8">
+                      <HolographicSigil Icon={Icon} isExpanded={isExpanded} id={thread.id} />
+                      <div>
+                        <div className="flex items-center gap-4 mb-2 font-mono text-[8px] tracking-[0.3em] uppercase opacity-40">
+                          <span>NODE_0{thread.id}</span>
+                          <div className="w-1 h-1 rounded-full bg-[#4A9EFF]"></div>
+                          <span>SECURE</span>
+                        </div>
+                        <h2 className="text-lg md:text-3xl font-[Orbitron] font-black text-white tracking-[0.1em] md:tracking-[0.2em] group-hover:text-[#72A0FF] transition-colors uppercase">
+                          {thread.title}
+                        </h2>
+                      </div>
+                    </div>
+
+                    <div className={`p-2 md:p-3 border border-white/10 transition-all duration-700 ${isExpanded ? 'rotate-180 bg-[#72A0FF]/10 border-[#72A0FF]/40' : 'group-hover:border-[#4A9EFF]/40'}`}>
+                      <ChevronDown size={20} className={isExpanded ? 'text-[#72A0FF]' : 'text-white/20'} />
+                    </div>
                   </div>
-                  <div className="card-header-content">
-                    <h2 className="card-title">{thread.title}</h2>
-                    <p className="card-description">{thread.description}</p>
-                  </div>
-                </div>
-                <div className="card-expand-icon">
-                  {expandedCard === thread.id ? (
-                    <ChevronUp size={28} />
-                  ) : (
-                    <ChevronDown size={28} />
+
+                  {!isExpanded && (
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="mt-6 text-xs text-white/40 font-light md:pl-32 leading-relaxed max-w-2xl font-['Space_Mono'] uppercase tracking-widest"
+                    >
+                      {thread.description}
+                    </motion.p>
                   )}
                 </div>
-              </div>
-              <div className={`card-content ${expandedCard === thread.id ? 'expanded' : ''}`}>
-                {thread.content}
-              </div>
-            </div>
-          );
-        })}
+
+                <AnimatePresence>
+                  {isExpanded && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                      className="overflow-hidden relative"
+                    >
+                      {/* Internal Textures */}
+                      <div className="absolute inset-0 opacity-[0.2] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay"></div>
+                      <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#4A9EFF 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
+
+                      <div className="p-6 md:p-20 pt-4 border-t border-white/5 relative z-10 bg-black/40 backdrop-blur-3xl">
+                        {/* Dossier Header Area */}
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 md:mb-16 font-mono text-[9px] text-[#72A0FF]/40 tracking-widest uppercase border-b border-white/5 pb-8 gap-4">
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-3">
+                              <div className="w-2 h-2 bg-[#4A9EFF] animate-pulse"></div>
+                              <span className="text-white/60">INTELLIGENCE_REPORT_ACTIVE</span>
+                            </div>
+                            <div>AUTH_LEVEL: SOVEREIGN</div>
+                          </div>
+                          <div className="text-left md:text-right">
+                            <div>DATA_STREAM: {Math.random().toString(16).toUpperCase()}</div>
+                            <div>TIMESTAMP: 2024.AR.09</div>
+                          </div>
+                        </div>
+
+                        <div className="prose-intel max-w-4xl mx-auto">
+                          {/* We wrap the content in a dossier card class for the glossy effect */}
+                          <div className="wisdom-dossier-card">
+                            <div className="data-stream-glow"></div>
+                            {thread.content}
+                          </div>
+                        </div>
+
+                        <div className="mt-12 md:mt-20 flex flex-col items-center gap-8">
+                          <div className="w-40 h-[1px] bg-gradient-to-r from-transparent via-[#4A9EFF]/40 to-transparent"></div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExpandedCard(null);
+                            }}
+                            className="group relative px-10 md:px-20 py-4 border border-[#4A9EFF]/20 bg-transparent transition-all hover:border-[#4A9EFF] hover:shadow-[0_0_60px_rgba(72,160,255,0.15)]"
+                          >
+                            <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <span className="relative z-10 font-[Orbitron] text-[9px] md:text-[10px] tracking-[0.4em] md:tracking-[0.6em] text-[#72A0FF] group-hover:text-white transition-colors">
+                              DISCONNECT_MODULE_II
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

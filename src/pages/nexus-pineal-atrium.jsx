@@ -731,6 +731,7 @@ export default function PinealAtrium() {
       <div className="pineal-atrium">
         <style>{`
           .pineal-atrium {
+            min-height: 100dvh;
             min-height: 100vh;
             background: #000;
             color: white;
@@ -792,6 +793,7 @@ export default function PinealAtrium() {
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap');
 
         .pineal-atrium {
+          min-height: 100dvh;
           min-height: 100vh;
           background: #000;
           color: white;
@@ -908,6 +910,7 @@ export default function PinealAtrium() {
           right: 0;
           top: 0;
           width: 400px;
+          max-height: 100dvh;
           max-height: 100vh;
           height: auto;
           background: rgba(0, 0, 0, 0.95);
@@ -1010,6 +1013,7 @@ export default function PinealAtrium() {
         @media (max-width: 768px) {
           .region-panel {
             width: 100%;
+            max-height: calc(100dvh - var(--safe-area-top) - var(--safe-area-bottom));
             max-height: calc(100vh - var(--safe-area-top) - var(--safe-area-bottom));
           }
 

@@ -1,25 +1,30 @@
-// OpenAI Integration using custom workflows
+// AI Integration using custom workflows
 // Replaces Base44 integrations with OpenAI gpt-4o-mini
 
-import { invokeAI, invokeAIWithStreaming } from './openaiService';
+import { invokeAI, invokeAIWithStreaming } from './aiService';
 
 // Core integration object that matches Base44 API structure
 export const Core = {
   // Main LLM invocation function (non-streaming)
   InvokeLLM: async ({ prompt, workflow = 'athena', context = {}, add_context_from_internet = false }) => {
-    const response = await invokeAI({ 
-      prompt, 
-      workflow,
-      context 
+    // Pass workflow through directly, fallback to athena only if undefined
+    const workflowId = workflow || 'athena';
+
+    const response = await invokeAI({
+      prompt,
+      workflow: workflowId,
+      context
     });
     return response;
   },
 
   // Streaming version for real-time responses
   InvokeLLMStream: async ({ prompt, workflow = 'athena', context = {}, onChunk, messages = [] }) => {
+    const workflowId = workflow || 'athena';
+
     const response = await invokeAIWithStreaming({
       prompt,
-      workflow,
+      workflow: workflowId,
       context,
       onChunk,
       messages

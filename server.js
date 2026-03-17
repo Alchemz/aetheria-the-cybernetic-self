@@ -1,22 +1,31 @@
-// Backend API server for secure OpenAI integration
+// Backend API server for secure AI integration
 import express from 'express';
 import cors from 'cors';
 import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createClient } from '@supabase/supabase-js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+import { SYSTEM_PROMPTS, getSystemPrompt } from './src/api/prompts.js';
+
+// Load environment variables
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-// Use port 5000 in production (Replit deployment), port 3000 in development
-const PORT = process.env.NODE_ENV === 'production' ? 5000 : 3000;
+// Use port 5000 in production, port 3000 in development
+const PORT = process.env.PORT || 3000;
 
-// Initialize OpenAI client (server-side only - API key never exposed to client)
+// Initialize OpenAI client
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
+
+// Initialize Gemini client
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'MISSING_KEY');
 
 // Initialize Supabase client (optional - used for caching only)
 let supabase = null;
@@ -24,16 +33,14 @@ let supabaseAvailable = false;
 
 try {
   if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-    // Clean up environment variables (fix Replit Secrets formatting issues)
-    const SUPABASE_URL = process.env.SUPABASE_URL.replace(/^=+/, '');
-    const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY.replace(/^=+/, '');
-    
+    const SUPABASE_URL = process.env.SUPABASE_URL;
+    const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+
     supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     supabaseAvailable = true;
     console.log('✅ Supabase connected (caching enabled)');
   } else {
     console.warn('⚠️  Supabase credentials not found - cosmic briefing caching disabled');
-    console.warn('   Set SUPABASE_URL and SUPABASE_ANON_KEY in Replit Secrets to enable caching');
   }
 } catch (error) {
   console.error('⚠️  Failed to initialize Supabase - cosmic briefing caching disabled');
@@ -44,7 +51,7 @@ try {
 app.use(cors());
 app.use(express.json());
 
-// Request logging middleware for debugging
+// Request logging middleware
 app.use((req, res, next) => {
   console.log(`📨 ${req.method} ${req.path}`);
   next();
@@ -59,12 +66,34 @@ if (process.env.NODE_ENV === 'production') {
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', openai: !!process.env.OPENAI_API_KEY });
+  res.json({
+    status: 'ok',
+    openai: !!process.env.OPENAI_API_KEY,
+    gemini: !!process.env.GEMINI_API_KEY
+  });
 });
+
+// Helper to determine system prompt and messages
+const prepareMessages = (workflow, messages, context) => {
+  const systemPrompt = getSystemPrompt(workflow, context);
+
+  // Inject context into system prompt if provided
+  let finalSystemContent = systemPrompt;
+  if (context && Object.keys(context).length > 0) {
+    finalSystemContent += `\n\nCONTEXT:\n${JSON.stringify(context, null, 2)}`;
+  }
+
+  const finalMessages = [
+    { role: 'system', content: finalSystemContent },
+    ...messages.filter(m => m.role !== 'system') // Filter out existing system messages to avoid duplication
+  ];
+
+  return finalMessages;
+};
 
 // Streaming chat endpoint
 app.post('/api/chat/stream', async (req, res) => {
-  const { messages, workflow } = req.body;
+  const { messages, workflow, context, provider = 'openai' } = req.body;
 
   if (!messages || !Array.isArray(messages)) {
     return res.status(400).json({ error: 'Messages array is required' });
@@ -76,20 +105,47 @@ app.post('/api/chat/stream', async (req, res) => {
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
 
-    // Create streaming completion
-    const stream = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: messages,
-      stream: true,
-      temperature: 0.7,
-      max_tokens: 2000
-    });
+    const finalMessages = prepareMessages(workflow, messages, context);
 
-    // Stream chunks to client
-    for await (const chunk of stream) {
-      const content = chunk.choices[0]?.delta?.content || '';
-      if (content) {
-        res.write(`data: ${JSON.stringify({ content })}\n\n`);
+    if (provider === 'gemini' && process.env.GEMINI_API_KEY) {
+      // GEMINI STREAMING
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+      const lastMessage = finalMessages[finalMessages.length - 1];
+      const history = finalMessages.slice(0, -1).map(m => ({
+        role: m.role === 'user' ? 'user' : 'model',
+        parts: [{ text: m.content }]
+      }));
+
+      const chat = model.startChat({
+        history: history,
+        systemInstruction: finalMessages.find(m => m.role === 'system')?.content
+      });
+
+      const result = await chat.sendMessageStream(lastMessage.content);
+
+      for await (const chunk of result.stream) {
+        const text = chunk.text();
+        if (text) {
+          res.write(`data: ${JSON.stringify({ content: text })}\n\n`);
+        }
+      }
+
+    } else {
+      // OPENAI STREAMING (Default)
+      const stream = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: finalMessages,
+        stream: true,
+        temperature: 0.7,
+        max_tokens: 2000
+      });
+
+      for await (const chunk of stream) {
+        const content = chunk.choices[0]?.delta?.content || '';
+        if (content) {
+          res.write(`data: ${JSON.stringify({ content })}\n\n`);
+        }
       }
     }
 
@@ -98,39 +154,64 @@ app.post('/api/chat/stream', async (req, res) => {
     res.end();
 
   } catch (error) {
-    console.error('OpenAI streaming error:', error);
-    res.status(500).json({ 
-      error: 'Failed to generate response',
-      details: error.message 
-    });
+    console.error('Streaming error:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Failed to generate response', details: error.message });
+    } else {
+      res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
+      res.end();
+    }
   }
 });
 
-// Non-streaming chat endpoint (fallback)
+// Non-streaming chat endpoint
 app.post('/api/chat', async (req, res) => {
-  const { messages, workflow } = req.body;
+  const { messages, workflow, context, provider = 'openai' } = req.body;
 
   if (!messages || !Array.isArray(messages)) {
     return res.status(400).json({ error: 'Messages array is required' });
   }
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: messages,
-      temperature: 0.7,
-      max_tokens: 2000
-    });
+    const finalMessages = prepareMessages(workflow, messages, context);
 
-    res.json({ 
-      content: completion.choices[0].message.content 
-    });
+    if (provider === 'gemini' && process.env.GEMINI_API_KEY) {
+      const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+        systemInstruction: finalMessages.find(m => m.role === 'system')?.content
+      });
+
+      const chatHistory = finalMessages.filter(m => m.role !== 'system').slice(0, -1).map(m => ({
+        role: m.role === 'user' ? 'user' : 'model',
+        parts: [{ text: m.content }]
+      }));
+
+      const chat = model.startChat({ history: chatHistory });
+      const lastMessage = finalMessages[finalMessages.length - 1];
+
+      const result = await chat.sendMessage(lastMessage.content);
+      const response = await result.response;
+
+      res.json({ content: response.text() });
+
+    } else {
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: finalMessages,
+        temperature: 0.7,
+        max_tokens: 2000
+      });
+
+      res.json({
+        content: completion.choices[0].message.content
+      });
+    }
 
   } catch (error) {
-    console.error('OpenAI error:', error);
-    res.status(500).json({ 
+    console.error('AI error:', error);
+    res.status(500).json({
       error: 'Failed to generate response',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -139,84 +220,48 @@ app.post('/api/chat', async (req, res) => {
 app.get('/api/cosmic-briefing', async (req, res) => {
   try {
     const today = new Date().toISOString().split('T')[0];
-    
-    // Check if briefing already exists for today (only if Supabase is available)
+    const todayFormatted = new Date().toLocaleDateString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+
+    // Check Supabase cache if available
     if (supabaseAvailable && supabase) {
       try {
-        const { data: existingBriefing, error: fetchError } = await supabase
+        const { data: existingBriefing } = await supabase
           .from('cosmic_briefings')
           .select('*')
           .eq('date', today)
           .single();
 
-        // Check for error object from Supabase
-        if (fetchError) {
-          console.warn('⚠️  Cache lookup error:', fetchError.message || fetchError);
-          // Continue to generate fresh briefing
-        } else if (existingBriefing) {
-          console.log('📖 Returning cached cosmic briefing for', today);
-          return res.json({
-            success: true,
-            briefing: existingBriefing,
-            cached: true
-          });
+        if (existingBriefing) {
+          return res.json({ success: true, briefing: existingBriefing, cached: true });
         }
-      } catch (cacheError) {
-        // Handle thrown exceptions (e.g., network errors, malformed responses)
-        console.warn('⚠️  Cache lookup exception, generating fresh briefing:', cacheError.message);
+      } catch (e) {
+        console.warn('⚠️ Cache lookup failed');
       }
     }
 
     console.log('✨ Generating new cosmic briefing for', today);
 
-    // Generate new briefing using OpenAI
-    const todayFormatted = new Date().toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-
-    const briefingPrompt = `You are a master astrologer and cosmic energy interpreter. Generate a detailed daily cosmic briefing for ${todayFormatted}.
-
-IMPORTANT INSTRUCTIONS:
-1. Analyze the current planetary transits and their meaning
-2. Consider the moon phase and its influence
-3. Note any significant astrological events (retrogrades, eclipses, planetary ingresses)
-4. Explain the collective energy available to humanity today
-5. Provide practical guidance for working with today's cosmic currents
-6. Include any powerful aspects between planets
-7. Mention which zodiac signs are most activated today
-8. Keep it empowering, insightful, and non-dogmatic
-
-Write in a tone that blends ancient cosmic wisdom with modern understanding. Be specific about planetary positions when relevant. Make it approximately 300-400 words.
-
-Format:
-- Start with the date and a captivating title
-- Main briefing text (flowing paragraphs)
-- End with a "Cosmic Invitation" - one practical action for today
-
-DO NOT make it personalized. This is a collective briefing for all of humanity.`;
-
-    const briefingCompletion = await openai.chat.completions.create({
+    // Reuse OpenAI for briefing generation (could also use Gemini here easily)
+    const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
-      messages: [{ role: 'user', content: briefingPrompt }],
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPTS.COSMIC_BRIEFING },
+        { role: 'user', content: `Generate the cosmic briefing for ${todayFormatted}.` }
+      ],
       temperature: 0.8,
       max_tokens: 800
     });
 
-    const briefingText = briefingCompletion.choices[0].message.content;
+    const briefingText = completion.choices[0].message.content;
 
-    // Extract themes using JSON mode
-    const themesPrompt = `Based on this cosmic briefing, extract 3-4 key cosmic themes as short phrases (3-5 words each):
-
-${briefingText}
-
-Return a JSON object with a "themes" key containing an array of strings. Example: {"themes": ["Emotional clarity", "Creative awakening", "Spiritual alignment"]}`;
-
+    // Extract themes
     const themesCompletion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
-      messages: [{ role: 'user', content: themesPrompt }],
+      messages: [
+        { role: 'user', content: `Extract 3-4 key cosmic themes from this text as a JSON object with a "themes" array: \n\n${briefingText}` }
+      ],
       response_format: { type: 'json_object' },
       temperature: 0.5
     });
@@ -224,45 +269,20 @@ Return a JSON object with a "themes" key containing an array of strings. Example
     let cosmicThemes = [];
     try {
       const themesData = JSON.parse(themesCompletion.choices[0].message.content);
-      cosmicThemes = themesData.themes || Object.values(themesData)[0] || [];
+      cosmicThemes = themesData.themes || [];
     } catch (e) {
-      console.error('Failed to parse themes:', e);
-      cosmicThemes = ['Cosmic Alignment', 'Universal Flow', 'Inner Wisdom'];
+      cosmicThemes = ['Cosmic Alignment', 'Universal Flow'];
     }
 
-    // Store the briefing in Supabase (only if available)
+    // Cache result
     if (supabaseAvailable && supabase) {
-      try {
-        const { data: newBriefing, error: insertError } = await supabase
-          .from('cosmic_briefings')
-          .insert({
-            date: today,
-            briefing_text: briefingText,
-            cosmic_themes: cosmicThemes
-          })
-          .select()
-          .single();
-
-        // Check for error object from Supabase
-        if (insertError) {
-          console.warn('⚠️  Failed to cache briefing:', insertError.message || insertError);
-          // Continue to return uncached briefing
-        } else if (newBriefing) {
-          console.log('💾 Briefing cached successfully');
-          return res.json({
-            success: true,
-            briefing: newBriefing,
-            cached: false
-          });
-        }
-      } catch (storageError) {
-        // Handle thrown exceptions (e.g., network errors, malformed responses)
-        console.warn('⚠️  Briefing storage exception:', storageError.message);
-        // Continue to return uncached briefing
-      }
+      await supabase.from('cosmic_briefings').insert({
+        date: today,
+        briefing_text: briefingText,
+        cosmic_themes: cosmicThemes
+      });
     }
 
-    // Return the briefing even if storage failed or Supabase is unavailable
     res.json({
       success: true,
       briefing: {
@@ -274,28 +294,26 @@ Return a JSON object with a "themes" key containing an array of strings. Example
     });
 
   } catch (error) {
-    console.error('Cosmic briefing generation error:', error);
-    res.status(500).json({ 
-      error: 'Failed to generate cosmic briefing',
-      details: error.message 
-    });
+    console.error('Cosmic briefing error:', error);
+    res.status(500).json({ error: 'Failed to generate cosmic briefing', details: error.message });
   }
 });
 
-// In production, serve index.html for all non-API routes (SPA support)
+// Serve index.html for all non-API routes in production
 if (process.env.NODE_ENV === 'production') {
   app.get('/*path', (req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
   });
 }
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Backend API server running on http://0.0.0.0:${PORT}`);
-  console.log(`🔑 OpenAI API Key: ${process.env.OPENAI_API_KEY ? 'Configured ✅' : 'Missing ❌'}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  if (process.env.NODE_ENV === 'production') {
-    console.log(`✅ Serving static files from dist/ folder`);
-  } else {
-    console.log(`✅ Ready to accept requests from Vite proxy`);
-  }
-});
+// Export app for Cloud Functions
+export { app };
+
+// Only listen if running directly (not imported as a library/function)
+if (process.env.NODE_ENV !== 'production' || process.argv[1] === fileURLToPath(import.meta.url)) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Backend API server running on http://0.0.0.0:${PORT}`);
+    console.log(`🔑 OpenAI: ${process.env.OPENAI_API_KEY ? '✅' : '❌'}`);
+    console.log(`💎 Gemini: ${process.env.GEMINI_API_KEY ? '✅' : '❌'}`);
+  });
+}

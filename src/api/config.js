@@ -11,19 +11,18 @@ import { Capacitor } from '@capacitor/core';
 const getApiBaseUrl = () => {
   const isNative = Capacitor.isNativePlatform();
   const isProduction = import.meta.env.PROD;
-  
+
   // Native apps always use the deployed backend
   if (isNative) {
-    // TODO: After deployment, update this with your actual Replit deployment URL
-    // Example: return 'https://innersync-api-username.replit.app';
-    return import.meta.env.VITE_API_URL || 'https://innersync-backend.replit.app';
+    // Production Firebase URL
+    return import.meta.env.VITE_API_URL || 'https://innersync-2bbd1.web.app';
   }
-  
-  // Production web build uses deployed backend
+
+  // Production web build uses relative path (served by same origin)
   if (isProduction) {
-    return import.meta.env.VITE_API_URL || 'https://innersync-backend.replit.app';
+    return import.meta.env.VITE_API_URL || '';
   }
-  
+
   // Development uses Vite proxy (proxies to localhost:3000)
   return '';
 };
