@@ -28,9 +28,12 @@ import { NotificationService } from '@/api/notificationService';
 const REALMS = {
     SANCTUARY: {
         id: 'SANCTUARY',
-        color: '#FF4500',
-        secondary: '#FFA500',
-        bg: 'radial-gradient(circle at center, #1a0b00 0%, #000000 100%)',
+        color: '#D94B1E',          // desaturated orange-red
+        colorLight: '#B83A10',
+        secondary: '#E07818',      // desaturated amber
+        secondaryLight: '#C46010',
+        bg: 'radial-gradient(circle at center, #150a02 0%, #0a0d18 100%)',
+        bgLight: 'radial-gradient(circle at center, #f2dece 0%, #ebe7df 100%)',
         particleMode: 'float',
         title: 'THE SANCTUARY',
         subtitle: 'Restoration & Subconscious Architecture',
@@ -38,9 +41,12 @@ const REALMS = {
     },
     NEXUS: {
         id: 'NEXUS',
-        color: '#9370DB',
-        secondary: '#E6E6FA',
-        bg: 'radial-gradient(circle at center, #0f0518 0%, #000000 100%)',
+        color: '#7B65C0',          // desaturated purple
+        colorLight: '#5A4AA8',
+        secondary: '#C4BCE0',      // desaturated lavender
+        secondaryLight: '#4A3C90',
+        bg: 'radial-gradient(circle at center, #0c0418 0%, #0a0d18 100%)',
+        bgLight: 'radial-gradient(circle at center, #e8e0f2 0%, #ebe7df 100%)',
         particleMode: 'spiral',
         title: 'THE NEXUS',
         subtitle: 'Cognitive Augmentation & Bio-Optimization',
@@ -48,9 +54,12 @@ const REALMS = {
     },
     TEMPLE: {
         id: 'TEMPLE',
-        color: '#00A86B',
-        secondary: '#00FFFF',
-        bg: 'radial-gradient(circle at center, #001a10 0%, #000000 100%)',
+        color: '#259B68',          // desaturated emerald
+        colorLight: '#1A7A50',
+        secondary: '#30C0C0',      // desaturated cyan
+        secondaryLight: '#147878',
+        bg: 'radial-gradient(circle at center, #021408 0%, #0a0d18 100%)',
+        bgLight: 'radial-gradient(circle at center, #d8f0e4 0%, #ebe7df 100%)',
         particleMode: 'rise',
         title: 'THE TEMPLE',
         subtitle: 'Embodiment, Wisdom & Synchrony',
@@ -379,7 +388,7 @@ const CommandOrb = ({ Icon, color, isActive }) => {
 
             {/* Core Glass Sphere */}
             <div
-                className={`relative z-10 w-12 h-12 md:w-16 md:h-16 flex items-center justify-center rounded-full border transition-all duration-700 ${isActive ? 'bg-white/10 border-white/40 shadow-[0_0_40px_rgba(255,255,255,0.2)]' : 'bg-white/5 border-white/10 group-hover/orb:bg-white/10 group-hover/orb:border-white/20'}`}
+                className={`relative z-10 w-12 h-12 md:w-16 md:h-16 flex items-center justify-center rounded-full border transition-all duration-700 ${isActive ? 'bg-white/10 border-white/40 shadow-[0_0_20px_rgba(255,255,255,0.10)]' : 'bg-white/5 border-white/10 group-hover/orb:bg-white/10 group-hover/orb:border-white/20'}`}
                 style={{
                     backdropFilter: 'blur(10px)',
                     boxShadow: isActive ? `0 0 50px ${color}33, inset 0 0 20px ${color}44` : 'none'
@@ -425,7 +434,7 @@ const SanctuarySigil = ({ Icon, isExpanded, id }) => {
             </div>
 
             {/* The Core Glass Container */}
-            <div className={`relative z-10 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center transition-all duration-700 ${isExpanded ? 'bg-[#FF4500]/15 border-[#FF4500] shadow-[0_0_50px_rgba(255,69,0,0.3)] scale-110' : 'bg-white/5 border-white/10 group-hover/sanctuary:bg-[#FF4500]/5 group-hover/sanctuary:border-[#FF4500]/30'}`}
+            <div className={`relative z-10 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center transition-all duration-700 ${isExpanded ? 'bg-[#FF4500]/15 border-[#FF4500] shadow-[0_0_28px_rgba(217,75,30,0.14)] scale-110' : 'bg-white/5 border-white/10 group-hover/sanctuary:bg-[#FF4500]/5 group-hover/sanctuary:border-[#FF4500]/30'}`}
                 style={{
                     clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)',
                     borderWidth: '1px'
@@ -447,7 +456,7 @@ const HolographicPlayButton = ({ isPlaying, onClick, dayMode }) => {
             <div className={`absolute inset-0 border border-white/10 rounded-full ${isPlaying ? 'animate-[spin_4s_linear_infinite]' : 'group-hover:animate-[spin_8s_linear_infinite]'}`}>
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full"></div>
             </div>
-            <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${dayMode ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)]' : 'bg-white/10 text-white border border-white/20 group-hover:bg-white/20'}`}>
+            <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${dayMode ? 'bg-white text-black shadow-[0_0_14px_rgba(255,255,255,0.15)]' : 'bg-white/10 text-white border border-white/20 group-hover:bg-white/20'}`}>
                 {isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" className="ml-1" />}
             </div>
             <div className={`absolute inset-0 rounded-full bg-white/5 blur-xl transition-opacity duration-700 ${isPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-50'}`} />
@@ -608,7 +617,7 @@ const ParticleField = ({ mode, dayMode }) => {
 
             // Dynamic Color Logic for Day/Night
             if (dayMode) {
-                targetColor.set('#000000'); // Dark/Gold particles for contrast on white bg
+                targetColor.set(REALMS[mode].colorLight || REALMS[mode].color);
             } else {
                 targetColor.set(REALMS[mode].color);
             }
@@ -761,7 +770,7 @@ const MasterHeader = ({ realm, dayMode, setDayMode }) => {
                     height: isExpanded ? 'auto' : '56px'
                 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className={`pointer-events-auto relative overflow-hidden backdrop-blur-3xl border border-white/10 shadow-[0_30px_100px_rgba(0,0,0,0.8)] transition-all duration-700 ${isExpanded ? 'rounded-2xl bg-black/80 p-1 pt-1' : 'rounded-full bg-white/5 hover:bg-white/10'}`}
+                className={`pointer-events-auto relative overflow-hidden backdrop-blur-3xl border border-white/10 shadow-[0_12px_48px_rgba(0,0,0,0.25)] transition-all duration-700 ${isExpanded ? 'rounded-2xl bg-black/80 p-1 pt-1' : 'rounded-full bg-white/5 hover:bg-white/10'}`}
                 onMouseEnter={() => setIsExpanded(true)}
                 onMouseLeave={() => setIsExpanded(false)}
                 onTouchStart={() => setIsExpanded(true)}
@@ -898,7 +907,7 @@ const PrecisionTimeHUD = ({ habit, onConfirm, onCancel }) => {
 
     return (
         <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/80 backdrop-blur-xl animate-in fade-in duration-300 p-4">
-            <div className="glass-card p-6 md:p-10 max-w-sm w-full border border-[var(--realm-color)]/30 rounded-3xl relative shadow-[0_0_80px_rgba(0,0,0,0.8)] overflow-hidden">
+            <div className="glass-card p-6 md:p-10 max-w-sm w-full border border-[var(--realm-color)]/30 rounded-3xl relative shadow-[0_0_40px_rgba(0,0,0,0.30)] overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[var(--realm-color)] to-transparent opacity-50" />
 
                 <div className="text-center mb-8">
@@ -933,7 +942,7 @@ const PrecisionTimeHUD = ({ habit, onConfirm, onCancel }) => {
                 <div className="flex flex-col gap-3">
                     <button
                         onClick={() => onConfirm(`${hours}:${minutes}`)}
-                        className="w-full py-4 bg-[var(--realm-color)] text-black font-[Orbitron] font-black tracking-[0.3em] text-[10px] rounded-xl shadow-[0_0_30px_rgba(255,69,0,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
+                        className="w-full py-4 bg-[var(--realm-color)] text-black font-[Orbitron] font-black tracking-[0.3em] text-[10px] rounded-xl shadow-[0_0_18px_rgba(217,75,30,0.14)] hover:scale-[1.02] active:scale-95 transition-all"
                     >
                         SYNC_ALARM_GATE
                     </button>
@@ -1187,7 +1196,7 @@ const SanctuaryDashboard = ({ isActive }) => {
                             <button
                                 onClick={handleMicToggle}
                                 className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 ${isRecording
-                                    ? 'bg-red-500 text-white shadow-[0_0_30px_rgba(239,68,68,0.5)] scale-95'
+                                    ? 'bg-red-500 text-white shadow-[0_0_18px_rgba(239,68,68,0.22)] scale-95'
                                     : 'bg-white/5 text-[var(--realm-color)] hover:bg-white/10 hover:shadow-[0_0_15px_var(--realm-color)]'
                                     }`}
                             >
@@ -1348,7 +1357,7 @@ const SanctuaryDashboard = ({ isActive }) => {
                                             <div className="w-40 h-[1px] bg-gradient-to-r from-transparent via-[var(--realm-color)]/30 to-transparent"></div>
                                             <button
                                                 onClick={() => setSelectedCourse(null)}
-                                                className="group relative px-10 md:px-20 py-4 border border-[var(--realm-color)]/20 bg-transparent transition-all hover:border-[var(--realm-color)] hover:shadow-[0_0_60px_rgba(255,69,0,0.15)] rounded-none"
+                                                className="group relative px-10 md:px-20 py-4 border border-[var(--realm-color)]/20 bg-transparent transition-all hover:border-[var(--realm-color)] hover:shadow-[0_0_28px_rgba(217,75,30,0.10)] rounded-none"
                                             >
                                                 <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                                 <span className="relative z-10 font-[Orbitron] text-[10px] tracking-[0.6em] text-[var(--realm-color)] group-hover:text-white transition-colors">
@@ -1545,7 +1554,7 @@ const NexusDashboard = ({ isActive }) => {
         <div className="w-full h-full flex flex-col items-center pt-32 pb-48 animate-fade-in relative z-10 overflow-y-auto custom-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
 
             {/* Header - Added padding-top to avoid overlap */}
-            <h2 className="font-[Orbitron] text-4xl font-black text-white mb-2 tracking-[0.3em] text-center filter drop-shadow-[0_0_15px_rgba(0,255,255,0.6)]">
+            <h2 className="font-[Orbitron] text-4xl font-black text-white mb-2 tracking-[0.3em] text-center filter drop-shadow-[0_0_12px_rgba(0,200,200,0.22)]">
                 NEXUS LAB
             </h2>
             <p className="text-xs font-mono text-[var(--realm-color)] uppercase tracking-[0.4em] mb-12 opacity-80">
@@ -1736,7 +1745,7 @@ const NexusDashboard = ({ isActive }) => {
 
                                                     <div className="mt-8">
                                                         <button
-                                                            className="w-full py-4 bg-[var(--realm-color)] text-black font-[Orbitron] font-black tracking-widest text-xs rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_30px_rgba(147,112,219,0.3)]"
+                                                            className="w-full py-4 bg-[var(--realm-color)] text-black font-[Orbitron] font-black tracking-widest text-xs rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_18px_rgba(123,101,192,0.14)]"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 setSelectedModule(null);
@@ -1774,7 +1783,7 @@ const NexusDashboard = ({ isActive }) => {
             {/* DAILY BRIEFING OVERLAY (Enhanced) */}
             {showBriefing && briefingData && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-300" onClick={() => setShowBriefing(false)}>
-                    <div className="glass-card p-6 md:p-10 max-w-2xl w-full border border-[var(--realm-color)]/50 rounded-2xl relative shadow-[0_0_50px_rgba(147,112,219,0.3)]" onClick={e => e.stopPropagation()}>
+                    <div className="glass-card p-6 md:p-10 max-w-2xl w-full border border-[var(--realm-color)]/50 rounded-2xl relative shadow-[0_0_24px_rgba(123,101,192,0.15)]" onClick={e => e.stopPropagation()}>
                         <button
                             onClick={() => setShowBriefing(false)}
                             className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors"
@@ -1868,7 +1877,7 @@ const NexusDashboard = ({ isActive }) => {
                         )}
 
                         <div className="observatory-header relative z-20 mb-8 text-center pt-8">
-                            <h1 className="font-[Orbitron] text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-[#9370DB] to-white tracking-[0.2em] drop-shadow-[0_0_15px_rgba(147,112,219,0.5)] mb-2">
+                            <h1 className="font-[Orbitron] text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-[#9370DB] to-white tracking-[0.2em] drop-shadow-[0_0_12px_rgba(123,101,192,0.22)] mb-2">
                                 COSMIC OBSERVATORY
                             </h1>
                             <div className="flex items-center justify-center gap-4 text-[#9370DB]/60 font-mono text-xs tracking-[0.3em]">
@@ -2368,6 +2377,11 @@ function MasterPortal() {
         }
     }, [location]);
 
+    // Sync dayMode to HTML data-theme attribute for CSS variable switching
+    useEffect(() => {
+        document.documentElement.dataset.theme = dayMode ? 'light' : 'dark';
+    }, [dayMode]);
+
     const cycleRealm = () => {
         const realms = Object.keys(REALMS);
         const currIdx = realms.indexOf(activeRealm);
@@ -2375,7 +2389,13 @@ function MasterPortal() {
         setActiveRealm(realms[nextIdx]);
     };
 
-    const currentRealm = REALMS[activeRealm];
+    const baseRealm = REALMS[activeRealm];
+    const currentRealm = dayMode ? {
+        ...baseRealm,
+        color: baseRealm.colorLight,
+        secondary: baseRealm.secondaryLight,
+        bg: baseRealm.bgLight,
+    } : baseRealm;
 
     const scrollToSection = (id) => {
         const el = document.getElementById(id);
@@ -2387,8 +2407,9 @@ function MasterPortal() {
     return (
         <main
             className="relative w-full overflow-y-auto text-white flex flex-col items-center transition-all duration-1000 custom-scrollbar noise-overlay"
-            style={{ height: '100dvh', minHeight: '-webkit-fill-available' }}
             style={{
+                height: '100dvh',
+                minHeight: '-webkit-fill-available',
                 '--realm-color': currentRealm.color,
                 '--secondary-color': currentRealm.secondary,
                 background: currentRealm.bg
@@ -2398,12 +2419,12 @@ function MasterPortal() {
             <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&family=Inter:wght@300;400;600&display=swap');
         
-        .glass-panel { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%); }
-        .glass-card { background: rgba(10, 10, 10, 0.4); backdrop-filter: blur(60px) saturate(200%); -webkit-backdrop-filter: blur(60px) saturate(200%); border-radius: 24px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); }
-        .glass-chip { background: rgba(0, 0, 0, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); padding: 12px 24px; border-radius: 99px; display: flex; flex-direction: column; align-items: center; backdrop-filter: blur(20px); transition: all 0.5s ease; cursor: pointer; }
-        .glass-chip:hover { transform: translateY(-3px); border-color: var(--realm-color); background: rgba(0,0,0,0.9); box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        .glass-chip .label { font-size: 8px; color: rgba(255,255,255,0.4); font-weight: 900; letter-spacing: 2px; margin-bottom: 2px; text-transform: uppercase; }
-        .glass-chip .value { font-family: 'Orbitron'; font-size: 16px; font-weight: 900; letter-spacing: 1px; }
+        .glass-panel { background: var(--glass-2); backdrop-filter: blur(40px) saturate(160%); -webkit-backdrop-filter: blur(40px) saturate(160%); border: 1px solid var(--glass-border); }
+        .glass-card { background: var(--glass-1); backdrop-filter: blur(60px) saturate(160%); -webkit-backdrop-filter: blur(60px) saturate(160%); border-radius: 24px; border: 1px solid var(--glass-border); box-shadow: 0 8px 40px var(--glass-shadow); }
+        .glass-chip { background: var(--glass-2); border: 1px solid var(--glass-border); padding: 12px 24px; border-radius: 99px; display: flex; flex-direction: column; align-items: center; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); transition: all 0.5s ease; cursor: pointer; }
+        .glass-chip:hover { transform: translateY(-3px); border-color: var(--realm-color); background: var(--glass-3); box-shadow: 0 0 14px rgba(0,0,0,calc(var(--glow-mult, 0.12) * 1.5)); }
+        .glass-chip .label { font-size: 8px; color: var(--text-secondary); font-weight: 900; letter-spacing: 2px; margin-bottom: 2px; text-transform: uppercase; }
+        .glass-chip .value { font-family: 'Orbitron'; font-size: 16px; font-weight: 900; letter-spacing: 1px; color: var(--text-primary); }
 
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
