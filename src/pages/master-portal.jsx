@@ -429,19 +429,23 @@ const SanctuarySigil = ({ Icon, isExpanded, id }) => {
     return (
         <div className="relative w-16 h-16 md:w-20 md:h-20 flex items-center justify-center group/sanctuary shrink-0">
             {/* Orbital Rings */}
-            <div className={`absolute inset-0 border border-[#FF4500]/10 rounded-full ${isExpanded ? 'animate-[spin_10s_linear_infinite]' : 'group-hover/sanctuary:animate-[spin_15s_linear_infinite]'}`}>
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#FF4500] rounded-full shadow-[0_0_10px_#FF4500]"></div>
+            <div className={`absolute inset-0 border border-[var(--realm-color)]/10 rounded-full ${isExpanded ? 'animate-[spin_10s_linear_infinite]' : 'group-hover/sanctuary:animate-[spin_15s_linear_infinite]'}`}>
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-[var(--realm-color)] rounded-full" style={{ boxShadow: '0 0 6px var(--realm-color)' }}></div>
             </div>
 
             {/* The Core Glass Container */}
-            <div className={`relative z-10 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center transition-all duration-700 ${isExpanded ? 'bg-[#FF4500]/15 border-[#FF4500] shadow-[0_0_28px_rgba(217,75,30,0.14)] scale-110' : 'bg-white/5 border-white/10 group-hover/sanctuary:bg-[#FF4500]/5 group-hover/sanctuary:border-[#FF4500]/30'}`}
+            <div className={`relative z-10 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center transition-all duration-700 ${isExpanded ? 'scale-110' : 'bg-white/5 border-white/10 group-hover/sanctuary:border-[var(--realm-color)]/30'}`}
                 style={{
                     clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)',
-                    borderWidth: '1px'
+                    borderWidth: '1px',
+                    background: isExpanded ? 'rgba(var(--realm-color-rgb, 217,75,30), 0.12)' : undefined,
+                    borderColor: isExpanded ? 'var(--realm-color)' : undefined,
                 }}
             >
-                <div className={`absolute inset-0 opacity-0 transition-opacity duration-700 bg-[radial-gradient(circle_at_50%_50%,rgba(255,69,0,0.3),transparent_70%)] ${isExpanded ? 'opacity-100' : 'group-hover/sanctuary:opacity-50'}`}></div>
-                <Icon size={20} strokeWidth={1.2} className={`transition-all duration-700 ${isExpanded ? 'text-white drop-shadow-[0_0_10px_white]' : 'text-white/40 group-hover/sanctuary:text-white'}`} />
+                <div className={`absolute inset-0 opacity-0 transition-opacity duration-700 ${isExpanded ? 'opacity-80' : 'group-hover/sanctuary:opacity-40'}`}
+                    style={{ background: 'radial-gradient(circle at 50% 50%, var(--realm-color), transparent 70%)', opacity: undefined }}
+                ></div>
+                <Icon size={20} strokeWidth={1.2} className={`transition-all duration-700 ${isExpanded ? 'text-white' : 'text-white/40 group-hover/sanctuary:text-white'}`} />
             </div>
         </div>
     );
@@ -760,7 +764,8 @@ const MasterHeader = ({ realm, dayMode, setDayMode }) => {
 
     return (
         <header
-            className="fixed top-6 left-0 right-0 z-[100] flex flex-col items-center pointer-events-none"
+            className="fixed left-0 right-0 z-[100] flex flex-col items-center pointer-events-none"
+            style={{ top: 'calc(1rem + env(safe-area-inset-top, 0px))' }}
         >
             <motion.div
                 initial={false}
@@ -773,7 +778,7 @@ const MasterHeader = ({ realm, dayMode, setDayMode }) => {
                 className={`pointer-events-auto relative overflow-hidden backdrop-blur-3xl border border-white/10 shadow-[0_12px_48px_rgba(0,0,0,0.25)] transition-all duration-700 ${isExpanded ? 'rounded-2xl bg-black/80 p-1 pt-1' : 'rounded-full bg-white/5 hover:bg-white/10'}`}
                 onMouseEnter={() => setIsExpanded(true)}
                 onMouseLeave={() => setIsExpanded(false)}
-                onTouchStart={() => setIsExpanded(true)}
+                onTouchStart={() => setIsExpanded(prev => !prev)}
             >
                 {/* HUD Scanline Effect */}
                 <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] bg-[length:100%_4px] opacity-20 pointer-events-none"></div>
@@ -2554,7 +2559,7 @@ function MasterPortal() {
           opacity: 0;
           transform: scale(0.98) translateY(20px);
           transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-          padding-top: 170px;
+          padding-top: calc(160px + env(safe-area-inset-top, 0px));
           /* Extra bottom padding for safe area + fixed nav buttons */
           padding-bottom: calc(200px + env(safe-area-inset-bottom, 0px));
           padding-left: max(1rem, calc(1rem + env(safe-area-inset-left, 0px)));
