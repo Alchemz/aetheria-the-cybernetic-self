@@ -10,7 +10,7 @@ import {
     Wind, Moon, Zap, Activity, BookOpen, Users,
     ChevronRight, ArrowRight, Brain, Lock, Star, Hexagon,
     Heart, Eye, ArrowLeft, Send, Download, History, Trash2,
-    X, Telescope, PenLine, Droplet, Sun, Sparkles, Target, Flame, Globe, List, Plus, Check, CheckSquare, ChevronUp,
+    X, Telescope, PenLine, Droplet, Sun, Sparkles, Target, Flame, Globe, List, Plus, Check, CheckSquare, ChevronUp, ChevronDown,
     Cpu, Orbit, KeyRound, Waves, LayoutGrid, Sword
 } from 'lucide-react';
 import { SpeechRecognition } from '@capacitor-community/speech-recognition';
@@ -22,6 +22,7 @@ import ErrorBoundary from '../components/ErrorBoundary'; // [NEW] Error Boundary
 import { MEDITATION_CATEGORIES, SLEEP_CATEGORIES, BIOHACKING_PROTOCOLS } from '../data/appData';
 import { bioModsData } from '@/data/heartwaveData';
 import { NotificationService } from '@/api/notificationService';
+import Tutorial from '../components/Tutorial';
 
 // --- CONFIGURATION & REAL DATA ---
 
@@ -703,6 +704,7 @@ const MasterHeader = ({ realm, dayMode, setDayMode }) => {
     const [trackIdx, setTrackIdx] = useState(0);
     const [selectedCategoryKey, setSelectedCategoryKey] = useState(null);
     const [isExpanded, setIsExpanded] = useState(false);
+    const [isMinimized, setIsMinimized] = useState(false);
 
     const audioRef = useRef(new Audio());
 
@@ -765,25 +767,45 @@ const MasterHeader = ({ realm, dayMode, setDayMode }) => {
     return (
         <header
             className="fixed left-0 right-0 z-[100] flex flex-col items-center pointer-events-none"
-            style={{ top: 'calc(1rem + env(safe-area-inset-top, 0px))' }}
+            style={{
+                top: isMinimized ? 'env(safe-area-inset-top, 0px)' : 'calc(1rem + env(safe-area-inset-top, 0px))',
+                transition: 'top 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+            }}
         >
             <motion.div
                 initial={false}
                 animate={{
-                    width: isExpanded ? '100%' : 'min(320px, calc(100vw - 2rem))',
-                    maxWidth: isExpanded ? '900px' : '320px',
-                    height: isExpanded ? 'auto' : '56px'
+                    width: isMinimized ? '100%' : (isExpanded ? 'calc(100vw - 2rem)' : 'min(320px, calc(100vw - 2rem))'),
+                    maxWidth: isMinimized ? '100%' : (isExpanded ? '620px' : '320px'),
+                    height: isMinimized ? '10px' : (isExpanded ? 'auto' : '56px'),
+                    maxHeight: isExpanded ? '70vh' : undefined,
+                    borderRadius: isMinimized ? 0 : (isExpanded ? 16 : 9999),
                 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className={`pointer-events-auto relative overflow-hidden backdrop-blur-3xl border border-white/10 shadow-[0_12px_48px_rgba(0,0,0,0.25)] transition-all duration-700 ${isExpanded ? 'rounded-2xl bg-black/80 p-1 pt-1' : 'rounded-full bg-white/5 hover:bg-white/10'}`}
-                onMouseEnter={() => setIsExpanded(true)}
-                onMouseLeave={() => setIsExpanded(false)}
-                onTouchStart={() => setIsExpanded(prev => !prev)}
+                className={`pointer-events-auto relative overflow-hidden backdrop-blur-3xl border border-white/10 shadow-[0_12px_48px_rgba(0,0,0,0.25)] ${
+                    isMinimized
+                        ? 'bg-black/70 cursor-pointer'
+                        : isExpanded
+                            ? 'bg-black/80 p-1 pt-1'
+                            : 'bg-white/5 hover:bg-white/10'
+                }`}
+                onMouseEnter={!isMinimized ? () => setIsExpanded(true) : undefined}
+                onMouseLeave={!isMinimized ? () => setIsExpanded(false) : undefined}
+                onClick={isMinimized ? () => setIsMinimized(false) : undefined}
             >
                 {/* HUD Scanline Effect */}
                 <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] bg-[length:100%_4px] opacity-20 pointer-events-none"></div>
 
-                <div className={`flex flex-col w-full h-full transition-all duration-500`}>
+                {/* MINIMIZED SLIVER — pulsing LED when playing */}
+                {isMinimized && (
+                    <div className="absolute inset-0 flex items-center justify-center gap-3">
+                        <div className={`w-2 h-2 rounded-full transition-all ${isPlaying ? 'bg-[#72A0FF] animate-pulse shadow-[0_0_8px_#72A0FF]' : 'bg-white/20'}`} />
+                        <div className="h-[1px] w-16 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                        <div className={`w-1.5 h-1.5 rounded-full transition-all ${isPlaying ? 'bg-[#72A0FF]/60 animate-pulse' : 'bg-white/10'}`} style={{ animationDelay: '0.3s' }} />
+                    </div>
+                )}
+
+                {!isMinimized && <div className={`flex flex-col w-full h-full transition-all duration-500`}>
 
                     {/* TOP HUD BAR - Primary Controls */}
                     <div className="flex items-center justify-between px-4 h-[54px] min-h-[54px]">
@@ -805,17 +827,42 @@ const MasterHeader = ({ realm, dayMode, setDayMode }) => {
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
                             {!isExpanded && (
-                                <FrequencyVisualizer isActive={isPlaying} color={realm.color} />
+                                <div className="hidden md:block">
+                                    <FrequencyVisualizer isActive={isPlaying} color={realm.color} />
+                                </div>
                             )}
 
+                            {/* Sleep / Meditation pill toggle */}
                             <button
                                 onClick={(e) => { e.stopPropagation(); setDayMode(!dayMode); }}
-                                className={`w-10 h-10 rounded-full border border-white/5 flex items-center justify-center transition-all ${dayMode ? 'bg-[#FFD700]/10 text-[#FFD700]' : 'bg-[#72A0FF]/10 text-[#72A0FF]'}`}
+                                className="flex items-center bg-white/5 border border-white/10 rounded-full overflow-hidden text-[11px] font-bold"
                             >
-                                {dayMode ? <Sun size={14} /> : <Moon size={14} />}
+                                <span className={`px-2.5 py-1.5 rounded-full transition-all duration-300 ${!dayMode ? 'bg-[#72A0FF]/30 text-[#72A0FF]' : 'text-white/20'}`}>ZZZ</span>
+                                <span className={`px-2.5 py-1.5 rounded-full transition-all duration-300 ${dayMode ? 'bg-[#FFD700]/20 text-[#FFD700]' : 'text-white/20'}`}>ॐ</span>
                             </button>
+
+                            {/* Minimize to sliver */}
+                            {!isExpanded && (
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); setIsMinimized(true); }}
+                                    className="w-7 h-7 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/30 hover:text-white transition-all"
+                                    title="Minimize player"
+                                >
+                                    <ChevronUp size={12} />
+                                </button>
+                            )}
+
+                            {/* Mobile-only expand button */}
+                            {!isExpanded && (
+                                <button
+                                    className="md:hidden w-7 h-7 rounded-full bg-white/5 flex items-center justify-center text-white/30"
+                                    onClick={(e) => { e.stopPropagation(); setIsExpanded(true); }}
+                                >
+                                    <ChevronDown size={12} />
+                                </button>
+                            )}
 
                             {isExpanded && (
                                 <div className="flex items-center gap-2 border-l border-white/10 pl-4 ml-2">
@@ -827,7 +874,7 @@ const MasterHeader = ({ realm, dayMode, setDayMode }) => {
                                     </button>
                                     <button
                                         onClick={(e) => { e.stopPropagation(); setIsExpanded(false); }}
-                                        className="ml-2 p-1 rounded-full bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all transform hover:-translate-y-0.5"
+                                        className="ml-2 p-1 rounded-full bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all"
                                         title="Collapse HUD"
                                     >
                                         <ChevronUp size={14} />
@@ -844,7 +891,7 @@ const MasterHeader = ({ realm, dayMode, setDayMode }) => {
                                 initial={{ opacity: 0, scale: 0.98 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.98 }}
-                                className="px-4 pb-4 overflow-hidden"
+                                className="px-4 pb-4 overflow-y-auto"
                             >
                                 <div className="grid grid-cols-1 md:grid-cols-4 gap-2 mt-2">
                                     {/* Selector Module */}
@@ -897,7 +944,7 @@ const MasterHeader = ({ realm, dayMode, setDayMode }) => {
                             </motion.div>
                         )}
                     </AnimatePresence>
-                </div>
+                </div>}
             </motion.div>
         </header>
     );
@@ -963,7 +1010,7 @@ const PrecisionTimeHUD = ({ habit, onConfirm, onCancel }) => {
     );
 };
 
-const RealmNavigator = ({ realm, onScrollTo }) => {
+const RealmNavigator = ({ realm, onScrollTo, isDark, setIsDark }) => {
     if (realm === 'TEMPLE') return null;
 
     const navItems = realm === 'SANCTUARY' ? [
@@ -993,6 +1040,14 @@ const RealmNavigator = ({ realm, onScrollTo }) => {
                         <span className="text-[9px] font-[Orbitron] font-black tracking-widest hidden md:block">{item.label}</span>
                     </button>
                 ))}
+                {/* Dark mode toggle */}
+                <button
+                    onClick={() => setIsDark(!isDark)}
+                    className="flex items-center gap-3 bg-black/40 backdrop-blur-xl border border-white/5 p-2 rounded-xl text-white/40 hover:text-[var(--realm-color)] hover:border-[var(--realm-color)]/30 transition-all hover:scale-110"
+                >
+                    {isDark ? <Sun size={16} /> : <Moon size={16} />}
+                    <span className="text-[9px] font-[Orbitron] font-black tracking-widest hidden md:block">{isDark ? 'LIGHT' : 'DARK'}</span>
+                </button>
             </div>
         </div>
     );
@@ -2104,6 +2159,33 @@ const TEMPLE_HABITS = [
 
 
 
+// Convert BIOHACKING_PROTOCOLS (foundational habits) into bioModsData-compatible shape
+const FOUNDATION_PROTOCOLS = Object.fromEntries(
+    BIOHACKING_PROTOCOLS.map(p => {
+        const allBenefits = Object.values(p.benefits).flat();
+        return [p.id, {
+            id: p.id,
+            name: p.name,
+            icon: p.icon,
+            color: p.color,
+            simpleExplanation: p.description,
+            supplements: [],
+            habits: p.protocol.map((step, i) => ({
+                id: `${p.id}-step-${i}`,
+                name: step.replace(/^\d+\.\s*/, '').split(':')[0].trim().slice(0, 40),
+                category: p.category,
+                duration: 15,
+                difficulty: i < 2 ? 'Easy' : i < 4 ? 'Medium' : 'Hard',
+                why: allBenefits[i] || p.description,
+                howTo: step.replace(/^\d+\.\s*/, ''),
+            }))
+        }];
+    })
+);
+
+// Foundation (foundational daily habits) + Advanced (biohacking lab mods)
+const ALL_PROTOCOLS = { ...FOUNDATION_PROTOCOLS, ...bioModsData };
+
 const TempleDashboard = ({ isActive }) => {
     const [selectedProtocolKey, setSelectedProtocolKey] = useState(null);
     const [activeHabit, setActiveHabit] = useState(null); // Click-to-persist state
@@ -2158,7 +2240,7 @@ const TempleDashboard = ({ isActive }) => {
                     </div>
 
                     <div className="flex-1 overflow-y-auto custom-scrollbar space-y-2 pr-2">
-                        {Object.entries(bioModsData).map(([key, protocol]) => (
+                        {Object.entries(ALL_PROTOCOLS).map(([key, protocol]) => (
                             <button
                                 key={key}
                                 onClick={() => setSelectedProtocolKey(key)}
@@ -2187,14 +2269,14 @@ const TempleDashboard = ({ isActive }) => {
                                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[var(--realm-color)] to-transparent" />
 
                                 <h2 className="font-[Orbitron] text-2xl text-white font-black tracking-widest uppercase mb-2 leading-tight">
-                                    {bioModsData[selectedProtocolKey].name}
+                                    {ALL_PROTOCOLS[selectedProtocolKey].name}
                                 </h2>
                                 <p className="text-sm text-white/60 mb-6 font-light leading-relaxed line-clamp-2">
-                                    {bioModsData[selectedProtocolKey].simpleExplanation}
+                                    {ALL_PROTOCOLS[selectedProtocolKey].simpleExplanation}
                                 </p>
 
                                 <div className="space-y-3 overflow-y-auto custom-scrollbar flex-1 pr-2 pb-4">
-                                    {bioModsData[selectedProtocolKey].habits.map((habit, idx) => {
+                                    {ALL_PROTOCOLS[selectedProtocolKey].habits.map((habit, idx) => {
                                         const isAdded = dailyStack.some(h => h.name === habit.name);
                                         const isActiveHabit = activeHabit?.name === habit.name;
                                         return (
@@ -2366,8 +2448,10 @@ const DailyQuoteOverlay = ({ onDismiss }) => {
 
 function MasterPortal() {
     const [activeRealm, setActiveRealm] = useState('SANCTUARY');
-    const [dayMode, setDayMode] = useState(true); // Light theme by default
+    const [dayMode, setDayMode] = useState(true); // true = meditation (ॐ), false = sleep (ZZZ)
+    const [isDark, setIsDark] = useState(false); // true = dark theme, false = light theme
     const [showQuote, setShowQuote] = useState(false);
+    const [showTutorial, setShowTutorial] = useState(() => !localStorage.getItem('rasync_tutorial_seen'));
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -2382,10 +2466,10 @@ function MasterPortal() {
         }
     }, [location]);
 
-    // Sync dayMode to HTML data-theme attribute for CSS variable switching
+    // Sync isDark to HTML data-theme attribute for CSS variable switching
     useEffect(() => {
-        document.documentElement.dataset.theme = dayMode ? 'light' : 'dark';
-    }, [dayMode]);
+        document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+    }, [isDark]);
 
     const cycleRealm = () => {
         const realms = Object.keys(REALMS);
@@ -2411,7 +2495,7 @@ function MasterPortal() {
     };
 
     const baseRealm = REALMS[activeRealm];
-    const currentRealm = dayMode ? {
+    const currentRealm = !isDark ? {
         ...baseRealm,
         color: baseRealm.colorLight,
         secondary: baseRealm.secondaryLight,
@@ -2423,6 +2507,7 @@ function MasterPortal() {
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
+    if (showTutorial) return <Tutorial onComplete={() => setShowTutorial(false)} />;
     if (showQuote) return <DailyQuoteOverlay onDismiss={() => setShowQuote(false)} />;
 
     return (
@@ -2436,7 +2521,7 @@ function MasterPortal() {
                 background: currentRealm.bg
             }}
         >
-            <RealmNavigator realm={activeRealm} onScrollTo={scrollToSection} />
+            <RealmNavigator realm={activeRealm} onScrollTo={scrollToSection} isDark={isDark} setIsDark={setIsDark} />
             <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&family=Inter:wght@300;400;600&display=swap');
         

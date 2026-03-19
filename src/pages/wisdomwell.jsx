@@ -442,20 +442,45 @@ export default function WisdomWell() {
   };
 
   return (
-    <div className="wisdom-well bg-black text-white font-['Exo_2'] min-h-screen relative overflow-x-hidden pt-24 pb-20">
-      {/* HUD OVERLAYS */}
+    <div className="wisdom-well font-['Exo_2'] min-h-screen relative overflow-x-hidden pt-24 pb-20">
+      {/* BACKGROUND — adapts to light/dark theme */}
       <div className="fixed inset-0 pointer-events-none z-[1]">
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] mix-blend-overlay"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black/80"></div>
-        {/* Scanlines */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.02),rgba(0,255,0,0.01),rgba(0,0,255,0.02))] bg-[length:100%_4px,3px_100%] pointer-events-none"></div>
+        <div className="ww-bg-layer absolute inset-0" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[rgba(0,0,0,0.15)]" />
       </div>
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&family=Space+Mono&display=swap');
-        
+
+        /* ── Dark theme (default) ── */
+        .wisdom-well { isolation: isolate; color: rgba(255,255,255,0.87); background: #090912; }
+        .ww-bg-layer { background: radial-gradient(ellipse at 50% 0%, rgba(74,100,180,0.12) 0%, transparent 70%); }
+        .wisdom-well .ww-accent { color: #72A0FF; }
+        .wisdom-well .ancient-glass { background: rgba(12,16,30,0.55); border-color: rgba(74,158,255,0.18); box-shadow: inset 0 0 24px rgba(74,158,255,0.04), 0 16px 40px rgba(0,0,0,0.4); }
+        .wisdom-well .prose-intel h3 { background: linear-gradient(to bottom, rgba(255,255,255,0.9), #72A0FF); }
+        .wisdom-well .prose-intel h4 { color: #72A0FF; }
+        .wisdom-well .prose-intel p { color: rgba(255,255,255,0.5); }
+        .wisdom-well .prose-intel strong { color: #72A0FF; }
+        .wisdom-well .prose-intel em { color: #9BBFFF; border-color: rgba(114,160,255,0.2); }
+        .wisdom-well .wisdom-dossier-card { background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.18)); border-color: rgba(255,255,255,0.06); box-shadow: 0 16px 48px rgba(0,0,0,0.35); }
+        .wisdom-well .wisdom-dossier-card::before, .wisdom-well .wisdom-dossier-card::after { background: #4A9EFF; }
+
+        /* ── Light theme ── */
+        :root[data-theme="light"] .wisdom-well { color: rgba(10,15,40,0.87); background: #f0f2fa; }
+        :root[data-theme="light"] .ww-bg-layer { background: radial-gradient(ellipse at 50% 0%, rgba(140,170,255,0.18) 0%, transparent 70%); }
+        :root[data-theme="light"] .wisdom-well .ww-accent { color: #3B6FD4; }
+        :root[data-theme="light"] .wisdom-well .ancient-glass { background: rgba(255,255,255,0.6); border-color: rgba(100,140,220,0.25); box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 12px 32px rgba(60,100,200,0.08); }
+        :root[data-theme="light"] .wisdom-well .prose-intel h3 { background: linear-gradient(to bottom, #1a2060, #3B6FD4); filter: drop-shadow(0 0 12px rgba(59,111,212,0.2)); }
+        :root[data-theme="light"] .wisdom-well .prose-intel h4 { color: #3B6FD4; }
+        :root[data-theme="light"] .wisdom-well .prose-intel p { color: rgba(10,15,40,0.6); }
+        :root[data-theme="light"] .wisdom-well .prose-intel strong { color: #2a52b0; }
+        :root[data-theme="light"] .wisdom-well .prose-intel em { color: #3B6FD4; border-color: rgba(59,111,212,0.25); }
+        :root[data-theme="light"] .wisdom-well .wisdom-dossier-card { background: rgba(255,255,255,0.7); border-color: rgba(100,140,220,0.2); box-shadow: 0 8px 32px rgba(60,100,200,0.07); }
+        :root[data-theme="light"] .wisdom-well .wisdom-dossier-card::before, :root[data-theme="light"] .wisdom-well .wisdom-dossier-card::after { background: #3B6FD4; }
+        :root[data-theme="light"] .wisdom-well * { border-color: rgba(100,140,220,0.2); }
+        :root[data-theme="light"] .wisdom-well .data-stream-glow { background: linear-gradient(90deg, transparent, #3B6FD4, transparent); }
+
         .wisdom-well { isolation: isolate; }
-        .wisdom-well * { border-color: rgba(74, 158, 255, 0.2); }
 
         @keyframes spin {
           from { transform: rotate(0deg); }
@@ -464,18 +489,16 @@ export default function WisdomWell() {
         
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { 
-          background: linear-gradient(to bottom, transparent, #4A9EFF, transparent); 
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: linear-gradient(to bottom, transparent, rgba(114,160,255,0.5), transparent);
           border-radius: 10px;
         }
 
         .ancient-glass {
-          background: rgba(15, 20, 30, 0.4);
-          backdrop-filter: blur(40px) saturate(180%);
-          border: 1px solid rgba(74, 158, 255, 0.2);
-          box-shadow: 
-            inset 0 0 30px rgba(74, 158, 255, 0.05),
-            0 20px 50px rgba(0, 0, 0, 0.5);
+          backdrop-filter: blur(40px) saturate(160%);
+          -webkit-backdrop-filter: blur(40px) saturate(160%);
+          border-width: 1px;
+          border-style: solid;
         }
 
         .wisdom-dossier-card {
