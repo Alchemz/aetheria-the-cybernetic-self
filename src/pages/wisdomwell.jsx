@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, ChevronDown, ChevronUp, Sparkles, Eye, Star, Sun, Moon,
@@ -8,53 +8,70 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const HolographicSigil = ({ Icon, isExpanded, id }) => {
+const HolographicSigil = ({ Icon, isExpanded, id, wwP, wwD }) => {
   return (
     <div className="relative w-16 h-16 md:w-24 md:h-24 flex items-center justify-center group/sigil shrink-0">
       {/* Orbital Discovery Ring */}
-      <div className={`absolute inset-0 border border-[#72A0FF]/10 rounded-full ${isExpanded ? 'animate-[spin_10s_linear_infinite]' : 'group-hover/sigil:animate-[spin_15s_linear_infinite]'}`}>
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#72A0FF] rounded-full shadow-[0_0_10px_#72A0FF]"></div>
+      <div
+        className={`absolute inset-0 rounded-full ${isExpanded ? 'animate-[spin_10s_linear_infinite]' : 'group-hover/sigil:animate-[spin_15s_linear_infinite]'}`}
+        style={{ border: `1px solid ${wwP}1a` }}
+      >
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+          style={{ background: wwP, boxShadow: `0 0 10px ${wwP}` }}></div>
       </div>
 
       {/* Secondary Pulse Ring */}
       <motion.div
         animate={isExpanded ? { scale: [1, 1.1, 1], opacity: [0.1, 0.3, 0.1] } : {}}
         transition={{ duration: 4, repeat: Infinity }}
-        className="absolute inset-2 border border-[#72A0FF]/5 rounded-full"
+        className="absolute inset-2 rounded-full"
+        style={{ border: `1px solid ${wwP}0d` }}
       />
 
       {/* The Core Glass Container */}
-      <div className={`relative z-10 w-12 h-12 md:w-16 md:h-16 flex items-center justify-center transition-all duration-700 ${isExpanded ? 'bg-[#4A9EFF]/15 border-[#72A0FF] shadow-[0_0_50px_rgba(72,160,255,0.3)] scale-110' : 'bg-white/5 border-white/10 group-hover/sigil:bg-[#4A9EFF]/5 group-hover/sigil:border-[#72A0FF]/30'}`}
+      <div
+        className={`relative z-10 w-12 h-12 md:w-16 md:h-16 flex items-center justify-center transition-all duration-700 ${isExpanded ? 'scale-110' : ''}`}
         style={{
           clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)',
-          borderWidth: '1px'
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          background: isExpanded ? `${wwD}22` : undefined,
+          borderColor: isExpanded ? wwP : undefined,
+          boxShadow: isExpanded ? `0 0 50px ${wwD}4d` : undefined,
         }}
       >
         {/* Internal Nebula Glow */}
-        <div className={`absolute inset-0 opacity-0 transition-opacity duration-700 bg-[radial-gradient(circle_at_50%_50%,rgba(74,158,255,0.3),transparent_70%)] ${isExpanded ? 'opacity-100' : 'group-hover/sigil:opacity-50'}`}></div>
+        <div
+          className={`absolute inset-0 opacity-0 transition-opacity duration-700 ${isExpanded ? 'opacity-100' : 'group-hover/sigil:opacity-50'}`}
+          style={{ background: `radial-gradient(circle at 50% 50%, ${wwD}4d, transparent 70%)` }}
+        ></div>
 
         {/* The Icon itself with bespoke styling */}
         <div className="relative z-20">
           <svg width="0" height="0" className="absolute">
             <defs>
               <linearGradient id={`icon-grad-${id}`} x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="white" />
-                <stop offset="100%" stopColor="#72A0FF" />
+                <stop offset="0%" stopColor="currentColor" />
+                <stop offset="100%" stopColor={wwP} />
               </linearGradient>
             </defs>
           </svg>
           <Icon
             size={22}
             strokeWidth={1.2}
-            className={`transition-all duration-700 md:w-7 md:h-7 ${isExpanded ? 'drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]' : 'text-white/40 group-hover/sigil:text-white'}`}
-            style={{ stroke: isExpanded ? `url(#icon-grad-${id})` : '' }}
+            className={`transition-all duration-700 md:w-7 md:h-7`}
+            style={{
+              color: isExpanded ? wwP : undefined,
+              stroke: isExpanded ? `url(#icon-grad-${id})` : undefined,
+              opacity: isExpanded ? 1 : 0.4,
+            }}
           />
         </div>
       </div>
 
       {/* Background Static Geometric Burst */}
       <div className={`absolute inset-4 opacity-[0.03] transition-all duration-700 pointer-events-none ${isExpanded ? 'rotate-45 scale-150 opacity-[0.07]' : ''}`}
-        style={{ backgroundImage: 'repeating-conic-gradient(#72A0FF 0% 1%, transparent 1% 10%)' }}>
+        style={{ backgroundImage: `repeating-conic-gradient(${wwP} 0% 1%, transparent 1% 10%)` }}>
       </div>
     </div>
   );
@@ -62,6 +79,23 @@ const HolographicSigil = ({ Icon, isExpanded, id }) => {
 
 export default function WisdomWell() {
   const [expandedCard, setExpandedCard] = useState(null);
+
+  // Track theme for adapting hardcoded blue colors
+  const [isLight, setIsLight] = useState(
+    () => document.documentElement.dataset.theme === 'light'
+  );
+  useEffect(() => {
+    const obs = new MutationObserver(() => {
+      setIsLight(document.documentElement.dataset.theme === 'light');
+    });
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => obs.disconnect();
+  }, []);
+
+  // Theme-aware Wisdom Well blue palette
+  // Dark: bright electric blue  /  Light: deep navy, low-saturation glow
+  const wwP = isLight ? '#2B4880' : '#72A0FF';   // primary (borders, text, icons)
+  const wwD = isLight ? '#1E3568' : '#4A9EFF';   // dim / secondary blue
 
   const wisdomThreads = [
     {
@@ -465,20 +499,21 @@ export default function WisdomWell() {
         .wisdom-well .wisdom-dossier-card { background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.18)); border-color: rgba(255,255,255,0.06); box-shadow: 0 16px 48px rgba(0,0,0,0.35); }
         .wisdom-well .wisdom-dossier-card::before, .wisdom-well .wisdom-dossier-card::after { background: #4A9EFF; }
 
-        /* ── Light theme ── */
-        :root[data-theme="light"] .wisdom-well { color: rgba(10,15,40,0.87); background: #f0f2fa; }
-        :root[data-theme="light"] .ww-bg-layer { background: radial-gradient(ellipse at 50% 0%, rgba(140,170,255,0.18) 0%, transparent 70%); }
-        :root[data-theme="light"] .wisdom-well .ww-accent { color: #3B6FD4; }
-        :root[data-theme="light"] .wisdom-well .ancient-glass { background: rgba(255,255,255,0.6); border-color: rgba(100,140,220,0.25); box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 12px 32px rgba(60,100,200,0.08); }
-        :root[data-theme="light"] .wisdom-well .prose-intel h3 { background: linear-gradient(to bottom, #1a2060, #3B6FD4); filter: drop-shadow(0 0 12px rgba(59,111,212,0.2)); }
-        :root[data-theme="light"] .wisdom-well .prose-intel h4 { color: #3B6FD4; }
-        :root[data-theme="light"] .wisdom-well .prose-intel p { color: rgba(10,15,40,0.6); }
-        :root[data-theme="light"] .wisdom-well .prose-intel strong { color: #2a52b0; }
-        :root[data-theme="light"] .wisdom-well .prose-intel em { color: #3B6FD4; border-color: rgba(59,111,212,0.25); }
-        :root[data-theme="light"] .wisdom-well .wisdom-dossier-card { background: rgba(255,255,255,0.7); border-color: rgba(100,140,220,0.2); box-shadow: 0 8px 32px rgba(60,100,200,0.07); }
-        :root[data-theme="light"] .wisdom-well .wisdom-dossier-card::before, :root[data-theme="light"] .wisdom-well .wisdom-dossier-card::after { background: #3B6FD4; }
-        :root[data-theme="light"] .wisdom-well * { border-color: rgba(100,140,220,0.2); }
-        :root[data-theme="light"] .wisdom-well .data-stream-glow { background: linear-gradient(90deg, transparent, #3B6FD4, transparent); }
+        /* ── Light theme — dark navy, low-saturation glow ── */
+        :root[data-theme="light"] .wisdom-well { color: rgba(10,14,30,0.88); background: #ebe7df; }
+        :root[data-theme="light"] .ww-bg-layer { background: radial-gradient(ellipse at 50% 0%, rgba(43,72,128,0.10) 0%, transparent 70%); }
+        :root[data-theme="light"] .wisdom-well .ww-accent { color: #2B4880; }
+        :root[data-theme="light"] .wisdom-well .ancient-glass { background: rgba(255,252,245,0.65); border-color: rgba(43,72,128,0.18); box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 12px 32px rgba(30,53,104,0.08); }
+        :root[data-theme="light"] .wisdom-well .prose-intel h3 { background: linear-gradient(to bottom, #0e1a40, #2B4880); filter: drop-shadow(0 0 10px rgba(43,72,128,0.15)); }
+        :root[data-theme="light"] .wisdom-well .prose-intel h4 { color: #2B4880; }
+        :root[data-theme="light"] .wisdom-well .prose-intel p { color: rgba(10,14,30,0.60); }
+        :root[data-theme="light"] .wisdom-well .prose-intel strong { color: #1E3568; }
+        :root[data-theme="light"] .wisdom-well .prose-intel em { color: #2B4880; border-color: rgba(43,72,128,0.22); }
+        :root[data-theme="light"] .wisdom-well .wisdom-dossier-card { background: rgba(255,252,245,0.72); border-color: rgba(43,72,128,0.14); box-shadow: 0 8px 32px rgba(30,53,104,0.07); }
+        :root[data-theme="light"] .wisdom-well .wisdom-dossier-card::before, :root[data-theme="light"] .wisdom-well .wisdom-dossier-card::after { background: #2B4880; }
+        :root[data-theme="light"] .wisdom-well * { border-color: rgba(43,72,128,0.16); }
+        :root[data-theme="light"] .wisdom-well .data-stream-glow { background: linear-gradient(90deg, transparent, #2B4880, transparent); }
+        :root[data-theme="light"] .wisdom-well .custom-scrollbar::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, transparent, rgba(43,72,128,0.4), transparent); }
 
         .wisdom-well { isolation: isolate; }
 
@@ -620,23 +655,32 @@ export default function WisdomWell() {
 
       <div className="max-w-4xl mx-auto px-6 relative z-[2]">
         <div className="wisdom-header text-center mb-16 relative">
-          <Link to="/portal" className="absolute -top-12 left-0 flex items-center gap-2 text-[#4A9EFF]/60 hover:text-[#4A9EFF] transition-all group font-mono text-xs tracking-widest uppercase">
+          <Link to="/portal" className="absolute -top-12 left-0 flex items-center gap-2 transition-all group font-mono text-xs tracking-widest uppercase"
+            style={{ color: `${wwD}99` }}>
             <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
             Control Center
           </Link>
 
-          <div className="inline-block px-4 py-1 border border-[#72A0FF]/30 rounded-none text-[9px] font-mono text-[#72A0FF] tracking-[0.4em] uppercase mb-4 bg-[#72A0FF]/5 backdrop-blur-sm">
+          <div className="inline-block px-4 py-1 rounded-none text-[9px] font-mono tracking-[0.4em] uppercase mb-4 backdrop-blur-sm"
+            style={{ border: `1px solid ${wwP}4d`, color: wwP, background: `${wwP}0d` }}>
             SUB-CONSCIOUS ARCHIVE // AUTH_NODE: ENABLED
           </div>
 
-          <h1 className="font-[Orbitron] text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-[#72A0FF] to-white tracking-[0.3em] drop-shadow-[0_0_30px_rgba(74,158,255,0.3)] mb-6">
+          <h1 className="font-[Orbitron] text-5xl md:text-7xl font-black text-transparent bg-clip-text tracking-[0.3em] mb-6"
+            style={{
+              backgroundImage: isLight
+                ? `linear-gradient(to right, rgba(10,14,30,0.7), ${wwP}, rgba(10,14,30,0.7))`
+                : `linear-gradient(to right, rgba(255,255,255,0.9), ${wwP}, rgba(255,255,255,0.9))`,
+              filter: `drop-shadow(0 0 24px ${wwD}4d)`,
+            }}>
             WISDOM WELL
           </h1>
 
-          <p className="text-[#4A9EFF]/40 font-[Orbitron] text-[10px] tracking-[0.5em] uppercase mb-8 flex items-center justify-center gap-6">
-            <span className="w-16 h-[1px] bg-gradient-to-r from-transparent via-[#4A9EFF]/20 to-transparent"></span>
+          <p className="font-[Orbitron] text-[10px] tracking-[0.5em] uppercase mb-8 flex items-center justify-center gap-6"
+            style={{ color: `${wwD}66` }}>
+            <span className="w-16 h-[1px]" style={{ background: `linear-gradient(to right, transparent, ${wwD}33, transparent)` }}></span>
             Streaming Ancient Intel Data
-            <span className="w-16 h-[1px] bg-gradient-to-l from-transparent via-[#4A9EFF]/20 to-transparent"></span>
+            <span className="w-16 h-[1px]" style={{ background: `linear-gradient(to left, transparent, ${wwD}33, transparent)` }}></span>
           </p>
         </div>
 
@@ -650,14 +694,16 @@ export default function WisdomWell() {
                 key={thread.id}
                 layout
                 initial={false}
-                className={`ancient-glass relative overflow-hidden group transition-all duration-700 rounded-px ${isExpanded ? 'ring-1 ring-[#72A0FF]/40' : 'hover:bg-[#4A9EFF]/5 hover:border-[#4A9EFF]/30'}`}
+                className="ancient-glass relative overflow-hidden group transition-all duration-700 rounded-px"
                 style={{
                   clipPath: isExpanded ? 'none' : 'polygon(0 0, 95% 0, 100% 10%, 100% 100%, 5% 100%, 0 90%)',
-                  borderRadius: '2px'
+                  borderRadius: '2px',
+                  outline: isExpanded ? `1px solid ${wwP}66` : undefined,
                 }}
               >
-                {/* Tech Highlights */}
-                <div className="absolute top-0 left-0 w-[1px] h-full bg-gradient-to-b from-[#4A9EFF] via-transparent to-transparent opacity-20" />
+                {/* Tech Highlight — left edge accent */}
+                <div className="absolute top-0 left-0 w-[1px] h-full opacity-20"
+                  style={{ background: `linear-gradient(to bottom, ${wwD}, transparent, transparent)` }} />
 
                 <div
                   className="p-6 md:p-10 cursor-pointer relative z-10"
@@ -665,21 +711,27 @@ export default function WisdomWell() {
                 >
                   <div className="flex justify-between items-center gap-4 md:gap-8">
                     <div className="flex items-center gap-4 md:gap-8">
-                      <HolographicSigil Icon={Icon} isExpanded={isExpanded} id={thread.id} />
+                      <HolographicSigil Icon={Icon} isExpanded={isExpanded} id={thread.id} wwP={wwP} wwD={wwD} />
                       <div>
                         <div className="flex items-center gap-4 mb-2 font-mono text-[8px] tracking-[0.3em] uppercase opacity-40">
                           <span>NODE_0{thread.id}</span>
-                          <div className="w-1 h-1 rounded-full bg-[#4A9EFF]"></div>
+                          <div className="w-1 h-1 rounded-full" style={{ background: wwD }}></div>
                           <span>SECURE</span>
                         </div>
-                        <h2 className="text-lg md:text-3xl font-[Orbitron] font-black text-white tracking-[0.1em] md:tracking-[0.2em] group-hover:text-[#72A0FF] transition-colors uppercase">
+                        <h2 className="text-lg md:text-3xl font-[Orbitron] font-black tracking-[0.1em] md:tracking-[0.2em] transition-colors uppercase"
+                          style={{ color: isExpanded ? wwP : undefined }}>
                           {thread.title}
                         </h2>
                       </div>
                     </div>
 
-                    <div className={`p-2 md:p-3 border border-white/10 transition-all duration-700 ${isExpanded ? 'rotate-180 bg-[#72A0FF]/10 border-[#72A0FF]/40' : 'group-hover:border-[#4A9EFF]/40'}`}>
-                      <ChevronDown size={20} className={isExpanded ? 'text-[#72A0FF]' : 'text-white/20'} />
+                    <div className="p-2 md:p-3 transition-all duration-700"
+                      style={{
+                        border: `1px solid ${isExpanded ? `${wwP}66` : 'rgba(255,255,255,0.10)'}`,
+                        background: isExpanded ? `${wwP}1a` : undefined,
+                        transform: isExpanded ? 'rotate(180deg)' : undefined,
+                      }}>
+                      <ChevronDown size={20} style={{ color: isExpanded ? wwP : undefined, opacity: isExpanded ? 1 : 0.2 }} />
                     </div>
                   </div>
 
@@ -687,7 +739,7 @@ export default function WisdomWell() {
                     <motion.p
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="mt-6 text-xs text-white/40 font-light md:pl-32 leading-relaxed max-w-2xl font-['Space_Mono'] uppercase tracking-widest"
+                      className="mt-6 text-xs font-light md:pl-32 leading-relaxed max-w-2xl font-['Space_Mono'] uppercase tracking-widest opacity-40"
                     >
                       {thread.description}
                     </motion.p>
@@ -705,15 +757,24 @@ export default function WisdomWell() {
                     >
                       {/* Internal Textures */}
                       <div className="absolute inset-0 opacity-[0.2] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay"></div>
-                      <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#4A9EFF 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
+                      <div className="absolute inset-0 opacity-[0.02] pointer-events-none"
+                        style={{ backgroundImage: `radial-gradient(${wwD} 1px, transparent 1px)`, backgroundSize: '30px 30px' }}></div>
 
-                      <div className="p-6 md:p-20 pt-4 border-t border-white/5 relative z-10 bg-black/40 backdrop-blur-3xl">
-                        {/* Dossier Header Area */}
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 md:mb-16 font-mono text-[9px] text-[#72A0FF]/40 tracking-widest uppercase border-b border-white/5 pb-8 gap-4">
+                      <div className="p-6 md:p-20 pt-4 relative z-10 backdrop-blur-3xl"
+                        style={{
+                          borderTop: `1px solid ${isLight ? 'rgba(43,72,128,0.12)' : 'rgba(255,255,255,0.05)'}`,
+                          background: isLight ? 'rgba(255,252,245,0.5)' : 'rgba(0,0,0,0.40)',
+                        }}>
+                        {/* Dossier Header */}
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 md:mb-16 font-mono text-[9px] tracking-widest uppercase pb-8 gap-4"
+                          style={{
+                            color: `${wwP}66`,
+                            borderBottom: `1px solid ${isLight ? 'rgba(43,72,128,0.10)' : 'rgba(255,255,255,0.05)'}`,
+                          }}>
                           <div className="space-y-2">
                             <div className="flex items-center gap-3">
-                              <div className="w-2 h-2 bg-[#4A9EFF] animate-pulse"></div>
-                              <span className="text-white/60">INTELLIGENCE_REPORT_ACTIVE</span>
+                              <div className="w-2 h-2 animate-pulse" style={{ background: wwD }}></div>
+                              <span style={{ color: isLight ? 'rgba(10,14,30,0.55)' : 'rgba(255,255,255,0.60)' }}>INTELLIGENCE_REPORT_ACTIVE</span>
                             </div>
                             <div>AUTH_LEVEL: SOVEREIGN</div>
                           </div>
@@ -724,7 +785,6 @@ export default function WisdomWell() {
                         </div>
 
                         <div className="prose-intel max-w-4xl mx-auto">
-                          {/* We wrap the content in a dossier card class for the glossy effect */}
                           <div className="wisdom-dossier-card">
                             <div className="data-stream-glow"></div>
                             {thread.content}
@@ -732,16 +792,17 @@ export default function WisdomWell() {
                         </div>
 
                         <div className="mt-12 md:mt-20 flex flex-col items-center gap-8">
-                          <div className="w-40 h-[1px] bg-gradient-to-r from-transparent via-[#4A9EFF]/40 to-transparent"></div>
+                          <div className="w-40 h-[1px]"
+                            style={{ background: `linear-gradient(to right, transparent, ${wwD}66, transparent)` }}></div>
                           <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setExpandedCard(null);
-                            }}
-                            className="group relative px-10 md:px-20 py-4 border border-[#4A9EFF]/20 bg-transparent transition-all hover:border-[#4A9EFF] hover:shadow-[0_0_60px_rgba(72,160,255,0.15)]"
+                            onClick={(e) => { e.stopPropagation(); setExpandedCard(null); }}
+                            className="group relative px-10 md:px-20 py-4 bg-transparent transition-all"
+                            style={{ border: `1px solid ${wwD}33` }}
                           >
-                            <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <span className="relative z-10 font-[Orbitron] text-[9px] md:text-[10px] tracking-[0.4em] md:tracking-[0.6em] text-[#72A0FF] group-hover:text-white transition-colors">
+                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                              style={{ background: `${wwP}0d` }}></div>
+                            <span className="relative z-10 font-[Orbitron] text-[9px] md:text-[10px] tracking-[0.4em] md:tracking-[0.6em] transition-colors"
+                              style={{ color: wwP }}>
                               DISCONNECT_MODULE_II
                             </span>
                           </button>

@@ -2507,7 +2507,7 @@ function MasterPortal() {
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
-    if (showTutorial) return <Tutorial onComplete={() => setShowTutorial(false)} />;
+    if (showTutorial) return <Tutorial onComplete={() => setShowTutorial(false)} isDark={isDark} setIsDark={setIsDark} />;
     if (showQuote) return <DailyQuoteOverlay onDismiss={() => setShowQuote(false)} />;
 
     return (
