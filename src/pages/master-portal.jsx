@@ -770,7 +770,7 @@ const MasterHeader = ({ realm, dayMode, setDayMode }) => {
             <motion.div
                 initial={false}
                 animate={{
-                    width: isExpanded ? '100%' : '320px',
+                    width: isExpanded ? '100%' : 'min(320px, calc(100vw - 2rem))',
                     maxWidth: isExpanded ? '900px' : '320px',
                     height: isExpanded ? 'auto' : '56px'
                 }}
@@ -793,12 +793,12 @@ const MasterHeader = ({ realm, dayMode, setDayMode }) => {
                                 <div className={`absolute -top-1 -right-1 w-2 h-2 rounded-full ${isPlaying ? 'bg-green-500 animate-pulse' : 'bg-red-500/40'}`}></div>
                             </div>
 
-                            <div className="flex flex-col min-w-[120px]">
-                                <span className="font-[Orbitron] text-[9px] font-black tracking-[0.2em] text-white/40 uppercase">
+                            <div className="flex flex-col min-w-[80px]">
+                                <span className="font-[Orbitron] text-[11px] md:text-[9px] font-black tracking-[0.2em] text-white/40 uppercase">
                                     {isExpanded ? 'Neural Stream: Active' : 'Frequency Node'}
                                 </span>
                                 <div className="flex items-center gap-2">
-                                    <span className={`font-[Orbitron] text-[11px] font-bold text-white truncate max-w-[140px] tracking-widest ${isPlaying ? 'text-[#72A0FF]' : ''}`}>
+                                    <span className={`font-[Orbitron] text-[13px] md:text-[11px] font-bold text-white truncate max-w-[140px] tracking-widest ${isPlaying ? 'text-[#72A0FF]' : ''}`}>
                                         {currentTrack?.name || "Initializing..."}
                                     </span>
                                 </div>
@@ -1262,7 +1262,7 @@ const SanctuaryDashboard = ({ isActive }) => {
                                 journalEntries.map(entry => (
                                     <div key={entry.id} className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-white/20 transition-colors">
                                         <div className="flex justify-between items-center mb-3">
-                                            <div className="text-[9px] font-mono text-white/30 uppercase tracking-[0.2em]">
+                                            <div className="text-[11px] md:text-[9px] font-mono text-white/30 uppercase tracking-[0.2em]">
                                                 {new Date(entry.date).toLocaleString()}
                                             </div>
                                             <div className="w-2 h-2 rounded-full bg-[var(--realm-color)] opacity-40 shadow-[0_0_5px_var(--realm-color)]" />
@@ -1283,7 +1283,7 @@ const SanctuaryDashboard = ({ isActive }) => {
                         </div>
                         <div>
                             <h3 className="font-[Orbitron] text-xl font-black text-white tracking-widest">SOVEREIGN LIBRARY</h3>
-                            <span className="text-[9px] font-black text-white/30 tracking-[0.2em] uppercase">NEURAL UPGRADE PROTOCOLS</span>
+                            <span className="text-[11px] md:text-[9px] font-black text-white/30 tracking-[0.2em] uppercase">NEURAL UPGRADE PROTOCOLS</span>
                         </div>
                     </div>
 
@@ -1339,11 +1339,11 @@ const SanctuaryDashboard = ({ isActive }) => {
                                                     <div key={idx} className="border-l-2 border-[var(--realm-color)]/30 pl-6 space-y-4">
                                                         <h4 className="font-[Orbitron] text-sm md:text-base font-black text-white tracking-wide">{cmd.name}</h4>
                                                         <div>
-                                                            <span className="text-[9px] font-mono font-black text-[var(--realm-color)] tracking-[0.3em] uppercase">Protocol</span>
+                                                            <span className="text-[11px] md:text-[9px] font-mono font-black text-[var(--realm-color)] tracking-[0.3em] uppercase">Protocol</span>
                                                             <p className="text-white/70 text-sm leading-relaxed mt-2">{cmd.rule}</p>
                                                         </div>
                                                         <div>
-                                                            <span className="text-[9px] font-mono font-black text-white/30 tracking-[0.3em] uppercase">Why It Works</span>
+                                                            <span className="text-[11px] md:text-[9px] font-mono font-black text-white/30 tracking-[0.3em] uppercase">Why It Works</span>
                                                             <p className="text-white/45 text-sm leading-relaxed mt-2 italic">{cmd.why}</p>
                                                         </div>
                                                     </div>
@@ -2366,7 +2366,7 @@ const DailyQuoteOverlay = ({ onDismiss }) => {
 
 function MasterPortal() {
     const [activeRealm, setActiveRealm] = useState('SANCTUARY');
-    const [dayMode, setDayMode] = useState(false); // Uplifted state
+    const [dayMode, setDayMode] = useState(true); // Light theme by default
     const [showQuote, setShowQuote] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
@@ -2392,6 +2392,22 @@ function MasterPortal() {
         const currIdx = realms.indexOf(activeRealm);
         const nextIdx = (currIdx + 1) % realms.length;
         setActiveRealm(realms[nextIdx]);
+    };
+
+    const cycleRealmPrev = () => {
+        const realms = Object.keys(REALMS);
+        const currIdx = realms.indexOf(activeRealm);
+        const prevIdx = (currIdx - 1 + realms.length) % realms.length;
+        setActiveRealm(realms[prevIdx]);
+    };
+
+    const swipeStartX = useRef(null);
+    const handleTouchStart = (e) => { swipeStartX.current = e.touches[0].clientX; };
+    const handleTouchEnd = (e) => {
+        if (swipeStartX.current === null) return;
+        const dx = e.changedTouches[0].clientX - swipeStartX.current;
+        if (Math.abs(dx) > 60) dx < 0 ? cycleRealm() : cycleRealmPrev();
+        swipeStartX.current = null;
     };
 
     const baseRealm = REALMS[activeRealm];
@@ -2586,19 +2602,33 @@ function MasterPortal() {
             />
 
 
-            <div className="relative w-full h-full max-w-7xl mx-auto">
+            <div
+                className="relative w-full h-full max-w-7xl mx-auto"
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+            >
                 <SanctuaryDashboard isActive={activeRealm === 'SANCTUARY'} />
                 <NexusDashboard isActive={activeRealm === 'NEXUS'} />
                 <TempleDashboard isActive={activeRealm === 'TEMPLE'} />
             </div>
 
-            {/* BOTTOM LEFT WISDOM WELL BUTTON */}
-            <div className="fixed left-4 md:left-8 z-[100]" style={{ bottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))' }}>
+            {/* MOBILE REALM INDICATOR DOTS */}
+            <div className="md:hidden fixed left-0 right-0 z-[99] flex justify-center gap-2 pointer-events-none" style={{ bottom: 'calc(4.5rem + env(safe-area-inset-bottom, 0px))' }}>
+                {Object.keys(REALMS).map(r => (
+                    <div
+                        key={r}
+                        className={`rounded-full transition-all duration-300 ${activeRealm === r ? 'w-4 h-2 bg-[var(--realm-color)]' : 'w-2 h-2 bg-white/20'}`}
+                    />
+                ))}
+            </div>
+
+            {/* BOTTOM LEFT WISDOM WELL BUTTON — desktop only */}
+            <div className="hidden md:block fixed left-8 z-[100]" style={{ bottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))' }}>
                 <button
                     onClick={() => navigate('/wisdomwell')}
-                    className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#5465FF]/10 backdrop-blur-2xl border border-[#5465FF]/30 flex items-center justify-center text-[#5465FF] hover:bg-[#5465FF]/20 transition-all hover:scale-110 shadow-[0_0_30px_rgba(84,101,255,0.2)] hover:shadow-[0_0_40px_#5465FF] group relative"
+                    className="w-16 h-16 rounded-full bg-[#5465FF]/10 backdrop-blur-2xl border border-[#5465FF]/30 flex items-center justify-center text-[#5465FF] hover:bg-[#5465FF]/20 transition-all hover:scale-110 shadow-[0_0_30px_rgba(84,101,255,0.2)] hover:shadow-[0_0_40px_#5465FF] group relative"
                 >
-                    <span className="text-2xl md:text-3xl pb-1">☥</span>
+                    <span className="text-3xl pb-1">☥</span>
                     <span className="absolute -top-12 left-1/2 -translate-x-1/2 bg-black/90 text-[#5465FF] text-[10px] px-3 py-1.5 rounded-lg border border-[#5465FF]/30 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap tracking-[0.2em] font-[Orbitron] font-bold">
                         WISDOM
                     </span>
@@ -2606,14 +2636,14 @@ function MasterPortal() {
                 </button>
             </div>
 
-            {/* CENTERED REALM SWITCH BUTTON */}
-            <div className="fixed left-0 right-0 z-50 flex justify-center pointer-events-none" style={{ bottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))' }}>
+            {/* CENTERED REALM SWITCH BUTTON — desktop only */}
+            <div className="hidden md:flex fixed left-0 right-0 z-50 justify-center pointer-events-none" style={{ bottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))' }}>
                 <button
                     onClick={cycleRealm}
-                    className="pointer-events-auto group px-6 py-3 md:px-8 md:py-4 bg-black/80 backdrop-blur-xl border border-white/10 rounded-full flex items-center gap-3 md:gap-4 transition-all duration-300 hover:scale-105 active:scale-95 hover:border-[var(--realm-color)] shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+                    className="pointer-events-auto group px-8 py-4 bg-black/80 backdrop-blur-xl border border-white/10 rounded-full flex items-center gap-4 transition-all duration-300 hover:scale-105 active:scale-95 hover:border-[var(--realm-color)] shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
                 >
                     <div className="w-2 h-2 rounded-full bg-[var(--realm-color)] animate-pulse shadow-[0_0_10px_var(--realm-color)]" />
-                    <span className="text-[10px] md:text-xs font-[Orbitron] font-black text-white tracking-[0.2em] group-hover:text-[var(--realm-color)] transition-colors uppercase">
+                    <span className="text-xs font-[Orbitron] font-black text-white tracking-[0.2em] group-hover:text-[var(--realm-color)] transition-colors uppercase">
                         SWITCH REALM
                     </span>
                     <div className="p-1 rounded-full bg-white/5 group-hover:bg-[var(--realm-color)]/20 transition-colors">
@@ -2622,17 +2652,45 @@ function MasterPortal() {
                 </button>
             </div>
 
-            {/* BOTTOM RIGHT ACCOUNT/LOCK BUTTON GROUP */}
-            <div className="fixed right-4 md:right-8 z-[100] flex items-center gap-4 md:gap-6" style={{ bottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))' }}>
+            {/* BOTTOM RIGHT SYNCHRONY BUTTON — desktop only */}
+            <div className="hidden md:flex fixed right-8 z-[100] items-center gap-6" style={{ bottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))' }}>
                 <button
                     onClick={() => navigate('/synchrony')}
-                    className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#5465FF]/10 backdrop-blur-2xl border border-[#5465FF]/30 flex items-center justify-center text-[#5465FF] hover:bg-[#5465FF]/20 transition-all hover:scale-110 shadow-[0_0_30px_rgba(84,101,255,0.2)] hover:shadow-[0_0_40px_#5465FF] group relative"
+                    className="w-16 h-16 rounded-full bg-[#5465FF]/10 backdrop-blur-2xl border border-[#5465FF]/30 flex items-center justify-center text-[#5465FF] hover:bg-[#5465FF]/20 transition-all hover:scale-110 shadow-[0_0_30px_rgba(84,101,255,0.2)] hover:shadow-[0_0_40px_#5465FF] group relative"
                 >
-                    <span className="text-2xl md:text-3xl pb-1">ॐ</span>
+                    <span className="text-3xl pb-1">ॐ</span>
                     <span className="absolute -top-12 left-1/2 -translate-x-1/2 bg-black/90 text-[#5465FF] text-[10px] px-3 py-1.5 rounded-lg border border-[#5465FF]/30 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap tracking-[0.2em] font-[Orbitron] font-bold">
                         SYNCHRONY
                     </span>
                     <div className="absolute inset-0 rounded-full border border-[#5465FF] opacity-0 group-hover:opacity-100 animate-ping-slow pointer-events-none" />
+                </button>
+            </div>
+
+            {/* MOBILE BOTTOM NAV BAR — mobile only */}
+            <div
+                className="md:hidden fixed left-0 right-0 bottom-0 z-[100] flex items-stretch bg-black/80 backdrop-blur-2xl border-t border-white/10"
+                style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+            >
+                <button
+                    onClick={() => navigate('/wisdomwell')}
+                    className="flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[#5465FF]/70 hover:text-[#5465FF] active:bg-white/5 transition-colors"
+                >
+                    <span className="text-xl">☥</span>
+                    <span className="font-[Orbitron] text-[8px] tracking-[0.2em] uppercase">Wisdom</span>
+                </button>
+                <button
+                    onClick={cycleRealm}
+                    className="flex-1 flex flex-col items-center justify-center gap-1 py-3 border-x border-white/10 text-white/70 hover:text-[var(--realm-color)] active:bg-white/5 transition-colors"
+                >
+                    <div className="w-2 h-2 rounded-full bg-[var(--realm-color)] animate-pulse shadow-[0_0_8px_var(--realm-color)]" />
+                    <span className="font-[Orbitron] text-[8px] tracking-[0.2em] uppercase">Switch Realm</span>
+                </button>
+                <button
+                    onClick={() => navigate('/synchrony')}
+                    className="flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[#5465FF]/70 hover:text-[#5465FF] active:bg-white/5 transition-colors"
+                >
+                    <span className="text-xl">ॐ</span>
+                    <span className="font-[Orbitron] text-[8px] tracking-[0.2em] uppercase">Synchrony</span>
                 </button>
             </div>
         </main >

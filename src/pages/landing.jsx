@@ -184,7 +184,7 @@ function GiantTitle() {
                 outlineColor="#00ffff"
                 outlineOpacity={1}
             >
-                INNERSYNC
+                RASYNC
             </Text>
 
             {/* Inner Glow Layer */}
@@ -202,7 +202,7 @@ function GiantTitle() {
                 outlineBlur={0.1}
                 outlineOpacity={0.8}
             >
-                INNERSYNC
+                RASYNC
             </Text>
 
             {/* Outer Bloom Layer */}
@@ -220,7 +220,7 @@ function GiantTitle() {
                 outlineBlur={0.4}
                 outlineOpacity={0.4}
             >
-                INNERSYNC
+                RASYNC
             </Text>
         </group>
     )
@@ -252,11 +252,12 @@ function Scene() {
 
 export default function SolarChakraScene() {
     const navigate = useNavigate();
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
     return (
         <div style={{ width: "100%", height: "100dvh", minHeight: "-webkit-fill-available", background: "#000000", position: 'relative', overflow: 'hidden' }}>
             <Canvas
-                camera={{ position: [0, 2, 8], fov: 60 }}
+                camera={{ position: [0, 2, 8], fov: isMobile ? 75 : 60 }}
                 gl={{ antialias: true, powerPreference: "high-performance", alpha: false }}
                 dpr={[1, 2]}
             >
@@ -266,21 +267,21 @@ export default function SolarChakraScene() {
             </Canvas>
 
             {/* Cinematic Overlay UI - Minimal */}
-            <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-end pb-32 z-10">
+            <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-end pb-20 md:pb-32 z-10">
                 <div className="pointer-events-auto">
                     <button
                         onClick={() => navigate('/portal')}
-                        className="group relative px-16 py-5 bg-transparent overflow-hidden rounded-none transition-all hover:scale-105 active:scale-95"
+                        className="group relative px-8 md:px-16 py-5 bg-transparent overflow-hidden rounded-none transition-all hover:scale-105 active:scale-95"
                     >
                         <div className="absolute inset-0 border border-white/20 skew-x-12 bg-black/20 backdrop-blur-sm group-hover:border-cyan-400/50 transition-colors" />
 
-                        <span className="relative font-[Orbitron] text-sm tracking-[0.5em] text-white/80 group-hover:text-cyan-200 transition-colors">
+                        <span className="relative font-[Orbitron] text-sm tracking-[0.2em] md:tracking-[0.5em] text-white/80 group-hover:text-cyan-200 transition-colors">
                             INITIALIZE SYSTEM
                         </span>
                     </button>
 
                     <div className="text-center mt-4">
-                        <span className="font-mono text-[10px] text-white/20 tracking-[0.5em] animate-pulse">
+                        <span className="font-mono text-[10px] text-white/20 tracking-[0.3em] md:tracking-[0.5em] animate-pulse">
                             READY
                         </span>
                     </div>
